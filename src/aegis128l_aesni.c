@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "aegis128l.h"
 #include "aegis128l_aesni.h"
 #include "common.h"
 

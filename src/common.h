@@ -72,12 +72,10 @@ rotl32(const uint32_t x, const int b)
     return (x << b) | (x >> (32 - b));
 }
 
+#define COMPILER_ASSERT(X) (void) sizeof(char[(X) ? 1 : -1])
+
 int aegis_verify_16(const uint8_t *x, const uint8_t *y);
 int aegis_verify_32(const uint8_t *x, const uint8_t *y);
-
-typedef struct aegis128l_state {
-    uint8_t opaque[200];
-} aegis128l_state;
 
 typedef struct aegis128l_implementation {
     int (*encrypt_detached)(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size_t mlen,
