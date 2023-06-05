@@ -1,0 +1,58 @@
+#ifdef __aarch64__
+
+#include <errno.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "aegis128l_armcrypto.h"
+#include "common.h"
+
+#ifdef __clang__
+#pragma clang attribute push(__attribute__((target("neon,crypto"))), apply_to = function)
+#elif defined(__GNUC__)
+#pragma GCC target("neon,crypto")
+#endif
+
+#include <arm_neon.h>
+
+typedef uint8x16_t aes_block_t;
+#define AES_BLOCK_XOR(A, B)       veorq_u8((A), (B))
+#define AES_BLOCK_AND(A, B)       vandq_u8((A), (B))
+#define AES_BLOCK_LOAD(A)         vld1q_u8(A)
+#define AES_BLOCK_LOAD_64x2(A, B) vreinterpretq_u8_u64(vsetq_lane_u64((A), vmovq_n_u64(B), 1))
+#define AES_BLOCK_STORE(A, B)     vst1q_u8((A), (B))
+#define AES_ENC(A, B)             veorq_u8(vaesmcq_u8(vaeseq_u8((A), vmovq_n_u8(0))), (B))
+
+static inline void
+aegis128l_update(aes_block_t *const state, const aes_block_t d1, const aes_block_t d2)
+{
+    aes_block_t tmp;
+
+    tmp      = state[7];
+    state[7] = AES_ENC(state[6], state[7]);
+    state[6] = AES_ENC(state[5], state[6]);
+    state[5] = AES_ENC(state[4], state[5]);
+    state[4] = AES_BLOCK_XOR(AES_ENC(state[3], state[4]), d2);
+    state[3] = AES_ENC(state[2], state[3]);
+    state[2] = AES_ENC(state[1], state[2]);
+    state[1] = AES_ENC(state[0], state[1]);
+    state[0] = AES_BLOCK_XOR(AES_ENC(tmp, state[0]), d1);
+}
+
+#include "aegis128l_common.h"
+
+struct aegis128l_implementation aegis128l_armcrypto_implementation = {
+    .encrypt_detached             = aegis128l_encrypt_detached,
+    .decrypt_detached             = aegis128l_decrypt_detached,
+    .state_init                   = aegis128l_state_init,
+    .state_encrypt_update         = aegis128l_state_encrypt_update,
+    .state_encrypt_detached_final = aegis128l_state_encrypt_detached_final,
+    .state_encrypt_final          = aegis128l_state_encrypt_final,
+};
+
+#ifdef __clang__
+#pragma clang attribute pop
+#endif
+
+#endif
