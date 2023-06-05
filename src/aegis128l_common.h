@@ -109,8 +109,8 @@ aegis128l_dec(uint8_t *const dst, const uint8_t *const src, aes_block_t *const s
 }
 
 static int
-aegis128l_encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size_t mlen,
-                           const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
+encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size_t mlen,
+                 const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
 {
     aes_block_t              state[8];
     CRYPTO_ALIGN(16) uint8_t src[32];
@@ -143,9 +143,8 @@ aegis128l_encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_
 }
 
 static int
-aegis128l_decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac,
-                           size_t maclen, const uint8_t *ad, size_t adlen, const uint8_t *npub,
-                           const uint8_t *k)
+decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, size_t maclen,
+                 const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
 {
     aes_block_t              state[8];
     CRYPTO_ALIGN(16) uint8_t src[32];
@@ -213,8 +212,8 @@ typedef struct _aegis128l_state {
 } _aegis128l_state;
 
 static void
-aegis128l_state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen, const uint8_t *npub,
-                     const uint8_t *k)
+state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen, const uint8_t *npub,
+           const uint8_t *k)
 {
     _aegis128l_state *const st = (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~15);
     size_t                  i;
@@ -236,7 +235,7 @@ aegis128l_state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen, cons
 }
 
 static size_t
-aegis128l_state_encrypt_update(aegis128l_state *st_, uint8_t *c, const uint8_t *m, size_t mlen)
+state_encrypt_update(aegis128l_state *st_, uint8_t *c, const uint8_t *m, size_t mlen)
 {
     _aegis128l_state *const st = (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~15);
     size_t                  written = 0;
@@ -276,8 +275,7 @@ aegis128l_state_encrypt_update(aegis128l_state *st_, uint8_t *c, const uint8_t *
 #include <stdio.h>
 
 static size_t
-aegis128l_state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, uint8_t *mac,
-                                       size_t maclen)
+state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, uint8_t *mac, size_t maclen)
 {
     _aegis128l_state *const st = (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~15);
 
@@ -296,7 +294,7 @@ aegis128l_state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, uint8_t
 }
 
 static size_t
-aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t maclen)
+state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t maclen)
 {
     _aegis128l_state *const st = (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~15);
 

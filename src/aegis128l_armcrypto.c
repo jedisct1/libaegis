@@ -44,12 +44,12 @@ aegis128l_update(aes_block_t *const state, const aes_block_t d1, const aes_block
 #include "aegis128l_common.h"
 
 struct aegis128l_implementation aegis128l_armcrypto_implementation = {
-    .encrypt_detached             = aegis128l_encrypt_detached,
-    .decrypt_detached             = aegis128l_decrypt_detached,
-    .state_init                   = aegis128l_state_init,
-    .state_encrypt_update         = aegis128l_state_encrypt_update,
-    .state_encrypt_detached_final = aegis128l_state_encrypt_detached_final,
-    .state_encrypt_final          = aegis128l_state_encrypt_final,
+    .encrypt_detached             = encrypt_detached,
+    .decrypt_detached             = decrypt_detached,
+    .state_init                   = state_init,
+    .state_encrypt_update         = state_encrypt_update,
+    .state_encrypt_detached_final = state_encrypt_detached_final,
+    .state_encrypt_final          = state_encrypt_final,
 };
 
 #ifdef __clang__

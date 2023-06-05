@@ -4,13 +4,15 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{ .preferred_optimize_mode = .ReleaseFast });
 
-    const exe = b.addExecutable(.{
+    const lib = b.addStaticLibrary(.{
         .name = "libaegis",
         .target = target,
         .optimize = optimize,
     });
 
-    exe.addCSourceFiles(&.{
+    lib.strip = true;
+
+    lib.addCSourceFiles(&.{
         "src/aegis128l_aesni.c",
         "src/aegis128l_armcrypto.c",
         "src/aegis128l_soft.c",
@@ -23,12 +25,12 @@ pub fn build(b: *std.Build) void {
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
     // step when running `zig build`).
-    b.installArtifact(exe);
+    b.installArtifact(lib);
 
     // This *creates* a Run step in the build graph, to be executed when another
     // step is evaluated that depends on it. The next line below will establish
     // such a dependency.
-    const run_cmd = b.addRunArtifact(exe);
+    const run_cmd = b.addRunArtifact(lib);
 
     // By making the run step depend on the install step, it will be run from the
     // installation directory rather than directly from within the cache directory.

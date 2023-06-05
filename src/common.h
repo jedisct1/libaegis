@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "aegis128l.h"
+
 #ifdef __linux__
 #define HAVE_SYS_AUXV_H
 #define HAVE_GETAUXVAL
