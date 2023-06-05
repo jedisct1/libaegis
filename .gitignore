@@ -50,3 +50,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# zig cc
+zig-cache
+zig-out
+
+# backups
+*~
