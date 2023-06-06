@@ -271,8 +271,6 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, const uint8_t *m, size_t 
     return written;
 }
 
-#include <stdio.h>
-
 static size_t
 state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, uint8_t *mac, size_t maclen)
 {
