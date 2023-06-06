@@ -10,7 +10,7 @@
 #define aegis128l_ABYTES_MAX 32
 
 typedef struct aegis128l_state {
-    uint8_t opaque[208];
+    uint8_t opaque[256];
 } aegis128l_state;
 
 size_t aegis128l_keybytes(void);
