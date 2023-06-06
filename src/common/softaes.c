@@ -69,7 +69,7 @@ _encrypt(const uint8_t ix0[4], const uint8_t ix1[4], const uint8_t ix2[4], const
         }
     }
 
-#ifdef HAVE_INLINE_ASM
+#if defined(__GNUC__) || defined(__clang__)
     __asm__ __volatile__("" : : "r"(t) : "memory");
 #endif
 
