@@ -214,7 +214,7 @@ state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen, const uint8_t 
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
     size_t i;
 
-    COMPILER_ASSERT(sizeof *st <= sizeof *st_);
+    COMPILER_ASSERT((sizeof *st) + 15 <= sizeof *st_);
     st->mlen = 0;
     st->pos  = 0;
 
