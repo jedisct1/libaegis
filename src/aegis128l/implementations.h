@@ -21,7 +21,7 @@ typedef struct aegis128l_implementation {
     size_t (*state_decrypt_detached_update)(aegis128l_state *st_, uint8_t *m, const uint8_t *c,
                                             size_t clen);
     int (*state_decrypt_detached_final)(aegis128l_state *st_, uint8_t *m, size_t *mlen,
-                                        const uint8_t *c, const uint8_t *mac, size_t maclen);
+                                        const uint8_t *mac, size_t maclen);
 } aegis128l_implementation;
 
 #endif

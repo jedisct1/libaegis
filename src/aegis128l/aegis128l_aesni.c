@@ -43,13 +43,14 @@ aegis128l_update(aes_block_t *const state, const aes_block_t d1, const aes_block
     state[0] = AES_BLOCK_XOR(state[0], d1);
     state[4] = AES_BLOCK_XOR(state[4], d2);
 }
+
 #include "aegis128l_common.h"
 
 struct aegis128l_implementation aegis128l_aesni_implementation = {
-    .encrypt_detached              = aegis128l_encrypt_detached,
+    .encrypt_detached              = encrypt_detached,
     .decrypt_detached              = decrypt_detached,
     .state_init                    = state_init,
-    .state_encrypt_update          = aegis128l_state_encrypt_update,
+    .state_encrypt_update          = state_encrypt_update,
     .state_encrypt_detached_final  = state_encrypt_detached_final,
     .state_encrypt_final           = state_encrypt_final,
     .state_decrypt_detached_update = state_decrypt_detached_update,
