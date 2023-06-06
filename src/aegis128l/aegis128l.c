@@ -91,6 +91,7 @@ void
 aegis128l_state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen, const uint8_t *npub,
                      const uint8_t *k)
 {
+    memset(st_, 0, sizeof *st_);
     implementation->state_init(st_, ad, adlen, npub, k);
 }
 
