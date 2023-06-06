@@ -248,11 +248,10 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, const uint8_t *m, size_t 
         const size_t n    = mlen < left ? mlen : left;
 
         memcpy(st->buf + st->pos, m + i, n);
-        i += n;
         mlen -= n;
         st->pos += n;
         if (st->pos == (sizeof st->buf)) {
-            aegis128l_enc(c + i, m + i, st->state);
+            aegis128l_enc(c, st->buf, st->state);
             written += 32;
             c += 32;
             st->pos = 0;

@@ -9,6 +9,10 @@
 #include <string.h>
 
 #include "../common/common.h"
+#include "../common/cpu.h"
+
+#ifndef HAS_HW_AES
+
 #include "../common/softaes.h"
 #include "aegis128l.h"
 #include "aegis128l_soft.h"
@@ -50,3 +54,5 @@ struct aegis128l_implementation aegis128l_soft_implementation = {
     .state_encrypt_detached_final = state_encrypt_detached_final,
     .state_encrypt_final          = state_encrypt_final,
 };
+
+#endif

@@ -3,13 +3,24 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../common/common.h"
 #include "../common/cpu.h"
 #include "aegis128l.h"
 #include "aegis128l_aesni.h"
 #include "aegis128l_armcrypto.h"
-#include "aegis128l_soft.h"
 
+#ifndef HAS_HW_AES
+#include "aegis128l_soft.h"
 static const aegis128l_implementation *implementation = &aegis128l_soft_implementation;
+#else
+#ifdef __aarch64__
+static const aegis128l_implementation *implementation = &aegis128l_armcrypto_implementation;
+#elif defined(__x86_64__) || defined(__i386__)
+static const aegis128l_implementation *implementation = &aegis128l_aesni_implementation;
+#else
+#error "Unsupported architecture"
+#endif
+#endif
 
 size_t
 aegis128l_keybytes(void)
@@ -108,6 +119,7 @@ aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, uint8_t *mac, si
     return implementation->state_encrypt_final(st_, c, maclen);
 }
 
+#ifndef HAS_HW_AES
 static int
 aegis128l_pick_best_implementation(void)
 {
@@ -129,14 +141,17 @@ aegis128l_pick_best_implementation(void)
 
     return 0; /* LCOV_EXCL_LINE */
 }
+#endif
 
 int
 aegis_init(void)
 {
+#ifndef HAS_HW_AES
     if (aegis_runtime_get_cpu_features() != 0) {
         return -1;
     }
     aegis128l_pick_best_implementation();
+#endif
 
     return 0;
 }
