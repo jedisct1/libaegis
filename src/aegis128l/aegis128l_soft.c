@@ -8,10 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../common/common.h"
+#include "../common/softaes.h"
 #include "aegis128l.h"
 #include "aegis128l_soft.h"
-#include "common.h"
-#include "softaes.h"
 
 typedef SoftAesBlock aes_block_t;
 #define AES_BLOCK_XOR(A, B)       softaes_block_xor((A), (B))

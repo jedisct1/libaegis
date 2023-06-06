@@ -4,8 +4,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "aegis128l.h"
-
 #ifdef __linux__
 #define HAVE_SYS_AUXV_H
 #define HAVE_GETAUXVAL
@@ -78,24 +76,5 @@ rotl32(const uint32_t x, const int b)
 
 int aegis_verify_16(const uint8_t *x, const uint8_t *y);
 int aegis_verify_32(const uint8_t *x, const uint8_t *y);
-
-typedef struct aegis128l_implementation {
-    int (*encrypt_detached)(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size_t mlen,
-                            const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k);
-    int (*decrypt_detached)(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac,
-                            size_t maclen, const uint8_t *ad, size_t adlen, const uint8_t *npub,
-                            const uint8_t *k);
-    void (*state_init)(aegis128l_state *st_, const uint8_t *ad, size_t adlen, const uint8_t *npub,
-                       const uint8_t *k);
-    size_t (*state_encrypt_update)(aegis128l_state *st_, uint8_t *c, const uint8_t *m, size_t mlen);
-    size_t (*state_encrypt_detached_final)(aegis128l_state *st_, uint8_t *c, uint8_t *mac,
-                                           size_t maclen);
-    size_t (*state_encrypt_final)(aegis128l_state *st_, uint8_t *c, size_t maclen);
-} aegis128l_implementation;
-
-#define aegis128l_KEYBYTES   16
-#define aegis128l_NPUBBYTES  16
-#define aegis128l_ABYTES_MIN 16
-#define aegis128l_ABYTES_MAX 32
 
 #endif

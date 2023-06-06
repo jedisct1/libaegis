@@ -13,13 +13,13 @@ pub fn build(b: *std.Build) void {
     lib.strip = true;
 
     lib.addCSourceFiles(&.{
-        "src/aegis128l_aesni.c",
-        "src/aegis128l_armcrypto.c",
-        "src/aegis128l_soft.c",
-        "src/common.c",
-        "src/cpu.c",
-        "src/main.c",
-        "src/softaes.c",
+        "src/aegis128l/aegis128l_aesni.c",
+        "src/aegis128l/aegis128l_armcrypto.c",
+        "src/aegis128l/aegis128l_soft.c",
+        "src/aegis128l/aegis128l.c",
+        "src/common/common.c",
+        "src/common/cpu.c",
+        "src/common/softaes.c",
     }, &.{});
 
     // This declares intent for the executable to be installed into the

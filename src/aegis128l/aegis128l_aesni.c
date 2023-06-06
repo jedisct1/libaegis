@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../common/common.h"
 #include "aegis128l.h"
 #include "aegis128l_aesni.h"
-#include "common.h"
 
 #ifdef __clang__
 #pragma clang attribute push(__attribute__((target("aes,ssse3"))), apply_to = function)

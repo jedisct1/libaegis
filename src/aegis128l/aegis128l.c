@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../common/cpu.h"
 #include "aegis128l.h"
 #include "aegis128l_aesni.h"
 #include "aegis128l_armcrypto.h"
 #include "aegis128l_soft.h"
-#include "cpu.h"
 
 static const aegis128l_implementation *implementation = &aegis128l_soft_implementation;
 

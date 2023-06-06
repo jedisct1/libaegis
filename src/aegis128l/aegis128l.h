@@ -4,6 +4,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define aegis128l_KEYBYTES   16
+#define aegis128l_NPUBBYTES  16
+#define aegis128l_ABYTES_MIN 16
+#define aegis128l_ABYTES_MAX 32
+
 typedef struct aegis128l_state {
     uint8_t opaque[200];
 } aegis128l_state;
