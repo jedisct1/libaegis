@@ -21,7 +21,7 @@ typedef __m128i aes_block_t;
 #define AES_BLOCK_XOR(A, B)       _mm_xor_si128((A), (B))
 #define AES_BLOCK_AND(A, B)       _mm_and_si128((A), (B))
 #define AES_BLOCK_LOAD(A)         _mm_loadu_si128((const aes_block_t *) (const void *) (A))
-#define AES_BLOCK_LOAD_64x2(A, B) _mm_set_epi64x((__int64) (A), (__int64) (B))
+#define AES_BLOCK_LOAD_64x2(A, B) _mm_set_epi64x((long long) (A), (long long) (B))
 #define AES_BLOCK_STORE(A, B)     _mm_storeu_si128((aes_block_t *) (void *) (A), (B))
 #define AES_ENC(A, B)             _mm_aesenc_si128((A), (B))
 
