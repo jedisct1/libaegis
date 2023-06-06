@@ -1,6 +1,6 @@
 #ifdef __aarch64__
 
-#include <errno.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,12 +44,14 @@ aegis128l_update(aes_block_t *const state, const aes_block_t d1, const aes_block
 #include "aegis128l_common.h"
 
 struct aegis128l_implementation aegis128l_armcrypto_implementation = {
-    .encrypt_detached             = encrypt_detached,
-    .decrypt_detached             = decrypt_detached,
-    .state_init                   = state_init,
-    .state_encrypt_update         = state_encrypt_update,
-    .state_encrypt_detached_final = state_encrypt_detached_final,
-    .state_encrypt_final          = state_encrypt_final,
+    .encrypt_detached              = encrypt_detached,
+    .decrypt_detached              = decrypt_detached,
+    .state_init                    = state_init,
+    .state_encrypt_update          = state_encrypt_update,
+    .state_encrypt_detached_final  = state_encrypt_detached_final,
+    .state_encrypt_final           = state_encrypt_final,
+    .state_decrypt_detached_update = state_decrypt_detached_update,
+    .state_decrypt_detached_final  = state_decrypt_detached_final,
 };
 
 #ifdef __clang__

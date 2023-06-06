@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdint.h>
 
 static inline int
