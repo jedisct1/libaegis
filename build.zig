@@ -10,6 +10,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    lib.linkLibC();
     lib.strip = true;
 
     lib.addCSourceFiles(&.{
