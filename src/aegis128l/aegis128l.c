@@ -112,7 +112,7 @@ aegis128l_state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, uint8_t
 }
 
 size_t
-aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, uint8_t *mac, size_t maclen)
+aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t maclen)
 {
     if (maclen != 16 && maclen != 32) {
         return (size_t) -1;
