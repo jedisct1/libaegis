@@ -242,9 +242,11 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, const uint8_t *m, size_t 
         const size_t left = (sizeof st->buf) - st->pos;
         const size_t n    = mlen < left ? mlen : left;
 
-        memcpy(st->buf + st->pos, m + i, n);
-        mlen -= n;
-        st->pos += n;
+        if (n != 0) {
+            memcpy(st->buf + st->pos, m + i, n);
+            mlen -= n;
+            st->pos += n;
+        }
         if (st->pos == (sizeof st->buf)) {
             aegis128l_enc(c, st->buf, st->state);
             written += 32;
@@ -259,7 +261,7 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, const uint8_t *m, size_t 
     }
     written += mlen & ~0x1f;
     left = mlen & 0x1f;
-    if (left) {
+    if (left != 0) {
         memcpy(st->buf, m + i, left);
         st->pos = left;
     }
@@ -318,9 +320,11 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, const uint8_t *c
         const size_t left = (sizeof st->buf) - st->pos;
         const size_t n    = clen < left ? clen : left;
 
-        memcpy(st->buf + st->pos, m + i, n);
-        clen -= n;
-        st->pos += n;
+        if (n != 0) {
+            memcpy(st->buf + st->pos, m + i, n);
+            clen -= n;
+            st->pos += n;
+        }
         if (st->pos == (sizeof st->buf)) {
             if (m != NULL) {
                 aegis128l_dec(m, st->buf, st->state);
