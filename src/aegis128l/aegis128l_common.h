@@ -230,15 +230,16 @@ state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen, const uint8_t 
     st->adlen = adlen;
 }
 
-static size_t
-state_encrypt_update(aegis128l_state *st_, uint8_t *c, const uint8_t *m, size_t mlen)
+static int
+state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t *written, const uint8_t *m,
+                     size_t mlen)
 {
     _aegis128l_state *const st =
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
-    size_t written = 0;
-    size_t i       = 0;
+    size_t i = 0;
     size_t left;
 
+    *written = 0;
     st->mlen += mlen;
     if (st->pos != 0) {
         const size_t available = (sizeof st->buf) - st->pos;
@@ -249,29 +250,30 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, const uint8_t *m, size_t 
             mlen -= n;
             st->pos += n;
         }
-        if (st->pos == (sizeof st->buf)) {
+        if (st->pos == sizeof st->buf) {
             aegis128l_enc(c, st->buf, st->state);
-            written += 32;
+            *written += 32;
             c += 32;
             st->pos = 0;
         } else {
-            return written;
+            return 0;
         }
     }
     for (i = 0; i + 32 < mlen; i += 32) {
         aegis128l_enc(c + i, m + i, st->state);
     }
-    written += mlen & ~(size_t) 0x1f;
+    *written += mlen & ~(size_t) 0x1f;
     left = mlen & 0x1f;
     if (left != 0) {
         memcpy(st->buf, m + i, left);
         st->pos = left;
     }
-    return written;
+    return 0;
 }
 
-static size_t
-state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, uint8_t *mac, size_t maclen)
+static int
+state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, size_t *written, uint8_t *mac,
+                             size_t maclen)
 {
     _aegis128l_state *const st =
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
@@ -287,11 +289,13 @@ state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, uint8_t *mac, siz
     }
     aegis128l_mac(mac, maclen, st->adlen, st->mlen, st->state);
 
-    return st->pos;
+    *written = st->pos;
+
+    return 0;
 }
 
-static size_t
-state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t maclen)
+static int
+state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t *written, size_t maclen)
 {
     _aegis128l_state *const st =
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
@@ -307,19 +311,22 @@ state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t maclen)
     }
     aegis128l_mac(c + st->pos, maclen, st->adlen, st->mlen, st->state);
 
-    return st->pos + maclen;
+    *written = st->pos + maclen;
+
+    return 0;
 }
 
-static size_t
-state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, const uint8_t *c, size_t clen)
+static int
+state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t *written, const uint8_t *c,
+                              size_t clen)
 {
     _aegis128l_state *const st =
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
-    size_t       written = 0;
-    size_t       i       = 0;
+    size_t       i = 0;
     size_t       left;
     const size_t mlen = clen;
 
+    *written = 0;
     st->mlen += mlen;
     if (st->pos != 0) {
         const size_t available = (sizeof st->buf) - st->pos;
@@ -336,11 +343,11 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, const uint8_t *c
             } else {
                 aegis128l_absorb(st->buf, st->state);
             }
-            written += 32;
+            *written += 32;
             c += 32;
             st->pos = 0;
         } else {
-            return written;
+            return 0;
         }
     }
     if (m != NULL) {
@@ -352,17 +359,17 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, const uint8_t *c
             aegis128l_absorb(c + i, st->state);
         }
     }
-    written += mlen & ~(size_t) 0x1f;
+    *written += mlen & ~(size_t) 0x1f;
     left = mlen & 0x1f;
     if (left) {
         memcpy(st->buf, c + i, left);
         st->pos = left;
     }
-    return written;
+    return 0;
 }
 
 static int
-state_decrypt_detached_final(aegis128l_state *st_, uint8_t *m, size_t *mlen, const uint8_t *mac,
+state_decrypt_detached_final(aegis128l_state *st_, uint8_t *m, size_t *written, const uint8_t *mac,
                              size_t maclen)
 {
     CRYPTO_ALIGN(16) uint8_t computed_mac[32];
@@ -370,7 +377,7 @@ state_decrypt_detached_final(aegis128l_state *st_, uint8_t *m, size_t *mlen, con
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
     int ret;
 
-    *mlen = st->pos;
+    *written = st->pos;
     if (st->pos != 0) {
         uint8_t src[32];
         uint8_t dst[32];
@@ -394,7 +401,7 @@ state_decrypt_detached_final(aegis128l_state *st_, uint8_t *m, size_t *mlen, con
     }
     if (ret != 0) {
         memset(m, 0, st->pos);
-        *mlen = 0;
+        *written = 0;
     }
     return ret;
 }

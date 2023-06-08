@@ -38,13 +38,13 @@ int aegis128l_decrypt(uint8_t *m, const uint8_t *c, size_t clen, size_t maclen, 
 void aegis128l_state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen,
                           const uint8_t *npub, const uint8_t *k);
 
-size_t aegis128l_state_encrypt_update(aegis128l_state *st_, uint8_t *c, const uint8_t *m,
-                                      size_t mlen);
+int aegis128l_state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t *written,
+                                   const uint8_t *m, size_t mlen);
 
-size_t aegis128l_state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, uint8_t *mac,
-                                              size_t maclen);
+int aegis128l_state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, size_t *written,
+                                           uint8_t *mac, size_t maclen);
 
-size_t aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t maclen);
+int aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t *written, size_t maclen);
 
 int aegis_init(void);
 

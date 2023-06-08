@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -51,6 +52,7 @@ aegis128l_encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_
                            const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
 {
     if (maclen != 16 && maclen != 32) {
+        errno = EINVAL;
         return -1;
     }
     return implementation->encrypt_detached(c, mac, maclen, m, mlen, ad, adlen, npub, k);
@@ -62,6 +64,7 @@ aegis128l_decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint
                            const uint8_t *k)
 {
     if (maclen != 16 && maclen != 32) {
+        errno = EINVAL;
         return -1;
     }
     return implementation->decrypt_detached(m, c, clen, mac, maclen, ad, adlen, npub, k);
@@ -95,29 +98,32 @@ aegis128l_state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen, cons
     implementation->state_init(st_, ad, adlen, npub, k);
 }
 
-size_t
-aegis128l_state_encrypt_update(aegis128l_state *st_, uint8_t *c, const uint8_t *m, size_t mlen)
+int
+aegis128l_state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t *written, const uint8_t *m,
+                               size_t mlen)
 {
-    return implementation->state_encrypt_update(st_, c, m, mlen);
+    return implementation->state_encrypt_update(st_, c, written, m, mlen);
 }
 
-size_t
-aegis128l_state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, uint8_t *mac,
-                                       size_t maclen)
+int
+aegis128l_state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, size_t *written,
+                                       uint8_t *mac, size_t maclen)
 {
     if (maclen != 16 && maclen != 32) {
-        return (size_t) -1;
+        errno = EINVAL;
+        return -1;
     }
-    return implementation->state_encrypt_detached_final(st_, c, mac, maclen);
+    return implementation->state_encrypt_detached_final(st_, c, written, mac, maclen);
 }
 
-size_t
-aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t maclen)
+int
+aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t *written, size_t maclen)
 {
     if (maclen != 16 && maclen != 32) {
-        return (size_t) -1;
+        errno = EINVAL;
+        return -1;
     }
-    return implementation->state_encrypt_final(st_, c, maclen);
+    return implementation->state_encrypt_final(st_, c, written, maclen);
 }
 
 #ifndef HAS_HW_AES
@@ -149,6 +155,7 @@ aegis_init(void)
 {
 #ifndef HAS_HW_AES
     if (aegis_runtime_get_cpu_features() != 0) {
+        errno = ENOSYS;
         return -1;
     }
     aegis128l_pick_best_implementation();

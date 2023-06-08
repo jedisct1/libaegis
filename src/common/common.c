@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "common.h"
+
 static inline int
 aegis_verify_n(const uint8_t *x_, const uint8_t *y_, const int n)
 {
