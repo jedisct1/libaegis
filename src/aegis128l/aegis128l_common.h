@@ -240,6 +240,10 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *
     size_t left;
 
     *written = 0;
+    if (clen_max < (mlen & ~(size_t) 0x1f)) {
+        errno = ERANGE;
+        return -1;
+    }
     st->mlen += mlen;
     if (st->pos != 0) {
         const size_t available = (sizeof st->buf) - st->pos;
@@ -278,6 +282,11 @@ state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, size_t clen_max, 
     _aegis128l_state *const st =
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
 
+    *written = 0;
+    if (clen_max < st->pos) {
+        errno = ERANGE;
+        return -1;
+    }
     if (st->pos != 0) {
         uint8_t src[32];
         uint8_t dst[32];
@@ -301,6 +310,11 @@ state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *w
     _aegis128l_state *const st =
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
 
+    *written = 0;
+    if (clen_max < st->pos + maclen) {
+        errno = ERANGE;
+        return -1;
+    }
     if (st->pos != 0) {
         uint8_t src[32];
         uint8_t dst[32];
@@ -328,6 +342,10 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
     const size_t mlen = clen;
 
     *written = 0;
+    if (mlen_max < (clen & ~(size_t) 0x1f)) {
+        errno = ERANGE;
+        return -1;
+    }
     st->mlen += mlen;
     if (st->pos != 0) {
         const size_t available = (sizeof st->buf) - st->pos;
@@ -378,7 +396,11 @@ state_decrypt_detached_final(aegis128l_state *st_, uint8_t *m, size_t mlen_max, 
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
     int ret;
 
-    *written = st->pos;
+    *written = 0;
+    if (mlen_max < st->pos) {
+        errno = ERANGE;
+        return -1;
+    }
     if (st->pos != 0) {
         uint8_t src[32];
         uint8_t dst[32];
@@ -400,9 +422,10 @@ state_decrypt_detached_final(aegis128l_state *st_, uint8_t *m, size_t mlen_max, 
     } else if (maclen == 32) {
         ret = aegis_verify_32(computed_mac, mac);
     }
-    if (ret != 0) {
+    if (ret == 0) {
+        *written = st->pos;
+    } else {
         memset(m, 0, st->pos);
-        *written = 0;
     }
     return ret;
 }
