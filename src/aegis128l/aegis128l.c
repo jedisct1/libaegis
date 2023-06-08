@@ -47,6 +47,12 @@ aegis128l_abytes_max(void)
     return aegis128l_ABYTES_MAX;
 }
 
+size_t
+aegis128l_tailbytes_max(void)
+{
+    return aegis128l_TAILBYTES_MAX;
+}
+
 int
 aegis128l_encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size_t mlen,
                            const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
@@ -99,31 +105,32 @@ aegis128l_state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen, cons
 }
 
 int
-aegis128l_state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t *written, const uint8_t *m,
-                               size_t mlen)
+aegis128l_state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *written,
+                               const uint8_t *m, size_t mlen)
 {
-    return implementation->state_encrypt_update(st_, c, written, m, mlen);
+    return implementation->state_encrypt_update(st_, c, clen_max, written, m, mlen);
 }
 
 int
-aegis128l_state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, size_t *written,
-                                       uint8_t *mac, size_t maclen)
+aegis128l_state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, size_t clen_max,
+                                       size_t *written, uint8_t *mac, size_t maclen)
 {
     if (maclen != 16 && maclen != 32) {
         errno = EINVAL;
         return -1;
     }
-    return implementation->state_encrypt_detached_final(st_, c, written, mac, maclen);
+    return implementation->state_encrypt_detached_final(st_, c, clen_max, written, mac, maclen);
 }
 
 int
-aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t *written, size_t maclen)
+aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *written,
+                              size_t maclen)
 {
     if (maclen != 16 && maclen != 32) {
         errno = EINVAL;
         return -1;
     }
-    return implementation->state_encrypt_final(st_, c, written, maclen);
+    return implementation->state_encrypt_final(st_, c, clen_max, written, maclen);
 }
 
 #ifndef HAS_HW_AES
