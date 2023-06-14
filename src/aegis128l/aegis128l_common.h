@@ -201,9 +201,9 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
 typedef struct _aegis128l_state {
     aes_block_t state[8];
     uint8_t     buf[32];
-    size_t      mlen;
+    uint64_t    adlen;
+    uint64_t    mlen;
     size_t      pos;
-    size_t      adlen;
 } _aegis128l_state;
 
 static void
