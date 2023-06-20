@@ -130,6 +130,8 @@ aegis128l_declast(uint8_t *const dst, const uint8_t *const src, size_t len,
     AES_BLOCK_STORE(pad + 16, msg1);
 
     memset(pad + len, 0, sizeof pad - len);
+    memcpy(dst, pad, len);
+
     msg0 = AES_BLOCK_LOAD(pad);
     msg1 = AES_BLOCK_LOAD(pad + 16);
 
