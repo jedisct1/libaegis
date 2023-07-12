@@ -179,7 +179,7 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
     aes_block_t              state[8];
     CRYPTO_ALIGN(16) uint8_t src[32];
     CRYPTO_ALIGN(16) uint8_t dst[32];
-    CRYPTO_ALIGN(16) uint8_t computed_mac[16];
+    CRYPTO_ALIGN(16) uint8_t computed_mac[32];
     const size_t             mlen = clen;
     size_t                   i;
     int                      ret;
@@ -211,6 +211,7 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
         }
     }
 
+    COMPILER_ASSERT(sizeof computed_mac >= 32);
     aegis128l_mac(computed_mac, maclen, adlen, mlen, state);
     ret = -1;
     if (maclen == 16) {
