@@ -344,7 +344,6 @@ state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *w
         return -1;
     }
     if (st->pos != 0) {
-
         memset(src, 0, sizeof src);
         memcpy(src, st->buf, st->pos);
         aegis128l_enc(dst, src, st->state);

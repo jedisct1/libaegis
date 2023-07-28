@@ -158,7 +158,7 @@ aegis128l_pick_best_implementation(void)
 #endif
 
 int
-aegis_init(void)
+aegis128l_setup(void)
 {
 #ifndef HAS_HW_AES
     if (aegis_runtime_get_cpu_features() != 0) {

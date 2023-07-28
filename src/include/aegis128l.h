@@ -50,6 +50,6 @@ int aegis128l_state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, siz
 int aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t clen_max,
                                   size_t *written, size_t maclen);
 
-int aegis_init(void);
+int aegis128l_setup(void);
 
 #endif
