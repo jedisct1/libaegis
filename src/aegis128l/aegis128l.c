@@ -134,7 +134,7 @@ aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t clen_max,
 }
 
 #ifndef HAS_HW_AES
-static int
+int
 aegis128l_pick_best_implementation(void)
 {
     implementation = &aegis128l_soft_implementation;
@@ -156,17 +156,3 @@ aegis128l_pick_best_implementation(void)
     return 0; /* LCOV_EXCL_LINE */
 }
 #endif
-
-int
-aegis128l_setup(void)
-{
-#ifndef HAS_HW_AES
-    if (aegis_runtime_get_cpu_features() != 0) {
-        errno = ENOSYS;
-        return -1;
-    }
-    aegis128l_pick_best_implementation();
-#endif
-
-    return 0;
-}

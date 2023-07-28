@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "aegis.h"
+
 #ifdef __linux__
 #define HAVE_SYS_AUXV_H
 #define HAVE_GETAUXVAL
@@ -74,8 +76,5 @@ rotl32(const uint32_t x, const int b)
 }
 
 #define COMPILER_ASSERT(X) (void) sizeof(char[(X) ? 1 : -1])
-
-int aegis_verify_16(const uint8_t *x, const uint8_t *y);
-int aegis_verify_32(const uint8_t *x, const uint8_t *y);
 
 #endif

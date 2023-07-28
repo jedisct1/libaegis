@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "common.h"
+#include "cpu.h"
 
 static inline int
 aegis_verify_n(const uint8_t *x_, const uint8_t *y_, const int n)
@@ -30,4 +31,23 @@ int
 aegis_verify_32(const uint8_t *x, const uint8_t *y)
 {
     return aegis_verify_n(x, y, 32);
+}
+
+extern int aegis128l_pick_best_implementation(void);
+extern int aegis256_pick_best_implementation(void);
+
+int
+aegis_init(void)
+{
+#ifndef HAS_HW_AES
+    if (aegis_runtime_get_cpu_features() != 0) {
+        errno = ENOSYS;
+        return -1;
+    }
+    if (aegis128_pick_best_implementation() != 0 || aegis256_pick_best_implementation() != 0) {
+        return -1;
+    }
+#endif
+
+    return 0;
 }
