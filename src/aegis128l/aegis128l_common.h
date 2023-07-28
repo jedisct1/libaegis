@@ -2,11 +2,11 @@ static void
 aegis128l_init(const uint8_t *key, const uint8_t *nonce, aes_block_t *const state)
 {
     static CRYPTO_ALIGN(16)
-        const uint8_t c0_[] = { 0xdb, 0x3d, 0x18, 0x55, 0x6d, 0xc2, 0x2f, 0xf1,
-                                0x20, 0x11, 0x31, 0x42, 0x73, 0xb5, 0x28, 0xdd };
-    static CRYPTO_ALIGN(16)
-        const uint8_t c1_[] = { 0x00, 0x01, 0x01, 0x02, 0x03, 0x05, 0x08, 0x0d,
+        const uint8_t c0_[] = { 0x00, 0x01, 0x01, 0x02, 0x03, 0x05, 0x08, 0x0d,
                                 0x15, 0x22, 0x37, 0x59, 0x90, 0xe9, 0x79, 0x62 };
+    static CRYPTO_ALIGN(16)
+        const uint8_t c1_[] = { 0xdb, 0x3d, 0x18, 0x55, 0x6d, 0xc2, 0x2f, 0xf1,
+                                0x20, 0x11, 0x31, 0x42, 0x73, 0xb5, 0x28, 0xdd };
     const aes_block_t c0    = AES_BLOCK_LOAD(c0_);
     const aes_block_t c1    = AES_BLOCK_LOAD(c1_);
     aes_block_t       k;
@@ -17,13 +17,13 @@ aegis128l_init(const uint8_t *key, const uint8_t *nonce, aes_block_t *const stat
     n = AES_BLOCK_LOAD(nonce);
 
     state[0] = AES_BLOCK_XOR(k, n);
-    state[1] = c0;
-    state[2] = c1;
-    state[3] = c0;
+    state[1] = c1;
+    state[2] = c0;
+    state[3] = c1;
     state[4] = AES_BLOCK_XOR(k, n);
-    state[5] = AES_BLOCK_XOR(k, c1);
-    state[6] = AES_BLOCK_XOR(k, c0);
-    state[7] = AES_BLOCK_XOR(k, c1);
+    state[5] = AES_BLOCK_XOR(k, c0);
+    state[6] = AES_BLOCK_XOR(k, c1);
+    state[7] = AES_BLOCK_XOR(k, c0);
     for (i = 0; i < 10; i++) {
         aegis128l_update(state, n, k);
     }

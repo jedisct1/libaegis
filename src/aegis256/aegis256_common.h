@@ -2,11 +2,11 @@ static void
 aegis256_init(const uint8_t *key, const uint8_t *nonce, aes_block_t *const state)
 {
     static CRYPTO_ALIGN(16)
-        const uint8_t c0_[] = { 0xdb, 0x3d, 0x18, 0x55, 0x6d, 0xc2, 0x2f, 0xf1,
-                                0x20, 0x11, 0x31, 0x42, 0x73, 0xb5, 0x28, 0xdd };
-    static CRYPTO_ALIGN(16)
-        const uint8_t c1_[] = { 0x00, 0x01, 0x01, 0x02, 0x03, 0x05, 0x08, 0x0d,
+        const uint8_t c0_[] = { 0x00, 0x01, 0x01, 0x02, 0x03, 0x05, 0x08, 0x0d,
                                 0x15, 0x22, 0x37, 0x59, 0x90, 0xe9, 0x79, 0x62 };
+    static CRYPTO_ALIGN(16)
+        const uint8_t c1_[] = { 0xdb, 0x3d, 0x18, 0x55, 0x6d, 0xc2, 0x2f, 0xf1,
+                                0x20, 0x11, 0x31, 0x42, 0x73, 0xb5, 0x28, 0xdd };
     const aes_block_t c0    = AES_BLOCK_LOAD(c0_);
     const aes_block_t c1    = AES_BLOCK_LOAD(c1_);
     const aes_block_t k0    = AES_BLOCK_LOAD(key);
@@ -38,7 +38,7 @@ aegis256_mac(uint8_t *mac, size_t maclen, size_t adlen, size_t mlen, aes_block_t
     int         i;
 
     tmp = AES_BLOCK_LOAD_64x2(((uint64_t) mlen) << 3, ((uint64_t) adlen) << 3);
-    tmp = AES_BLOCK_XOR(tmp, state[2]);
+    tmp = AES_BLOCK_XOR(tmp, state[3]);
 
     for (i = 0; i < 7; i++) {
         aegis256_update(state, tmp);
