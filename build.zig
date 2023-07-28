@@ -13,6 +13,8 @@ pub fn build(b: *std.Build) void {
     lib.linkLibC();
     lib.strip = true;
 
+    lib.addIncludePath("src/include");
+
     lib.addCSourceFiles(&.{
         "src/aegis128l/aegis128l_aesni.c",
         "src/aegis128l/aegis128l_armcrypto.c",
