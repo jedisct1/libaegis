@@ -57,3 +57,6 @@ zig-out
 
 # backups
 *~
+
+# build dir
+build

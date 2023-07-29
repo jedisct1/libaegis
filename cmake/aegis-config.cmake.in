@@ -1,0 +1,7 @@
+get_filename_component(aegis_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+if(NOT TARGET aegis::aegis)
+  include("${aegis_CMAKE_DIR}/aegis-targets.cmake")
+endif()
+
+set(aegis_LIBRARIES aegis::aegis)
