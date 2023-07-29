@@ -50,6 +50,10 @@ int aegis256_state_encrypt_detached_final(aegis256_state *st_, uint8_t *c, size_
 int aegis256_state_encrypt_final(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *written,
                                  size_t maclen);
 
-int aegis256_setup(void);
+int aegis256_state_decrypt_detached_update(aegis256_state *st_, uint8_t *m, size_t mlen_max,
+                                           size_t *written, const uint8_t *c, size_t clen);
+
+int aegis256_state_decrypt_detached_final(aegis256_state *st_, uint8_t *m, size_t mlen_max,
+                                          size_t *written, const uint8_t *mac, size_t maclen);
 
 #endif

@@ -133,6 +133,24 @@ aegis256_state_encrypt_final(aegis256_state *st_, uint8_t *c, size_t clen_max, s
     return implementation->state_encrypt_final(st_, c, clen_max, written, maclen);
 }
 
+int
+aegis256_state_decrypt_detached_update(aegis256_state *st_, uint8_t *m, size_t mlen_max,
+                                       size_t *written, const uint8_t *c, size_t clen)
+{
+    return implementation->state_decrypt_detached_update(st_, m, mlen_max, written, c, clen);
+}
+
+int
+aegis256_state_decrypt_detached_final(aegis256_state *st_, uint8_t *m, size_t mlen_max,
+                                      size_t *written, const uint8_t *mac, size_t maclen)
+{
+    if (maclen != 16 && maclen != 32) {
+        errno = EINVAL;
+        return -1;
+    }
+    return implementation->state_decrypt_detached_final(st_, m, mlen_max, written, mac, maclen);
+}
+
 #ifndef HAS_HW_AES
 int
 aegis256_pick_best_implementation(void)
