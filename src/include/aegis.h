@@ -19,6 +19,8 @@
  * in your application before doing anything else with the library.
  *
  * If you don't, AEGIS will still work, but it may be much slower.
+ *
+ * The function can be called multiple times but is not thread-safe.
  */
 int aegis_init(void);
 
