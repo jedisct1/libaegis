@@ -34,3 +34,9 @@ make install
 
 Copy everything in `src` directly into your project, and compile everything like regular C code. No special configuration is required.
 
+## Usage
+
+Include `<aegis.h>` and call `aegis_init()` prior to doing anything else with the library.
+
+`aegis_init()` checks the CPU capabilities in order to later use the fastest implementations. 
+
