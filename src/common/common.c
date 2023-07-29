@@ -39,6 +39,11 @@ extern int aegis256_pick_best_implementation(void);
 int
 aegis_init(void)
 {
+    static int initialized = 0;
+
+    if (initialized) {
+        return 0;
+    }
 #ifndef HAS_HW_AES
     if (aegis_runtime_get_cpu_features() != 0) {
         errno = ENOSYS;
@@ -48,6 +53,21 @@ aegis_init(void)
         return -1;
     }
 #endif
+    initialized = 1;
 
     return 0;
+}
+
+#if defined(_MSC_VER)
+#pragma section(".CRT$XCU", read)
+static void __cdecl _do_aegis_init(void);
+__declspec(allocate(".CRT$XCU")) void (*aegis_init_constructor)(void) = _do_aegis_init;
+#else
+static void _do_aegis_init(void) __attribute__((constructor));
+#endif
+
+static void
+_do_aegis_init(void)
+{
+    (void) aegis_init();
 }
