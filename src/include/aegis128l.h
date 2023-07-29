@@ -67,7 +67,7 @@ int aegis128l_encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const ui
  */
 int aegis128l_decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac,
                                size_t maclen, const uint8_t *ad, size_t adlen, const uint8_t *npub,
-                               const uint8_t *k);
+                               const uint8_t *k) __attribute__((warn_unused_result));
 
 /*
  * Encrypt a message with AEGIS in one shot mode, returning the tag and the ciphertext together.
@@ -99,7 +99,8 @@ int aegis128l_encrypt(uint8_t *c, size_t maclen, const uint8_t *m, size_t mlen, 
  * Returns 0 if the ciphertext is authentic, -1 otherwise.
  */
 int aegis128l_decrypt(uint8_t *m, const uint8_t *c, size_t clen, size_t maclen, const uint8_t *ad,
-                      size_t adlen, const uint8_t *npub, const uint8_t *k);
+                      size_t adlen, const uint8_t *npub, const uint8_t *k)
+    __attribute__((warn_unused_result));
 
 /*
  * Initialize a state for incremental encryption or decryption.
@@ -172,7 +173,8 @@ int aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t clen_
  * Return 0 on success, -1 on failure.
  */
 int aegis128l_state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
-                                            size_t *written, const uint8_t *c, size_t clen);
+                                            size_t *written, const uint8_t *c, size_t clen)
+    __attribute__((warn_unused_result));
 
 /*
  * Decrypt the final message chunk and verify the authentication tag.
@@ -187,6 +189,7 @@ int aegis128l_state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, si
  * Return 0 on success, -1 on failure.
  */
 int aegis128l_state_decrypt_detached_final(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
-                                           size_t *written, const uint8_t *mac, size_t maclen);
+                                           size_t *written, const uint8_t *mac, size_t maclen)
+    __attribute__((warn_unused_result));
 
 #endif

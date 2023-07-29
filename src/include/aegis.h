@@ -3,6 +3,13 @@
 
 #include <stdint.h>
 
+#if !defined(__clang__) && !defined(__GNUC__)
+#ifdef __attribute__
+#undef __attribute__
+#endif
+#define __attribute__(a)
+#endif
+
 #include "aegis128l.h"
 #include "aegis256.h"
 
@@ -21,7 +28,8 @@ int aegis_init(void);
  *
  * Returns 0 if the blocks are equal, -1 otherwise.
  */
-int aegis_verify_16(const uint8_t *x, const uint8_t *y);
+int aegis_verify_16(const uint8_t *x, const uint8_t *y) __attribute__((warn_unused_result));
+;
 
 /* Compare two 32-byte blocks for equality.
  *
@@ -29,6 +37,7 @@ int aegis_verify_16(const uint8_t *x, const uint8_t *y);
  *
  * Returns 0 if the blocks are equal, -1 otherwise.
  */
-int aegis_verify_32(const uint8_t *x, const uint8_t *y);
+int aegis_verify_32(const uint8_t *x, const uint8_t *y) __attribute__((warn_unused_result));
+;
 
 #endif
