@@ -4,10 +4,22 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define aegis128l_KEYBYTES      16
-#define aegis128l_NPUBBYTES     16
-#define aegis128l_ABYTES_MIN    16
-#define aegis128l_ABYTES_MAX    32
+/* The length of an AEGIS key, in bytes */
+#define aegis128l_KEYBYTES 16
+
+/* The length of an AEGIS nonce, in bytes */
+#define aegis128l_NPUBBYTES 16
+
+/* The minimum length of an AEGIS authentication tag, in bytes */
+#define aegis128l_ABYTES_MIN 16
+
+/* The maximum length of an AEGIS authentication tag, in bytes */
+#define aegis128l_ABYTES_MAX 32
+
+/*
+ * When using AEGIS in incremental mode, this is the maximum number
+ * of leftover ciphertext bytes that can be returned at finalization.
+ */
 #define aegis128l_TAILBYTES_MAX 31
 
 /* An AEGIS state, for incremental updates */
@@ -162,6 +174,8 @@ int aegis128l_state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t clen_
 
 /*
  * Decrypt a message chunk.
+ *
+ * The output should never be released to the caller until the tag has been verified.
  *
  * st_: state to update
  * m: plaintext output buffer
