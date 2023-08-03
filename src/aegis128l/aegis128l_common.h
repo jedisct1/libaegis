@@ -267,10 +267,6 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *
     size_t left;
 
     *written = 0;
-    if (clen_max < (mlen & ~(size_t) 0x1f)) {
-        errno = ERANGE;
-        return -1;
-    }
     st->mlen += mlen;
     if (st->pos != 0) {
         const size_t available = (sizeof st->buf) - st->pos;
@@ -283,6 +279,11 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *
             st->pos += n;
         }
         if (st->pos == sizeof st->buf) {
+            if (clen_max < 32) {
+                errno = ERANGE;
+                return -1;
+            }
+            clen_max -= 32;
             aegis128l_enc(c, st->buf, st->state);
             *written += 32;
             c += 32;
@@ -290,6 +291,10 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *
         } else {
             return 0;
         }
+    }
+    if (clen_max < mlen & ~(size_t) 0x1f) {
+        errno = ERANGE;
+        return -1;
     }
     for (i = 0; i + 32 <= mlen; i += 32) {
         aegis128l_enc(c + i, m + i, st->state);
@@ -369,10 +374,6 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
     const size_t             mlen = clen;
 
     *written = 0;
-    if (mlen_max < (clen & ~(size_t) 0x1f)) {
-        errno = ERANGE;
-        return -1;
-    }
     st->mlen += mlen;
     if (st->pos != 0) {
         const size_t available = (sizeof st->buf) - st->pos;
@@ -386,6 +387,11 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
         }
         if (st->pos == (sizeof st->buf)) {
             if (m != NULL) {
+                if (mlen_max < 32) {
+                    errno = ERANGE;
+                    return -1;
+                }
+                mlen_max -= 32;
                 aegis128l_dec(m, st->buf, st->state);
             } else {
                 aegis128l_dec(dst, st->buf, st->state);
@@ -398,6 +404,10 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
         }
     }
     if (m != NULL) {
+        if (mlen_max < clen & ~(size_t) 0x1f) {
+            errno = ERANGE;
+            return -1;
+        }
         for (i = 0; i + 32 <= clen; i += 32) {
             aegis128l_dec(m + i, c + i, st->state);
         }

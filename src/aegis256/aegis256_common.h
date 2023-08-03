@@ -252,10 +252,6 @@ state_encrypt_update(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *w
     size_t left;
 
     *written = 0;
-    if (clen_max < (mlen & ~(size_t) 0xf)) {
-        errno = ERANGE;
-        return -1;
-    }
     st->mlen += mlen;
     if (st->pos != 0) {
         const size_t available = (sizeof st->buf) - st->pos;
@@ -268,6 +264,11 @@ state_encrypt_update(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *w
             st->pos += n;
         }
         if (st->pos == sizeof st->buf) {
+            if (clen_max < 16) {
+                errno = ERANGE;
+                return -1;
+            }
+            clen_max -= 16;
             aegis256_enc(c, st->buf, st->state);
             *written += 16;
             c += 16;
@@ -275,6 +276,10 @@ state_encrypt_update(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *w
         } else {
             return 0;
         }
+    }
+    if (clen_max < mlen & ~(size_t) 0xf) {
+        errno = ERANGE;
+        return -1;
     }
     for (i = 0; i + 16 <= mlen; i += 16) {
         aegis256_enc(c + i, m + i, st->state);
@@ -371,6 +376,11 @@ state_decrypt_detached_update(aegis256_state *st_, uint8_t *m, size_t mlen_max, 
         }
         if (st->pos == (sizeof st->buf)) {
             if (m != NULL) {
+                if (mlen_max < 16) {
+                    errno = ERANGE;
+                    return -1;
+                }
+                mlen_max -= 16;
                 aegis256_dec(m, st->buf, st->state);
             } else {
                 aegis256_dec(dst, st->buf, st->state);
@@ -383,6 +393,10 @@ state_decrypt_detached_update(aegis256_state *st_, uint8_t *m, size_t mlen_max, 
         }
     }
     if (m != NULL) {
+        if (mlen_max < clen & ~(size_t) 0xf) {
+            errno = ERANGE;
+            return -1;
+        }
         for (i = 0; i + 16 <= clen; i += 16) {
             aegis256_dec(m + i, c + i, st->state);
         }
