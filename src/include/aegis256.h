@@ -5,10 +5,10 @@
 #include <stdint.h>
 
 /* The length of an AEGIS key, in bytes */
-#define aegis256_KEYBYTES 16
+#define aegis256_KEYBYTES 32
 
 /* The length of an AEGIS nonce, in bytes */
-#define aegis256_NPUBBYTES 16
+#define aegis256_NPUBBYTES 32
 
 /* The minimum length of an AEGIS authentication tag, in bytes */
 #define aegis256_ABYTES_MIN 16
