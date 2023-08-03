@@ -380,6 +380,7 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
 
         if (n != 0) {
             memcpy(st->buf + st->pos, m + i, n);
+            c += n;
             clen -= n;
             st->pos += n;
         }
