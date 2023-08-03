@@ -21,9 +21,13 @@ jobs:
         with:
           version: master
 
+      - name: Unit tests
+        run: |
+          zig build test
+          zig build test -Drelease
+
       - name: Compilation to multiple targets
         run: |
-          zig build
           zig build -Drelease
 
           zig build -Dtarget=x86_64-linux -Dcpu=baseline
