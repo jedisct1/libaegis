@@ -165,7 +165,7 @@ aegis256_pick_best_implementation(void)
 #endif
 
 #if defined(__x86_64__) || defined(__i386__)
-    if (aegis_runtime_has_aesni() && aegis_runtime_has_avx()) {
+    if (aegis_runtime_has_aesni() && aegis_runtime_has_ssse3()) {
         implementation = &aegis256_aesni_implementation;
         return 0;
     }

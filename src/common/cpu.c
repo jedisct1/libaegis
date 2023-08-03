@@ -23,6 +23,7 @@ typedef struct CPUFeatures_ {
     int initialized;
     int has_neon;
     int has_armcrypto;
+    int has_ssse3;
     int has_avx;
     int has_avx2;
     int has_avx512f;
@@ -35,6 +36,7 @@ static CPUFeatures _cpu_features;
 #define CPUID_EBX_AVX2    0x00000020
 #define CPUID_EBX_AVX512F 0x00010000
 
+#define CPUID_ECX_SSSE3   0x00000200
 #define CPUID_ECX_AESNI   0x02000000
 #define CPUID_ECX_XSAVE   0x04000000
 #define CPUID_ECX_OSXSAVE 0x08000000
@@ -189,6 +191,12 @@ _runtime_intel_cpu_features(CPUFeatures *const cpu_features)
     }
     _cpuid(cpu_info, 0x00000001);
 
+#ifdef HAVE_TMMINTRIN_H
+    cpu_features->has_ssse3 = ((cpu_info[2] & CPUID_ECX_SSSE3) != 0x0);
+#else
+    cpu_features->has_ssse3 = 0;
+#endif
+
     (void) xcr0;
 #ifdef HAVE_AVXINTRIN_H
     if ((cpu_info[2] & (CPUID_ECX_AVX | CPUID_ECX_XSAVE | CPUID_ECX_OSXSAVE)) ==
@@ -282,6 +290,12 @@ int
 aegis_runtime_has_armcrypto(void)
 {
     return _cpu_features.has_armcrypto;
+}
+
+int
+aegis_runtime_has_ssse3(void)
+{
+    return _cpu_features.has_ssse3;
 }
 
 int

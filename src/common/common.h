@@ -25,6 +25,7 @@
 #define HAVE_AVXINTRIN_H
 #define HAVE_AVX2INTRIN_H
 #define HAVE_AVX512FINTRIN_H
+#define HAVE_TMMINTRIN_H
 #define HAVE_WMMINTRIN_H
 #endif
 #ifdef __aarch64__
