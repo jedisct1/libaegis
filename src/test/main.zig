@@ -105,7 +105,7 @@ test "aegis-128l - incremental" {
     var c2 = c2_buf[0..msg_len];
 
     const ad_len = random.intRangeAtMost(usize, 0, ad_buf.len);
-    const ad = &ad_buf[0..ad_len];
+    const ad = ad_buf[0..ad_len];
 
     var nonce: [aegis.aegis256_NPUBBYTES]u8 = undefined;
     random.bytes(&nonce);
@@ -120,13 +120,18 @@ test "aegis-128l - incremental" {
     var cx = c;
 
     const m0 = msg[0 .. msg.len / 3];
-    const m1 = msg[msg.len / 3 ..];
+    const m1 = msg[msg.len / 3 .. 2 * msg.len / 3];
+    const m2 = msg[2 * msg.len / 3 ..];
 
     var ret = aegis.aegis128l_state_encrypt_update(&st, cx.ptr, cx.len, &written, m0.ptr, m0.len);
     try testing.expectEqual(ret, 0);
     cx = cx[written..];
 
     ret = aegis.aegis128l_state_encrypt_update(&st, cx.ptr, cx.len, &written, m1.ptr, m1.len);
+    try testing.expectEqual(ret, 0);
+    cx = cx[written..];
+
+    ret = aegis.aegis128l_state_encrypt_update(&st, cx.ptr, cx.len, &written, m2.ptr, m2.len);
     try testing.expectEqual(ret, 0);
     cx = cx[written..];
 
@@ -170,7 +175,7 @@ test "aegis-256 - incremental" {
     var c2 = c2_buf[0..msg_len];
 
     const ad_len = random.intRangeAtMost(usize, 0, ad_buf.len);
-    const ad = &ad_buf[0..ad_len];
+    const ad = ad_buf[0..ad_len];
 
     var nonce: [aegis.aegis256_NPUBBYTES]u8 = undefined;
     random.bytes(&nonce);
@@ -185,13 +190,18 @@ test "aegis-256 - incremental" {
     var cx = c;
 
     const m0 = msg[0 .. msg.len / 3];
-    const m1 = msg[msg.len / 3 ..];
+    const m1 = msg[msg.len / 3 .. 2 * msg.len / 3];
+    const m2 = msg[2 * msg.len / 3 ..];
 
     var ret = aegis.aegis256_state_encrypt_update(&st, cx.ptr, cx.len, &written, m0.ptr, m0.len);
     try testing.expectEqual(ret, 0);
     cx = cx[written..];
 
     ret = aegis.aegis256_state_encrypt_update(&st, cx.ptr, cx.len, &written, m1.ptr, m1.len);
+    try testing.expectEqual(ret, 0);
+    cx = cx[written..];
+
+    ret = aegis.aegis256_state_encrypt_update(&st, cx.ptr, cx.len, &written, m2.ptr, m2.len);
     try testing.expectEqual(ret, 0);
     cx = cx[written..];
 
