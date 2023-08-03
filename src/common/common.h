@@ -17,6 +17,9 @@
 #if defined(__i386__) || defined(__x86_64__)
 #define HAVE_CPUID
 #define NATIVE_LITTLE_ENDIAN
+#if defined(__clang__) || defined(__GNUC__)
+#define HAVE_AVX_ASM
+#endif
 #endif
 #ifdef __x86_64__
 #define HAVE_AVXINTRIN_H
