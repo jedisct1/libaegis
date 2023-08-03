@@ -220,3 +220,64 @@ test "aegis-256 - incremental encryption" {
     try testing.expectEqual(ret, 0);
     try testing.expectEqualSlices(u8, msg, msg2);
 }
+
+test "aegis-256 - incremental encryption 2" {
+    try testing.expectEqual(aegis.aegis_init(), 0);
+
+    const mac_len: usize = 16;
+    var msg: [633]u8 = undefined;
+    var msg2: [msg.len]u8 = undefined;
+    var ad: [10]u8 = undefined;
+    var c: [msg.len + mac_len]u8 = undefined;
+    var c2: [c.len]u8 = undefined;
+
+    random.bytes(&ad);
+    random.bytes(&msg);
+
+    var nonce: [aegis.aegis256_NPUBBYTES]u8 = undefined;
+    random.bytes(&nonce);
+    var key: [aegis.aegis256_KEYBYTES]u8 = undefined;
+    random.bytes(&key);
+
+    var st: aegis.aegis256_state = undefined;
+    var written: usize = undefined;
+
+    aegis.aegis256_state_init(&st, &ad, ad.len, &nonce, &key);
+
+    var cx: []u8 = c[0..];
+
+    const m0 = msg[0..11];
+    const m1 = msg[11 .. 11 + 21];
+    const m2 = msg[11 + 21 .. 11 + 21 + 311];
+    const m3 = msg[11 + 21 + 311 ..];
+
+    var ret = aegis.aegis256_state_encrypt_update(&st, cx.ptr, cx.len, &written, m0.ptr, m0.len);
+    try testing.expectEqual(ret, 0);
+    cx = cx[written..];
+
+    ret = aegis.aegis256_state_encrypt_update(&st, cx.ptr, cx.len, &written, m1.ptr, m1.len);
+    try testing.expectEqual(ret, 0);
+    cx = cx[written..];
+
+    ret = aegis.aegis256_state_encrypt_update(&st, cx.ptr, cx.len, &written, m2.ptr, m2.len);
+    try testing.expectEqual(ret, 0);
+    cx = cx[written..];
+
+    ret = aegis.aegis256_state_encrypt_update(&st, cx.ptr, cx.len, &written, m3.ptr, m3.len);
+    try testing.expectEqual(ret, 0);
+    cx = cx[written..];
+
+    ret = aegis.aegis256_state_encrypt_final(&st, cx.ptr, cx.len, &written, mac_len);
+    try testing.expectEqual(ret, 0);
+    cx = cx[written..];
+    try testing.expectEqual(cx.len, 0);
+
+    ret = aegis.aegis256_encrypt(&c2, mac_len, &msg, msg.len, &ad, ad.len, &nonce, &key);
+    try testing.expectEqual(ret, 0);
+
+    try testing.expectEqualSlices(u8, &c, &c2);
+
+    ret = aegis.aegis256_decrypt(&msg2, &c, c.len, mac_len, &ad, ad.len, &nonce, &key);
+    try testing.expectEqual(ret, 0);
+    try testing.expectEqualSlices(u8, &msg, &msg2);
+}
