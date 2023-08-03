@@ -81,7 +81,7 @@ test "aegis-256 - encrypt_detached oneshot" {
     }
 }
 
-test "aegis-128l - incremental" {
+test "aegis-128l - incremental encryption" {
     try testing.expectEqual(aegis.aegis_init(), 0);
 
     const mac_len: usize = 16;
@@ -151,7 +151,7 @@ test "aegis-128l - incremental" {
     try testing.expectEqualSlices(u8, msg, msg2);
 }
 
-test "aegis-256 - incremental" {
+test "aegis-256 - incremental encryption" {
     try testing.expectEqual(aegis.aegis_init(), 0);
 
     const mac_len: usize = 16;
