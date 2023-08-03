@@ -278,6 +278,7 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *
 
         if (n != 0) {
             memcpy(st->buf + st->pos, m + i, n);
+            m += n;
             mlen -= n;
             st->pos += n;
         }
