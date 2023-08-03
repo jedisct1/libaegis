@@ -50,7 +50,7 @@ aegis_init(void)
         errno = ENOSYS;
         return -1;
     }
-    if (aegis128_pick_best_implementation() != 0 || aegis256_pick_best_implementation() != 0) {
+    if (aegis128l_pick_best_implementation() != 0 || aegis256_pick_best_implementation() != 0) {
         return -1;
     }
 #endif
