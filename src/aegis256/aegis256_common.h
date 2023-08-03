@@ -134,7 +134,7 @@ encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size
 
     aegis256_init(k, npub, state);
 
-    for (i = 0ULL; i + 16ULL <= adlen; i += 16ULL) {
+    for (i = 0; i + 16 <= adlen; i += 16) {
         aegis256_absorb(ad + i, state);
     }
     if (adlen & 0xf) {
@@ -142,7 +142,7 @@ encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size
         memcpy(src, ad + i, adlen & 0xf);
         aegis256_absorb(src, state);
     }
-    for (i = 0ULL; i + 16ULL <= mlen; i += 16ULL) {
+    for (i = 0; i + 16 <= mlen; i += 16) {
         aegis256_enc(c + i, m + i, state);
     }
     if (mlen & 0xf) {
@@ -171,7 +171,7 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
 
     aegis256_init(k, npub, state);
 
-    for (i = 0ULL; i + 16ULL <= adlen; i += 16ULL) {
+    for (i = 0; i + 16 <= adlen; i += 16) {
         aegis256_absorb(ad + i, state);
     }
     if (adlen & 0xf) {
@@ -180,11 +180,11 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
         aegis256_absorb(src, state);
     }
     if (m != NULL) {
-        for (i = 0ULL; i + 16ULL <= mlen; i += 16ULL) {
+        for (i = 0; i + 16 <= mlen; i += 16) {
             aegis256_dec(m + i, c + i, state);
         }
     } else {
-        for (i = 0ULL; i + 16ULL <= mlen; i += 16ULL) {
+        for (i = 0; i + 16 <= mlen; i += 16) {
             aegis256_dec(dst, c + i, state);
         }
     }
@@ -231,7 +231,7 @@ state_init(aegis256_state *st_, const uint8_t *ad, size_t adlen, const uint8_t *
     st->pos  = 0;
 
     aegis256_init(k, npub, st->state);
-    for (i = 0ULL; i + 16ULL <= adlen; i += 16ULL) {
+    for (i = 0; i + 16 <= adlen; i += 16) {
         aegis256_absorb(ad + i, st->state);
     }
     if (adlen & 0xf) {
@@ -275,7 +275,7 @@ state_encrypt_update(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *w
             return 0;
         }
     }
-    for (i = 0; i + 16 < mlen; i += 16) {
+    for (i = 0; i + 16 <= mlen; i += 16) {
         aegis256_enc(c + i, m + i, st->state);
     }
     *written += mlen & ~(size_t) 0xf;
@@ -381,11 +381,11 @@ state_decrypt_detached_update(aegis256_state *st_, uint8_t *m, size_t mlen_max, 
         }
     }
     if (m != NULL) {
-        for (i = 0; i + 16 < clen; i += 16) {
+        for (i = 0; i + 16 <= clen; i += 16) {
             aegis256_dec(m + i, c + i, st->state);
         }
     } else {
-        for (i = 0; i + 16 < clen; i += 16) {
+        for (i = 0; i + 16 <= clen; i += 16) {
             aegis256_dec(dst, c + i, st->state);
         }
     }

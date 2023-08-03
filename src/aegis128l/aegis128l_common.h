@@ -149,7 +149,7 @@ encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size
 
     aegis128l_init(k, npub, state);
 
-    for (i = 0ULL; i + 32ULL <= adlen; i += 32ULL) {
+    for (i = 0; i + 32 <= adlen; i += 32) {
         aegis128l_absorb(ad + i, state);
     }
     if (adlen & 0x1f) {
@@ -157,7 +157,7 @@ encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size
         memcpy(src, ad + i, adlen & 0x1f);
         aegis128l_absorb(src, state);
     }
-    for (i = 0ULL; i + 32ULL <= mlen; i += 32ULL) {
+    for (i = 0; i + 32 <= mlen; i += 32) {
         aegis128l_enc(c + i, m + i, state);
     }
     if (mlen & 0x1f) {
@@ -186,7 +186,7 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
 
     aegis128l_init(k, npub, state);
 
-    for (i = 0ULL; i + 32ULL <= adlen; i += 32ULL) {
+    for (i = 0; i + 32 <= adlen; i += 32) {
         aegis128l_absorb(ad + i, state);
     }
     if (adlen & 0x1f) {
@@ -195,11 +195,11 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
         aegis128l_absorb(src, state);
     }
     if (m != NULL) {
-        for (i = 0ULL; i + 32ULL <= mlen; i += 32ULL) {
+        for (i = 0; i + 32 <= mlen; i += 32) {
             aegis128l_dec(m + i, c + i, state);
         }
     } else {
-        for (i = 0ULL; i + 32ULL <= mlen; i += 32ULL) {
+        for (i = 0; i + 32 <= mlen; i += 32) {
             aegis128l_dec(dst, c + i, state);
         }
     }
@@ -246,7 +246,7 @@ state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen, const uint8_t 
     st->pos  = 0;
 
     aegis128l_init(k, npub, st->state);
-    for (i = 0ULL; i + 32ULL <= adlen; i += 32ULL) {
+    for (i = 0; i + 32 <= adlen; i += 32) {
         aegis128l_absorb(ad + i, st->state);
     }
     if (adlen & 0x1f) {
@@ -290,7 +290,7 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *
             return 0;
         }
     }
-    for (i = 0; i + 32 < mlen; i += 32) {
+    for (i = 0; i + 32 <= mlen; i += 32) {
         aegis128l_enc(c + i, m + i, st->state);
     }
     *written += mlen & ~(size_t) 0x1f;
@@ -396,11 +396,11 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
         }
     }
     if (m != NULL) {
-        for (i = 0; i + 32 < clen; i += 32) {
+        for (i = 0; i + 32 <= clen; i += 32) {
             aegis128l_dec(m + i, c + i, st->state);
         }
     } else {
-        for (i = 0; i + 32 < clen; i += 32) {
+        for (i = 0; i + 32 <= clen; i += 32) {
             aegis128l_dec(dst, c + i, st->state);
         }
     }
