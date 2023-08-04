@@ -292,7 +292,7 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *
             return 0;
         }
     }
-    if (clen_max < mlen & ~(size_t) 0x1f) {
+    if (clen_max < (mlen & ~(size_t) 0x1f)) {
         errno = ERANGE;
         return -1;
     }
@@ -404,7 +404,7 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
         }
     }
     if (m != NULL) {
-        if (mlen_max < clen & ~(size_t) 0x1f) {
+        if (mlen_max < (clen & ~(size_t) 0x1f)) {
             errno = ERANGE;
             return -1;
         }
