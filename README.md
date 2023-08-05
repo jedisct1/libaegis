@@ -4,9 +4,9 @@ Portable C implementations of AEGIS (AEGIS-128L, AEGIS-128X2 and AEGIS-256), wit
 
 ## Features
 
-- AEGIS-128L with 16 and 32 bytes tags
-- AEGIS-128X2 with 16 and 32 bytes tags
-- AEGIS-256 with 16 and 32 bytes tags
+- AEGIS-128L with 16 and 32 bytes tags (software, AES-NI, ARM Crypto)
+- AEGIS-128X2 with 16 and 32 bytes tags (software, VAES + AVX2, AES-NI, ARM Crypto)
+- AEGIS-256 with 16 and 32 bytes tags (software, AES-NI, ARM Crypto)
 - Encryption and decryption with attached and detached tags
 - Incremental encryption and decryption.
 
