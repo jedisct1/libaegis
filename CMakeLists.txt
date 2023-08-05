@@ -10,7 +10,7 @@ endif()
 
 include_directories("src/include")
 
-file(GLOB SOURCE_FILES "src/aegis128l/*.c" "src/aegis256/*.c" "src/common/*.c")
+file(GLOB SOURCE_FILES "src/aegis128l/*.c" "src/aegis128x2/*.c" "src/aegis256/*.c" "src/common/*.c")
 file(GLOB HEADER_FILES "src/include/*.h")
 
 add_library("${PROJECT_NAME}")

@@ -11,6 +11,7 @@
 #endif
 
 #include "aegis128l.h"
+#include "aegis128x2.h"
 #include "aegis256.h"
 
 /* Initialize the AEGIS library.

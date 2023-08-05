@@ -1,10 +1,11 @@
 # libaegis
 
-Portable C implementations of AEGIS (AEGIS-128L and AEGIS-256), with runtime CPU detection.
+Portable C implementations of AEGIS (AEGIS-128L, AEGIS-128X2 and AEGIS-256), with runtime CPU detection.
 
 ## Features
 
 - AEGIS-128L with 16 and 32 bytes tags
+- AEGIS-128X2 with 16 and 32 bytes tags
 - AEGIS-256 with 16 and 32 bytes tags
 - Encryption and decryption with attached and detached tags
 - Incremental encryption and decryption.
