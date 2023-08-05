@@ -285,12 +285,6 @@ aegis_runtime_has_armcrypto(void)
 }
 
 int
-aegis_runtime_has_ssse3(void)
-{
-    return _cpu_features.has_ssse3;
-}
-
-int
 aegis_runtime_has_avx(void)
 {
     return _cpu_features.has_avx;
