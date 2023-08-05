@@ -225,10 +225,10 @@ state_init(aegis256_state *st_, const uint8_t *ad, size_t adlen, const uint8_t *
            const uint8_t *k)
 {
     _aegis256_state *const st =
-        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
+        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
     size_t i;
 
-    COMPILER_ASSERT((sizeof *st) + 15 <= sizeof *st_);
+    COMPILER_ASSERT((sizeof *st) + RATE <= sizeof *st_);
     st->mlen = 0;
     st->pos  = 0;
 
@@ -249,7 +249,7 @@ state_encrypt_update(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *w
                      const uint8_t *m, size_t mlen)
 {
     _aegis256_state *const st =
-        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
+        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
     size_t i = 0;
     size_t left;
 
@@ -300,7 +300,7 @@ state_encrypt_detached_final(aegis256_state *st_, uint8_t *c, size_t clen_max, s
                              uint8_t *mac, size_t maclen)
 {
     _aegis256_state *const st =
-        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
+        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
     CRYPTO_ALIGN(RATE) uint8_t src[RATE];
     CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
 
@@ -327,7 +327,7 @@ state_encrypt_final(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *wr
                     size_t maclen)
 {
     _aegis256_state *const st =
-        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
+        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
     CRYPTO_ALIGN(RATE) uint8_t src[RATE];
     CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
 
@@ -354,7 +354,7 @@ state_decrypt_detached_update(aegis256_state *st_, uint8_t *m, size_t mlen_max, 
                               const uint8_t *c, size_t clen)
 {
     _aegis256_state *const st =
-        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
+        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
     CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
     size_t                     i = 0;
     size_t                     left;
@@ -423,7 +423,7 @@ state_decrypt_detached_final(aegis256_state *st_, uint8_t *m, size_t mlen_max, s
     CRYPTO_ALIGN(RATE) uint8_t computed_mac[32];
     CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
     _aegis256_state *const     st =
-        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
+        (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
     int ret;
 
     *written = 0;

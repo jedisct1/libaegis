@@ -24,7 +24,7 @@
 
 /* An AEGIS state, for incremental updates */
 typedef struct aegis256_state {
-    uint8_t opaque[256];
+    uint8_t opaque[192];
 } aegis256_state;
 
 /* The length of an AEGIS key, in bytes */
