@@ -13,6 +13,13 @@ pub fn build(b: *std.Build) void {
     lib.linkLibC();
     lib.strip = true;
 
+    const lib_options = b.addOptions();
+    const favor_performance: bool = b.option(bool, "favor-performance", "Favor performance over side channel mitigations") orelse false;
+    lib_options.addOption(bool, "favor_performance", favor_performance);
+    if (favor_performance) {
+        lib.defineCMacro("FAVOR_PERFORMANCE", "1");
+    }
+
     lib.addIncludePath(.{ .path = "src/include" });
 
     lib.addCSourceFiles(&.{
