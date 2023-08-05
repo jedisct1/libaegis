@@ -11,9 +11,9 @@
 #include "aegis256_aesni.h"
 
 #ifdef __clang__
-#pragma clang attribute push(__attribute__((target("aes,ssse3"))), apply_to = function)
+#pragma clang attribute push(__attribute__((target("aes,avx"))), apply_to = function)
 #elif defined(__GNUC__)
-#pragma GCC target("aes,ssse3")
+#pragma GCC target("aes,avx")
 #endif
 
 #include <wmmintrin.h>

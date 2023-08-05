@@ -13,8 +13,6 @@ int aegis_runtime_has_neon(void);
 
 int aegis_runtime_has_armcrypto(void);
 
-int aegis_runtime_has_ssse3(void);
-
 int aegis_runtime_has_avx(void);
 
 int aegis_runtime_has_avx2(void);
