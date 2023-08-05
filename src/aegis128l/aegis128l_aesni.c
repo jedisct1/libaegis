@@ -18,6 +18,8 @@
 
 #include <wmmintrin.h>
 
+#define AES_BLOCK_LENGTH 16
+
 typedef __m128i aes_block_t;
 #define AES_BLOCK_XOR(A, B)       _mm_xor_si128((A), (B))
 #define AES_BLOCK_AND(A, B)       _mm_and_si128((A), (B))

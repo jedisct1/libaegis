@@ -13,6 +13,8 @@
 #include "aegis256.h"
 #include "aegis256_soft.h"
 
+#define AES_BLOCK_LENGTH 16
+
 typedef SoftAesBlock aes_block_t;
 #define AES_BLOCK_XOR(A, B)       softaes_block_xor((A), (B))
 #define AES_BLOCK_AND(A, B)       softaes_block_and((A), (B))
