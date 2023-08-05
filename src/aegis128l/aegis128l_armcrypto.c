@@ -11,9 +11,9 @@
 #include "aegis128l_armcrypto.h"
 
 #ifdef __clang__
-#pragma clang attribute push(__attribute__((target("neon,crypto"))), apply_to = function)
+#pragma clang attribute push(__attribute__((target("neon,crypto,aes"))), apply_to = function)
 #elif defined(__GNUC__)
-#pragma GCC target("neon,crypto")
+#pragma GCC target("neon,crypto,aes")
 #endif
 
 #include <arm_neon.h>
