@@ -19,6 +19,12 @@ zig build -Drelease
 
 The library and headers are installed in the `zig-out` folder.
 
+To favor performance over side-channel mitigations on WebAssembly and on devices without hardware acceleration, add `-Dfavor-performance`:
+
+```sh
+zig build -Drelease -Dfavor-performance
+```
+
 ### Compilation with `cmake`:
 
 ```sh
@@ -27,6 +33,8 @@ cd build
 cmake -DCMAKE_INSTALL_PREFIX=/install/prefix ..
 make install
 ```
+
+To favor performance over side-channel mitigations on WebAssembly and on devices without hardware acceleration, add `-DFAVOR_PERFORMANCE`.
 
 ### Direct inclusion
 
