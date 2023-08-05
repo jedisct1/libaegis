@@ -1,3 +1,5 @@
+#define RATE 32
+
 static void
 aegis128l_init(const uint8_t *key, const uint8_t *nonce, aes_block_t *const state)
 {
@@ -112,7 +114,7 @@ static void
 aegis128l_declast(uint8_t *const dst, const uint8_t *const src, size_t len,
                   aes_block_t *const state)
 {
-    uint8_t     pad[32];
+    uint8_t     pad[RATE];
     aes_block_t msg0, msg1;
 
     memset(pad, 0, sizeof pad);
@@ -142,26 +144,26 @@ static int
 encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size_t mlen,
                  const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
 {
-    aes_block_t              state[8];
-    CRYPTO_ALIGN(16) uint8_t src[32];
-    CRYPTO_ALIGN(16) uint8_t dst[32];
-    size_t                   i;
+    aes_block_t                state[8];
+    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
+    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
+    size_t                     i;
 
     aegis128l_init(k, npub, state);
 
-    for (i = 0; i + 32 <= adlen; i += 32) {
+    for (i = 0; i + RATE <= adlen; i += RATE) {
         aegis128l_absorb(ad + i, state);
     }
     if (adlen & 0x1f) {
-        memset(src, 0, 32);
+        memset(src, 0, RATE);
         memcpy(src, ad + i, adlen & 0x1f);
         aegis128l_absorb(src, state);
     }
-    for (i = 0; i + 32 <= mlen; i += 32) {
+    for (i = 0; i + RATE <= mlen; i += RATE) {
         aegis128l_enc(c + i, m + i, state);
     }
     if (mlen & 0x1f) {
-        memset(src, 0, 32);
+        memset(src, 0, RATE);
         memcpy(src, m + i, mlen & 0x1f);
         aegis128l_enc(dst, src, state);
         memcpy(c + i, dst, mlen & 0x1f);
@@ -176,30 +178,30 @@ static int
 decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, size_t maclen,
                  const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
 {
-    aes_block_t              state[8];
-    CRYPTO_ALIGN(16) uint8_t src[32];
-    CRYPTO_ALIGN(16) uint8_t dst[32];
-    CRYPTO_ALIGN(16) uint8_t computed_mac[32];
-    const size_t             mlen = clen;
-    size_t                   i;
-    int                      ret;
+    aes_block_t                state[8];
+    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
+    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
+    CRYPTO_ALIGN(16) uint8_t   computed_mac[32];
+    const size_t               mlen = clen;
+    size_t                     i;
+    int                        ret;
 
     aegis128l_init(k, npub, state);
 
-    for (i = 0; i + 32 <= adlen; i += 32) {
+    for (i = 0; i + RATE <= adlen; i += RATE) {
         aegis128l_absorb(ad + i, state);
     }
     if (adlen & 0x1f) {
-        memset(src, 0, 32);
+        memset(src, 0, RATE);
         memcpy(src, ad + i, adlen & 0x1f);
         aegis128l_absorb(src, state);
     }
     if (m != NULL) {
-        for (i = 0; i + 32 <= mlen; i += 32) {
+        for (i = 0; i + RATE <= mlen; i += RATE) {
             aegis128l_dec(m + i, c + i, state);
         }
     } else {
-        for (i = 0; i + 32 <= mlen; i += 32) {
+        for (i = 0; i + RATE <= mlen; i += RATE) {
             aegis128l_dec(dst, c + i, state);
         }
     }
@@ -227,7 +229,7 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
 
 typedef struct _aegis128l_state {
     aes_block_t state[8];
-    uint8_t     buf[32];
+    uint8_t     buf[RATE];
     uint64_t    adlen;
     uint64_t    mlen;
     size_t      pos;
@@ -246,11 +248,11 @@ state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen, const uint8_t 
     st->pos  = 0;
 
     aegis128l_init(k, npub, st->state);
-    for (i = 0; i + 32 <= adlen; i += 32) {
+    for (i = 0; i + RATE <= adlen; i += RATE) {
         aegis128l_absorb(ad + i, st->state);
     }
     if (adlen & 0x1f) {
-        memset(st->buf, 0, 32);
+        memset(st->buf, 0, RATE);
         memcpy(st->buf, ad + i, adlen & 0x1f);
         aegis128l_absorb(st->buf, st->state);
     }
@@ -279,14 +281,14 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *
             st->pos += n;
         }
         if (st->pos == sizeof st->buf) {
-            if (clen_max < 32) {
+            if (clen_max < RATE) {
                 errno = ERANGE;
                 return -1;
             }
-            clen_max -= 32;
+            clen_max -= RATE;
             aegis128l_enc(c, st->buf, st->state);
-            *written += 32;
-            c += 32;
+            *written += RATE;
+            c += RATE;
             st->pos = 0;
         } else {
             return 0;
@@ -296,7 +298,7 @@ state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *
         errno = ERANGE;
         return -1;
     }
-    for (i = 0; i + 32 <= mlen; i += 32) {
+    for (i = 0; i + RATE <= mlen; i += RATE) {
         aegis128l_enc(c + i, m + i, st->state);
     }
     *written += mlen & ~(size_t) 0x1f;
@@ -314,8 +316,8 @@ state_encrypt_detached_final(aegis128l_state *st_, uint8_t *c, size_t clen_max, 
 {
     _aegis128l_state *const st =
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
-    CRYPTO_ALIGN(16) uint8_t src[32];
-    CRYPTO_ALIGN(16) uint8_t dst[32];
+    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
+    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
 
     *written = 0;
     if (clen_max < st->pos) {
@@ -341,8 +343,8 @@ state_encrypt_final(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *w
 {
     _aegis128l_state *const st =
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
-    CRYPTO_ALIGN(16) uint8_t src[32];
-    CRYPTO_ALIGN(16) uint8_t dst[32];
+    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
+    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
 
     *written = 0;
     if (clen_max < st->pos + maclen) {
@@ -368,10 +370,10 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
 {
     _aegis128l_state *const st =
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
-    CRYPTO_ALIGN(16) uint8_t dst[32];
-    size_t                   i = 0;
-    size_t                   left;
-    const size_t             mlen = clen;
+    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
+    size_t                     i = 0;
+    size_t                     left;
+    const size_t               mlen = clen;
 
     *written = 0;
     st->mlen += mlen;
@@ -387,17 +389,17 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
         }
         if (st->pos == (sizeof st->buf)) {
             if (m != NULL) {
-                if (mlen_max < 32) {
+                if (mlen_max < RATE) {
                     errno = ERANGE;
                     return -1;
                 }
-                mlen_max -= 32;
+                mlen_max -= RATE;
                 aegis128l_dec(m, st->buf, st->state);
             } else {
                 aegis128l_dec(dst, st->buf, st->state);
             }
-            *written += 32;
-            c += 32;
+            *written += RATE;
+            c += RATE;
             st->pos = 0;
         } else {
             return 0;
@@ -408,11 +410,11 @@ state_decrypt_detached_update(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
             errno = ERANGE;
             return -1;
         }
-        for (i = 0; i + 32 <= clen; i += 32) {
+        for (i = 0; i + RATE <= clen; i += RATE) {
             aegis128l_dec(m + i, c + i, st->state);
         }
     } else {
-        for (i = 0; i + 32 <= clen; i += 32) {
+        for (i = 0; i + RATE <= clen; i += RATE) {
             aegis128l_dec(dst, c + i, st->state);
         }
     }
@@ -429,9 +431,9 @@ static int
 state_decrypt_detached_final(aegis128l_state *st_, uint8_t *m, size_t mlen_max, size_t *written,
                              const uint8_t *mac, size_t maclen)
 {
-    CRYPTO_ALIGN(16) uint8_t computed_mac[32];
-    CRYPTO_ALIGN(16) uint8_t dst[32];
-    _aegis128l_state *const  st =
+    CRYPTO_ALIGN(16) uint8_t   computed_mac[32];
+    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
+    _aegis128l_state *const    st =
         (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + 15) & ~(uintptr_t) 15);
     int ret;
 
