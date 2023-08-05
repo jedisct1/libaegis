@@ -17,9 +17,7 @@ Portable C implementations of AEGIS (AEGIS-128L and AEGIS-256), with runtime CPU
 zig build -Drelease
 ```
 
-The library is installed in the `zig-out/lib` folder.
-
-Public inludes are in the `src/include` folder.
+The library and headers are installed in the `zig-out` folder.
 
 ### Compilation with `cmake`:
 

@@ -36,6 +36,12 @@ pub fn build(b: *std.Build) void {
     // step when running `zig build`).
     b.installArtifact(lib);
 
+    b.installDirectory(.{
+        .install_dir = .header,
+        .install_subdir = "",
+        .source_dir = .{ .path = "src/include" },
+    });
+
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.
     const main_tests = b.addTest(.{
