@@ -11,6 +11,8 @@ Portable C implementations of AEGIS (AEGIS-128L and AEGIS-256), with runtime CPU
 
 ## Installation
 
+Note that the compiler makes a difference. Zig (or a recent `clang` with target-specific options such as `-march=native`) produces more efficient code than `gcc`.
+
 ### Compilation with `zig`:
 
 ```sh
