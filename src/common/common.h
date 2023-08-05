@@ -28,9 +28,6 @@
 #define HAVE_TMMINTRIN_H
 #define HAVE_WMMINTRIN_H
 #endif
-#ifdef __aarch64__
-
-#endif
 
 #if defined(__INTEL_COMPILER) || defined(_MSC_VER)
 #define CRYPTO_ALIGN(x) __declspec(align(x))

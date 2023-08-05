@@ -15,7 +15,7 @@
 #include "aegis128x2_soft.h"
 static const aegis128x2_implementation *implementation = &aegis128x2_soft_implementation;
 #else
-#ifdef __aarch64__
+#if defined(__aarch64__) || defined(_M_ARM64)
 static const aegis128x2_implementation *implementation = &aegis128x2_armcrypto_implementation;
 #elif defined(__x86_64__) || defined(__i386__)
 static const aegis128x2_implementation *implementation = &aegis128x2_aesni_implementation;
@@ -158,7 +158,7 @@ aegis128x2_pick_best_implementation(void)
 {
     implementation = &aegis128x2_soft_implementation;
 
-#ifdef __aarch64__
+#if defined(__aarch64__) || defined(_M_ARM64)
     if (aegis_runtime_has_armcrypto()) {
         implementation = &aegis128x2_armcrypto_implementation;
         return 0;
