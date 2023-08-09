@@ -153,17 +153,20 @@ aegis128x4_state_decrypt_detached_final(aegis128x4_state *st_, uint8_t *m, size_
     return implementation->state_decrypt_detached_final(st_, m, mlen_max, written, mac, maclen);
 }
 
-#ifndef HAS_HW_AES
 int
 aegis128x4_pick_best_implementation(void)
 {
+#ifndef HAS_HW_AES
     implementation = &aegis128x4_soft_implementation;
+#endif
 
 #if defined(__aarch64__) || defined(_M_ARM64)
+#ifndef HAS_HW_AES
     if (aegis_runtime_has_armcrypto()) {
         implementation = &aegis128x4_armcrypto_implementation;
         return 0;
     }
+#endif
 #endif
 
 #if defined(__x86_64__) || defined(__i386__)
@@ -185,4 +188,3 @@ aegis128x4_pick_best_implementation(void)
 
     return 0; /* LCOV_EXCL_LINE */
 }
-#endif
