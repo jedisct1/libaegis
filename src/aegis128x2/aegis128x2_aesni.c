@@ -51,7 +51,7 @@ AES_BLOCK_LOAD_64x2(uint64_t a, uint64_t b)
     return (aes_block_t) { t, t };
 }
 
-#ifdef NON_TEMPOORAL_STORES
+#ifdef NON_TEMPORAL_STORES
 static inline void
 AES_BLOCK_STORE(uint8_t *a, const aes_block_t b)
 {
