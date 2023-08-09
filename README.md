@@ -29,12 +29,6 @@ To favor performance over side-channel mitigations on WebAssembly and on devices
 zig build -Drelease -Dfavor-performance
 ```
 
-To avoid caching outputs, add `-Dnon-temporal-stores`:
-
-```sh
-zig build -Drelease -Dnon-temporal-stores
-```
-
 ### Compilation with `cmake`:
 
 ```sh
@@ -45,8 +39,6 @@ make install
 ```
 
 To favor performance over side-channel mitigations on WebAssembly and on devices without hardware acceleration, add `-DFAVOR_PERFORMANCE`.
-
-To avoid caching outputs, add `-DNON_TEMPORAL_STORES`.
 
 ### Direct inclusion
 
