@@ -161,12 +161,10 @@ aegis128x4_pick_best_implementation(void)
 #endif
 
 #if defined(__aarch64__) || defined(_M_ARM64)
-#ifndef HAS_HW_AES
     if (aegis_runtime_has_armcrypto()) {
         implementation = &aegis128x4_armcrypto_implementation;
         return 0;
     }
-#endif
 #endif
 
 #if defined(__x86_64__) || defined(__i386__)

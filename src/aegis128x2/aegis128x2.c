@@ -173,12 +173,10 @@ aegis128x2_pick_best_implementation(void)
         implementation = &aegis128x2_avx2_implementation;
         return 0;
     }
-#ifndef HAS_HW_AES
     if (aegis_runtime_has_aesni() && aegis_runtime_has_avx()) {
         implementation = &aegis128x2_aesni_implementation;
         return 0;
     }
-#endif
 #endif
 
     return 0; /* LCOV_EXCL_LINE */

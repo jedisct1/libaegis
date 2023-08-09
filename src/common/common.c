@@ -47,7 +47,6 @@ aegis_init(void)
     if (initialized) {
         return 0;
     }
-#ifndef HAS_HW_AES
     if (aegis_runtime_get_cpu_features() != 0) {
         errno = ENOSYS;
         return -1;
@@ -56,7 +55,6 @@ aegis_init(void)
         aegis256_pick_best_implementation() != 0 || aegis128x4_pick_best_implementation() != 0) {
         return -1;
     }
-#endif
     initialized = 1;
 
     return 0;

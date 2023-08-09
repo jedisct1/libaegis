@@ -1,8 +1,6 @@
 #include "cpu.h"
 #include "common.h"
 
-#ifndef HAS_HW_AES
-
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -316,5 +314,3 @@ aegis_runtime_has_vaes(void)
 {
     return _cpu_features.has_vaes;
 }
-
-#endif
