@@ -1,4 +1,3 @@
-#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -48,8 +47,7 @@ aegis_init(void)
         return 0;
     }
     if (aegis_runtime_get_cpu_features() != 0) {
-        errno = ENOSYS;
-        return -1;
+        return 0;
     }
     if (aegis128l_pick_best_implementation() != 0 || aegis128x2_pick_best_implementation() != 0 ||
         aegis256_pick_best_implementation() != 0 || aegis128x4_pick_best_implementation() != 0) {
