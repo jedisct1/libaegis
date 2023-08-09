@@ -167,10 +167,12 @@ aegis128x4_pick_best_implementation(void)
 #endif
 
 #if defined(__x86_64__) || defined(__i386__)
+#ifdef HAVE_VAESINTRIN_H
     if (aegis_runtime_has_vaes() && aegis_runtime_has_avx512f()) {
         implementation = &aegis128x4_avx512_implementation;
         return 0;
     }
+#endif
     if (aegis_runtime_has_vaes() && aegis_runtime_has_avx2()) {
         implementation = &aegis128x4_avx2_implementation;
         return 0;

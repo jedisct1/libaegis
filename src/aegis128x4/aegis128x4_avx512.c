@@ -10,6 +10,8 @@
 #include "aegis128x4.h"
 #include "aegis128x4_avx512.h"
 
+#ifdef HAVE_VAESINTRIN_H
+
 #ifdef __clang__
 #pragma clang attribute push(__attribute__((target("vaes,avx512f"))), apply_to = function)
 #elif defined(__GNUC__)
@@ -67,6 +69,8 @@ struct aegis128x4_implementation aegis128x4_avx512_implementation = {
 
 #ifdef __clang__
 #pragma clang attribute pop
+#endif
+
 #endif
 
 #endif

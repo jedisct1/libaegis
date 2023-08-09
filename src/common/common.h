@@ -27,6 +27,12 @@
 #define HAVE_AVX512FINTRIN_H
 #define HAVE_TMMINTRIN_H
 #define HAVE_WMMINTRIN_H
+#define HAVE_VAESINTRIN_H
+#ifdef __GNUC__
+#if !__has_include(<vaesintrin.h>)
+#undef HAVE_VAESINTRIN_H
+#endif
+#endif
 #endif
 
 #if defined(__INTEL_COMPILER) || defined(_MSC_VER)
