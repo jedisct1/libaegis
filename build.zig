@@ -87,4 +87,14 @@ pub fn build(b: *std.Build) void {
     // This will evaluate the `test` step rather than the default, which is "install".
     const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&run_main_tests.step);
+
+    const benchmark = b.addExecutable(.{
+        .name = "benchmark",
+        .root_source_file = .{ .path = "src/test/benchmark.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    benchmark.addIncludePath(.{ .path = "src/include" });
+    benchmark.linkLibrary(lib);
+    b.installArtifact(benchmark);
 }
