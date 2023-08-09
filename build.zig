@@ -14,10 +14,17 @@ pub fn build(b: *std.Build) void {
     lib.strip = true;
 
     const lib_options = b.addOptions();
+
     const favor_performance: bool = b.option(bool, "favor-performance", "Favor performance over side channel mitigations") orelse false;
     lib_options.addOption(bool, "favor_performance", favor_performance);
     if (favor_performance) {
         lib.defineCMacro("FAVOR_PERFORMANCE", "1");
+    }
+
+    const non_temporal_stores: bool = b.option(bool, "non-temporal-stores", "Use non-temporal stores") orelse false;
+    lib_options.addOption(bool, "non_temporal_stores", non_temporal_stores);
+    if (non_temporal_stores) {
+        lib.defineCMacro("NON_TEMPORAL_STORES", "1");
     }
 
     lib.addIncludePath(.{ .path = "src/include" });
