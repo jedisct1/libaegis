@@ -60,3 +60,5 @@ zig-out
 
 # build dir
 build
+
+.vscode
