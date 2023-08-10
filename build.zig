@@ -21,9 +21,9 @@ pub fn build(b: *std.Build) void {
         lib.defineCMacro("FAVOR_PERFORMANCE", "1");
     }
 
-    const non_temporal_stores: bool = b.option(bool, "non-temporal-stores", "Use non-temporal stores") orelse false;
-    lib_options.addOption(bool, "non_temporal_stores", non_temporal_stores);
-    if (non_temporal_stores) {
+    const with_benchmark: bool = b.option(bool, "with-benchmark", "Compile benchmark") orelse false;
+    lib_options.addOption(bool, "non_temporal_stores", with_benchmark);
+    if (with_benchmark) {
         lib.defineCMacro("NON_TEMPORAL_STORES", "1");
     }
 
@@ -88,13 +88,15 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&run_main_tests.step);
 
-    const benchmark = b.addExecutable(.{
-        .name = "benchmark",
-        .root_source_file = .{ .path = "src/test/benchmark.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-    benchmark.addIncludePath(.{ .path = "src/include" });
-    benchmark.linkLibrary(lib);
-    b.installArtifact(benchmark);
+    if (with_benchmark) {
+        const benchmark = b.addExecutable(.{
+            .name = "benchmark",
+            .root_source_file = .{ .path = "src/test/benchmark.zig" },
+            .target = target,
+            .optimize = optimize,
+        });
+        benchmark.addIncludePath(.{ .path = "src/include" });
+        benchmark.linkLibrary(lib);
+        b.installArtifact(benchmark);
+    }
 }
