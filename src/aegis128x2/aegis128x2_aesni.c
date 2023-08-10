@@ -51,21 +51,12 @@ AES_BLOCK_LOAD_64x2(uint64_t a, uint64_t b)
     return (aes_block_t) { t, t };
 }
 
-#ifdef NON_TEMPORAL_STORES
-static inline void
-AES_BLOCK_STORE(uint8_t *a, const aes_block_t b)
-{
-    _mm_stream_si128((__m128i *) (void *) a, b.b0);
-    _mm_stream_si128((__m128i *) (void *) (a + 16), b.b1);
-}
-#else
 static inline void
 AES_BLOCK_STORE(uint8_t *a, const aes_block_t b)
 {
     _mm_storeu_si128((__m128i *) (void *) a, b.b0);
     _mm_storeu_si128((__m128i *) (void *) (a + 16), b.b1);
 }
-#endif
 
 static inline aes_block_t
 AES_ENC(const aes_block_t a, const aes_block_t b)

@@ -28,12 +28,8 @@ typedef __m512i aes_block_t;
 #define AES_BLOCK_LOAD128_BROADCAST(A) _mm512_broadcast_i32x4(_mm_loadu_si128((const void *) (A)))
 #define AES_BLOCK_LOAD(A)              _mm512_loadu_si512((const aes_block_t *) (const void *) (A))
 #define AES_BLOCK_LOAD_64x2(A, B)      _mm512_broadcast_i32x4(_mm_set_epi64x((A), (B)))
-#ifdef NON_TEMPORAL_STORES
-#define AES_BLOCK_STORE(A, B) _mm512_stream_si512((aes_block_t *) (void *) (A), (B))
-#else
-#define AES_BLOCK_STORE(A, B) _mm512_storeu_si512((aes_block_t *) (void *) (A), (B))
-#endif
-#define AES_ENC(A, B) _mm512_aesenc_epi128((A), (B))
+#define AES_BLOCK_STORE(A, B)          _mm512_storeu_si512((aes_block_t *) (void *) (A), (B))
+#define AES_ENC(A, B)                  _mm512_aesenc_epi128((A), (B))
 
 static inline void
 aegis128x4_update(aes_block_t *const state, const aes_block_t d1, const aes_block_t d2)
