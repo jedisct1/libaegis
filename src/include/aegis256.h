@@ -172,4 +172,38 @@ int aegis256_state_encrypt_detached_final(aegis256_state *st_, uint8_t *c, size_
 int aegis256_state_encrypt_final(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *written,
                                  size_t maclen);
 
+/*
+ * Decrypt a message chunk.
+ *
+ * The output should never be released to the caller until the tag has been verified.
+ *
+ * st_: state to update
+ * m: plaintext output buffer
+ * mlen_max: length of the plaintext chunk buffer (must be >= clen)
+ * written: number of plaintext bytes actually written
+ * c: ciphertext chunk input buffer
+ * clen: length of the ciphertext chunk
+ *
+ * Return 0 on success, -1 on failure.
+ */
+int aegis256_state_decrypt_detached_update(aegis256_state *st_, uint8_t *m, size_t mlen_max,
+                                           size_t *written, const uint8_t *c, size_t clen)
+    __attribute__((warn_unused_result));
+
+/*
+ * Decrypt the final message chunk and verify the authentication tag.
+ *
+ * st_: state to finalize
+ * m: plaintext output buffer
+ * mlen_max: length of the plaintext chunk buffer (must be >= remaining bytes)
+ * written: number of plaintext bytes actually written
+ * mac: authentication tag input buffer
+ * maclen: length of the authentication tag (16 or 32)
+ *
+ * Return 0 on success, -1 on failure.
+ */
+int aegis256_state_decrypt_detached_final(aegis256_state *st_, uint8_t *m, size_t mlen_max,
+                                          size_t *written, const uint8_t *mac, size_t maclen)
+    __attribute__((warn_unused_result));
+
 #endif
