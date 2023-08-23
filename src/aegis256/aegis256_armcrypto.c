@@ -16,6 +16,10 @@
 #pragma GCC target("neon,crypto,aes")
 #endif
 
+#ifndef __ARM_FEATURE_AES
+#define __ARM_FEATURE_AES 1
+#endif
+
 #include <arm_neon.h>
 
 #define AES_BLOCK_LENGTH 16
