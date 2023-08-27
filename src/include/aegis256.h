@@ -20,7 +20,7 @@
  * When using AEGIS in incremental mode, this is the maximum number
  * of leftover ciphertext bytes that can be returned at finalization.
  */
-#define aegis256_TAILBYTES_MAX 31
+#define aegis256_TAILBYTES_MAX 15
 
 /* An AEGIS state, for incremental updates */
 typedef struct aegis256_state {
