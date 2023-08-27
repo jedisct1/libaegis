@@ -37,6 +37,7 @@ extern int aegis128l_pick_best_implementation(void);
 extern int aegis128x2_pick_best_implementation(void);
 extern int aegis128x4_pick_best_implementation(void);
 extern int aegis256_pick_best_implementation(void);
+extern int aegis256x2_pick_best_implementation(void);
 
 int
 aegis_init(void)
@@ -50,7 +51,8 @@ aegis_init(void)
         return 0;
     }
     if (aegis128l_pick_best_implementation() != 0 || aegis128x2_pick_best_implementation() != 0 ||
-        aegis256_pick_best_implementation() != 0 || aegis128x4_pick_best_implementation() != 0) {
+        aegis128x4_pick_best_implementation() != 0 || aegis256_pick_best_implementation() != 0 ||
+        aegis256x2_pick_best_implementation() != 0) {
         return -1;
     }
     initialized = 1;

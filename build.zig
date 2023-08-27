@@ -53,6 +53,12 @@ pub fn build(b: *std.Build) void {
         "src/aegis256/aegis256_soft.c",
         "src/aegis256/aegis256.c",
 
+        "src/aegis256x2/aegis256x2_aesni.c",
+        "src/aegis256x2/aegis256x2_avx2.c",
+        "src/aegis256x2/aegis256x2_armcrypto.c",
+        "src/aegis256x2/aegis256x2_soft.c",
+        "src/aegis256x2/aegis256x2.c",
+
         "src/common/common.c",
         "src/common/cpu.c",
         "src/common/softaes.c",
