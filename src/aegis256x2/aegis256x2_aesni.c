@@ -16,6 +16,7 @@
 #pragma GCC target("aes,avx")
 #endif
 
+#include <immintrin.h>
 #include <wmmintrin.h>
 
 #define AES_BLOCK_LENGTH 32
