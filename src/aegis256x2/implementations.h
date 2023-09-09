@@ -1,5 +1,5 @@
-#ifndef implementations_H
-#define implementations_H
+#ifndef aegis256x2_implementations_H
+#define aegis256x2_implementations_H
 
 #include <stddef.h>
 #include <stdint.h>
