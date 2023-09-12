@@ -6,15 +6,15 @@
 #include <string.h>
 
 #ifdef HAVE_ANDROID_GETCPUFEATURES
-#include <cpu-features.h>
+#    include <cpu-features.h>
 #endif
 #ifdef __APPLE__
-#include <mach/machine.h>
-#include <sys/sysctl.h>
-#include <sys/types.h>
+#    include <mach/machine.h>
+#    include <sys/sysctl.h>
+#    include <sys/types.h>
 #endif
 #ifdef HAVE_SYS_AUXV_H
-#include <sys/auxv.h>
+#    include <sys/auxv.h>
 #endif
 
 typedef struct CPUFeatures_ {
@@ -59,27 +59,27 @@ _runtime_arm_cpu_features(CPUFeatures *const cpu_features)
 #elif defined(HAVE_ANDROID_GETCPUFEATURES) && defined(ANDROID_CPU_ARM_FEATURE_NEON)
     cpu_features->has_neon = (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_NEON) != 0x0;
 #elif (defined(__aarch64__) || defined(_M_ARM64)) && defined(AT_HWCAP)
-#ifdef HAVE_GETAUXVAL
+#    ifdef HAVE_GETAUXVAL
     cpu_features->has_neon = (getauxval(AT_HWCAP) & (1L << 1)) != 0;
-#elif defined(HAVE_ELF_AUX_INFO)
+#    elif defined(HAVE_ELF_AUX_INFO)
     {
         unsigned long buf;
         if (elf_aux_info(AT_HWCAP, (void *) &buf, (int) sizeof buf) == 0) {
             cpu_features->has_neon = (buf & (1L << 1)) != 0;
         }
     }
-#endif
+#    endif
 #elif defined(__arm__) && defined(AT_HWCAP)
-#ifdef HAVE_GETAUXVAL
+#    ifdef HAVE_GETAUXVAL
     cpu_features->has_neon      = (getauxval(AT_HWCAP) & (1L << 12)) != 0;
-#elif defined(HAVE_ELF_AUX_INFO)
+#    elif defined(HAVE_ELF_AUX_INFO)
     {
         unsigned long buf;
         if (elf_aux_info(AT_HWCAP, (void *) &buf, (int) sizeof buf) == 0) {
             cpu_features->has_neon = (buf & (1L << 12)) != 0;
         }
     }
-#endif
+#    endif
 #endif
 
     if (cpu_features->has_neon == 0) {
@@ -108,27 +108,27 @@ _runtime_arm_cpu_features(CPUFeatures *const cpu_features)
 #elif defined(HAVE_ANDROID_GETCPUFEATURES) && defined(ANDROID_CPU_ARM_FEATURE_AES)
     cpu_features->has_armcrypto = (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_AES) != 0x0;
 #elif (defined(__aarch64__) || defined(_M_ARM64)) && defined(AT_HWCAP)
-#ifdef HAVE_GETAUXVAL
+#    ifdef HAVE_GETAUXVAL
     cpu_features->has_armcrypto = (getauxval(AT_HWCAP) & (1L << 3)) != 0;
-#elif defined(HAVE_ELF_AUX_INFO)
+#    elif defined(HAVE_ELF_AUX_INFO)
     {
         unsigned long buf;
         if (elf_aux_info(AT_HWCAP, (void *) &buf, (int) sizeof buf) == 0) {
             cpu_features->has_armcrypto = (buf & (1L << 3)) != 0;
         }
     }
-#endif
+#    endif
 #elif defined(__arm__) && defined(AT_HWCAP2)
-#ifdef HAVE_GETAUXVAL
+#    ifdef HAVE_GETAUXVAL
     cpu_features->has_armcrypto = (getauxval(AT_HWCAP2) & (1L << 0)) != 0;
-#elif defined(HAVE_ELF_AUX_INFO)
+#    elif defined(HAVE_ELF_AUX_INFO)
     {
         unsigned long buf;
         if (elf_aux_info(AT_HWCAP2, (void *) &buf, (int) sizeof buf) == 0) {
             cpu_features->has_armcrypto = (buf & (1L << 0)) != 0;
         }
     }
-#endif
+#    endif
 #endif
 
     return 0;
@@ -141,7 +141,7 @@ _cpuid(unsigned int cpu_info[4U], const unsigned int cpu_info_type)
     __cpuid((int *) cpu_info, cpu_info_type);
 #elif defined(HAVE_CPUID)
     cpu_info[0] = cpu_info[1] = cpu_info[2] = cpu_info[3] = 0;
-#ifdef __i386__
+#    ifdef __i386__
     __asm__ __volatile__(
         "pushfl; pushfl; "
         "popl %0; "
@@ -153,23 +153,23 @@ _cpuid(unsigned int cpu_info[4U], const unsigned int cpu_info_type)
     if (((cpu_info[0] ^ cpu_info[1]) & 0x200000) == 0x0) {
         return; /* LCOV_EXCL_LINE */
     }
-#endif
-#ifdef __i386__
+#    endif
+#    ifdef __i386__
     __asm__ __volatile__("xchgl %%ebx, %k1; cpuid; xchgl %%ebx, %k1"
                          : "=a"(cpu_info[0]), "=&r"(cpu_info[1]), "=c"(cpu_info[2]),
                            "=d"(cpu_info[3])
                          : "0"(cpu_info_type), "2"(0U));
-#elif defined(__x86_64__)
+#    elif defined(__x86_64__)
     __asm__ __volatile__("xchgq %%rbx, %q1; cpuid; xchgq %%rbx, %q1"
                          : "=a"(cpu_info[0]), "=&r"(cpu_info[1]), "=c"(cpu_info[2]),
                            "=d"(cpu_info[3])
                          : "0"(cpu_info_type), "2"(0U));
-#else
+#    else
     __asm__ __volatile__("cpuid"
                          : "=a"(cpu_info[0]), "=b"(cpu_info[1]), "=c"(cpu_info[2]),
                            "=d"(cpu_info[3])
                          : "0"(cpu_info_type), "2"(0U));
-#endif
+#    endif
 #else
     (void) cpu_info_type;
     cpu_info[0] = cpu_info[1] = cpu_info[2] = cpu_info[3] = 0;
@@ -195,10 +195,10 @@ _runtime_intel_cpu_features(CPUFeatures *const cpu_features)
     if ((cpu_info[2] & (CPUID_ECX_AVX | CPUID_ECX_XSAVE | CPUID_ECX_OSXSAVE)) ==
         (CPUID_ECX_AVX | CPUID_ECX_XSAVE | CPUID_ECX_OSXSAVE)) {
         xcr0 = 0U;
-#if defined(HAVE__XGETBV) || \
-    (defined(_MSC_VER) && defined(_XCR_XFEATURE_ENABLED_MASK) && _MSC_FULL_VER >= 160040219)
+#    if defined(HAVE__XGETBV) || \
+        (defined(_MSC_VER) && defined(_XCR_XFEATURE_ENABLED_MASK) && _MSC_FULL_VER >= 160040219)
         xcr0 = (uint32_t) _xgetbv(0);
-#elif defined(_MSC_VER) && defined(_M_IX86)
+#    elif defined(_MSC_VER) && defined(_M_IX86)
         /*
          * Visual Studio documentation states that eax/ecx/edx don't need to
          * be preserved in inline assembly code. But that doesn't seem to
@@ -215,12 +215,12 @@ _runtime_intel_cpu_features(CPUFeatures *const cpu_features)
             pop ecx
             pop eax
         }
-#elif defined(HAVE_AVX_ASM)
+#    elif defined(HAVE_AVX_ASM)
         __asm__ __volatile__(".byte 0x0f, 0x01, 0xd0" /* XGETBV */
                              : "=a"(xcr0)
                              : "c"((uint32_t) 0U)
                              : "%edx");
-#endif
+#    endif
         if ((xcr0 & (XCR0_SSE | XCR0_AVX)) == (XCR0_SSE | XCR0_AVX)) {
             cpu_features->has_avx = 1;
         }

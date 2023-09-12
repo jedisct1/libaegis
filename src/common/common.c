@@ -61,7 +61,7 @@ aegis_init(void)
 }
 
 #if defined(_MSC_VER)
-#pragma section(".CRT$XCU", read)
+#    pragma section(".CRT$XCU", read)
 static void __cdecl _do_aegis_init(void);
 __declspec(allocate(".CRT$XCU")) void (*aegis_init_constructor)(void) = _do_aegis_init;
 #else

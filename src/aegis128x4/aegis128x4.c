@@ -13,16 +13,16 @@
 #include "aegis128x4_avx512.h"
 
 #ifndef HAS_HW_AES
-#include "aegis128x4_soft.h"
+#    include "aegis128x4_soft.h"
 static const aegis128x4_implementation *implementation = &aegis128x4_soft_implementation;
 #else
-#if defined(__aarch64__) || defined(_M_ARM64)
+#    if defined(__aarch64__) || defined(_M_ARM64)
 static const aegis128x4_implementation *implementation = &aegis128x4_armcrypto_implementation;
-#elif defined(__x86_64__) || defined(__i386__)
+#    elif defined(__x86_64__) || defined(__i386__)
 static const aegis128x4_implementation *implementation = &aegis128x4_aesni_implementation;
-#else
-#error "Unsupported architecture"
-#endif
+#    else
+#        error "Unsupported architecture"
+#    endif
 #endif
 
 size_t
@@ -168,12 +168,12 @@ aegis128x4_pick_best_implementation(void)
 #endif
 
 #if defined(__x86_64__) || defined(__i386__)
-#ifdef HAVE_VAESINTRIN_H
+#    ifdef HAVE_VAESINTRIN_H
     if (aegis_runtime_has_vaes() && aegis_runtime_has_avx512f()) {
         implementation = &aegis128x4_avx512_implementation;
         return 0;
     }
-#endif
+#    endif
     if (aegis_runtime_has_vaes() && aegis_runtime_has_avx2()) {
         implementation = &aegis128x4_avx2_implementation;
         return 0;

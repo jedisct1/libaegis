@@ -9,19 +9,19 @@
 
 #ifndef HAS_HW_AES
 
-#include "../common/softaes.h"
-#include "aegis256.h"
-#include "aegis256_soft.h"
+#    include "../common/softaes.h"
+#    include "aegis256.h"
+#    include "aegis256_soft.h"
 
-#define AES_BLOCK_LENGTH 16
+#    define AES_BLOCK_LENGTH 16
 
 typedef SoftAesBlock aes_block_t;
-#define AES_BLOCK_XOR(A, B)       softaes_block_xor((A), (B))
-#define AES_BLOCK_AND(A, B)       softaes_block_and((A), (B))
-#define AES_BLOCK_LOAD(A)         softaes_block_load(A)
-#define AES_BLOCK_LOAD_64x2(A, B) softaes_block_load64x2((A), (B))
-#define AES_BLOCK_STORE(A, B)     softaes_block_store((A), (B))
-#define AES_ENC(A, B)             softaes_block_encrypt((A), (B))
+#    define AES_BLOCK_XOR(A, B)       softaes_block_xor((A), (B))
+#    define AES_BLOCK_AND(A, B)       softaes_block_and((A), (B))
+#    define AES_BLOCK_LOAD(A)         softaes_block_load(A)
+#    define AES_BLOCK_LOAD_64x2(A, B) softaes_block_load64x2((A), (B))
+#    define AES_BLOCK_STORE(A, B)     softaes_block_store((A), (B))
+#    define AES_ENC(A, B)             softaes_block_encrypt((A), (B))
 
 static inline void
 aegis256_update(aes_block_t *const state, const aes_block_t d)
@@ -37,7 +37,7 @@ aegis256_update(aes_block_t *const state, const aes_block_t d)
     state[0] = AES_BLOCK_XOR(AES_ENC(tmp, state[0]), d);
 }
 
-#include "aegis256_common.h"
+#    include "aegis256_common.h"
 
 struct aegis256_implementation aegis256_soft_implementation = {
     .encrypt_detached              = encrypt_detached,

@@ -1,36 +1,37 @@
 #if defined(__aarch64__) || defined(_M_ARM64)
 
-#include <errno.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+#    include <errno.h>
+#    include <stddef.h>
+#    include <stdint.h>
+#    include <stdlib.h>
+#    include <string.h>
 
-#include "../common/common.h"
-#include "aegis128l.h"
-#include "aegis128l_armcrypto.h"
+#    include "../common/common.h"
+#    include "aegis128l.h"
+#    include "aegis128l_armcrypto.h"
 
-#ifdef __clang__
-#pragma clang attribute push(__attribute__((target("neon,crypto,aes"))), apply_to = function)
-#elif defined(__GNUC__)
-#pragma GCC target("neon,crypto,aes")
-#endif
+#    ifdef __clang__
+#        pragma clang attribute push(__attribute__((target("neon,crypto,aes"))), \
+                                         apply_to = function)
+#    elif defined(__GNUC__)
+#        pragma GCC target("neon,crypto,aes")
+#    endif
 
-#ifndef __ARM_FEATURE_AES
-#define __ARM_FEATURE_AES 1
-#endif
+#    ifndef __ARM_FEATURE_AES
+#        define __ARM_FEATURE_AES 1
+#    endif
 
-#include <arm_neon.h>
+#    include <arm_neon.h>
 
-#define AES_BLOCK_LENGTH 16
+#    define AES_BLOCK_LENGTH 16
 
 typedef uint8x16_t aes_block_t;
-#define AES_BLOCK_XOR(A, B)       veorq_u8((A), (B))
-#define AES_BLOCK_AND(A, B)       vandq_u8((A), (B))
-#define AES_BLOCK_LOAD(A)         vld1q_u8(A)
-#define AES_BLOCK_LOAD_64x2(A, B) vreinterpretq_u8_u64(vsetq_lane_u64((A), vmovq_n_u64(B), 1))
-#define AES_BLOCK_STORE(A, B)     vst1q_u8((A), (B))
-#define AES_ENC(A, B)             veorq_u8(vaesmcq_u8(vaeseq_u8((A), vmovq_n_u8(0))), (B))
+#    define AES_BLOCK_XOR(A, B)       veorq_u8((A), (B))
+#    define AES_BLOCK_AND(A, B)       vandq_u8((A), (B))
+#    define AES_BLOCK_LOAD(A)         vld1q_u8(A)
+#    define AES_BLOCK_LOAD_64x2(A, B) vreinterpretq_u8_u64(vsetq_lane_u64((A), vmovq_n_u64(B), 1))
+#    define AES_BLOCK_STORE(A, B)     vst1q_u8((A), (B))
+#    define AES_ENC(A, B)             veorq_u8(vaesmcq_u8(vaeseq_u8((A), vmovq_n_u8(0))), (B))
 
 static inline void
 aegis128l_update(aes_block_t *const state, const aes_block_t d1, const aes_block_t d2)
@@ -48,7 +49,7 @@ aegis128l_update(aes_block_t *const state, const aes_block_t d1, const aes_block
     state[0] = AES_BLOCK_XOR(AES_ENC(tmp, state[0]), d1);
 }
 
-#include "aegis128l_common.h"
+#    include "aegis128l_common.h"
 
 struct aegis128l_implementation aegis128l_armcrypto_implementation = {
     .encrypt_detached              = encrypt_detached,
@@ -61,8 +62,8 @@ struct aegis128l_implementation aegis128l_armcrypto_implementation = {
     .state_decrypt_detached_final  = state_decrypt_detached_final,
 };
 
-#ifdef __clang__
-#pragma clang attribute pop
-#endif
+#    ifdef __clang__
+#        pragma clang attribute pop
+#    endif
 
 #endif

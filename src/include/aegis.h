@@ -4,10 +4,10 @@
 #include <stdint.h>
 
 #if !defined(__clang__) && !defined(__GNUC__)
-#ifdef __attribute__
-#undef __attribute__
-#endif
-#define __attribute__(a)
+#    ifdef __attribute__
+#        undef __attribute__
+#    endif
+#    define __attribute__(a)
 #endif
 
 #include "aegis128l.h"

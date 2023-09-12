@@ -8,37 +8,37 @@
 #include "aegis.h"
 
 #ifdef __linux__
-#define HAVE_SYS_AUXV_H
-#define HAVE_GETAUXVAL
+#    define HAVE_SYS_AUXV_H
+#    define HAVE_GETAUXVAL
 #endif
 #ifdef __ANDROID_API__
-#define HAVE_ANDROID_GETCPUFEATURES
+#    define HAVE_ANDROID_GETCPUFEATURES
 #endif
 #if defined(__i386__) || defined(__x86_64__)
-#define HAVE_CPUID
-#define NATIVE_LITTLE_ENDIAN
-#if defined(__clang__) || defined(__GNUC__)
-#define HAVE_AVX_ASM
-#endif
+#    define HAVE_CPUID
+#    define NATIVE_LITTLE_ENDIAN
+#    if defined(__clang__) || defined(__GNUC__)
+#        define HAVE_AVX_ASM
+#    endif
 #endif
 #ifdef __x86_64__
-#define HAVE_AVXINTRIN_H
-#define HAVE_AVX2INTRIN_H
-#define HAVE_AVX512FINTRIN_H
-#define HAVE_TMMINTRIN_H
-#define HAVE_WMMINTRIN_H
-#define HAVE_VAESINTRIN_H
-#ifdef __GNUC__
-#if !__has_include(<vaesintrin.h>)
-#undef HAVE_VAESINTRIN_H
-#endif
-#endif
+#    define HAVE_AVXINTRIN_H
+#    define HAVE_AVX2INTRIN_H
+#    define HAVE_AVX512FINTRIN_H
+#    define HAVE_TMMINTRIN_H
+#    define HAVE_WMMINTRIN_H
+#    define HAVE_VAESINTRIN_H
+#    ifdef __GNUC__
+#        if !__has_include(<vaesintrin.h>)
+#            undef HAVE_VAESINTRIN_H
+#        endif
+#    endif
 #endif
 
 #if defined(__INTEL_COMPILER) || defined(_MSC_VER)
-#define CRYPTO_ALIGN(x) __declspec(align(x))
+#    define CRYPTO_ALIGN(x) __declspec(align(x))
 #else
-#define CRYPTO_ALIGN(x) __attribute__((aligned(x)))
+#    define CRYPTO_ALIGN(x) __attribute__((aligned(x)))
 #endif
 
 #define LOAD32_LE(SRC) load32_le(SRC)

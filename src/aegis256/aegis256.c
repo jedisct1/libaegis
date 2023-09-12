@@ -11,16 +11,16 @@
 #include "aegis256_armcrypto.h"
 
 #ifndef HAS_HW_AES
-#include "aegis256_soft.h"
+#    include "aegis256_soft.h"
 static const aegis256_implementation *implementation = &aegis256_soft_implementation;
 #else
-#if defined(__aarch64__) || defined(_M_ARM64)
+#    if defined(__aarch64__) || defined(_M_ARM64)
 static const aegis256_implementation *implementation = &aegis256_armcrypto_implementation;
-#elif defined(__x86_64__) || defined(__i386__)
+#    elif defined(__x86_64__) || defined(__i386__)
 static const aegis256_implementation *implementation = &aegis256_aesni_implementation;
-#else
-#error "Unsupported architecture"
-#endif
+#    else
+#        error "Unsupported architecture"
+#    endif
 #endif
 
 size_t

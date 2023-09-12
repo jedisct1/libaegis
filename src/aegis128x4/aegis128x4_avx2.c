@@ -1,24 +1,24 @@
 #if defined(__i386__) || defined(__x86_64__)
 
-#include <errno.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+#    include <errno.h>
+#    include <stddef.h>
+#    include <stdint.h>
+#    include <stdlib.h>
+#    include <string.h>
 
-#include "../common/common.h"
-#include "aegis128x4.h"
-#include "aegis128x4_avx2.h"
+#    include "../common/common.h"
+#    include "aegis128x4.h"
+#    include "aegis128x4_avx2.h"
 
-#ifdef __clang__
-#pragma clang attribute push(__attribute__((target("vaes,avx2"))), apply_to = function)
-#elif defined(__GNUC__)
-#pragma GCC target("vaes,avx2")
-#endif
+#    ifdef __clang__
+#        pragma clang attribute push(__attribute__((target("vaes,avx2"))), apply_to = function)
+#    elif defined(__GNUC__)
+#        pragma GCC target("vaes,avx2")
+#    endif
 
-#include <immintrin.h>
+#    include <immintrin.h>
 
-#define AES_BLOCK_LENGTH 64
+#    define AES_BLOCK_LENGTH 64
 
 typedef struct {
     __m256i b0;
@@ -83,7 +83,7 @@ aegis128x4_update(aes_block_t *const state, const aes_block_t d1, const aes_bloc
     state[4] = AES_BLOCK_XOR(state[4], d2);
 }
 
-#include "aegis128x4_common.h"
+#    include "aegis128x4_common.h"
 
 struct aegis128x4_implementation aegis128x4_avx2_implementation = {
     .encrypt_detached              = encrypt_detached,
@@ -96,8 +96,8 @@ struct aegis128x4_implementation aegis128x4_avx2_implementation = {
     .state_decrypt_detached_final  = state_decrypt_detached_final,
 };
 
-#ifdef __clang__
-#pragma clang attribute pop
-#endif
+#    ifdef __clang__
+#        pragma clang attribute pop
+#    endif
 
 #endif

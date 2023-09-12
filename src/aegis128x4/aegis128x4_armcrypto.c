@@ -1,28 +1,29 @@
 #if defined(__aarch64__) || defined(_M_ARM64)
 
-#include <errno.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+#    include <errno.h>
+#    include <stddef.h>
+#    include <stdint.h>
+#    include <stdlib.h>
+#    include <string.h>
 
-#include "../common/common.h"
-#include "aegis128x4.h"
-#include "aegis128x4_armcrypto.h"
+#    include "../common/common.h"
+#    include "aegis128x4.h"
+#    include "aegis128x4_armcrypto.h"
 
-#ifdef __clang__
-#pragma clang attribute push(__attribute__((target("neon,crypto,aes"))), apply_to = function)
-#elif defined(__GNUC__)
-#pragma GCC target("neon,crypto,aes")
-#endif
+#    ifdef __clang__
+#        pragma clang attribute push(__attribute__((target("neon,crypto,aes"))), \
+                                         apply_to = function)
+#    elif defined(__GNUC__)
+#        pragma GCC target("neon,crypto,aes")
+#    endif
 
-#ifndef __ARM_FEATURE_AES
-#define __ARM_FEATURE_AES 1
-#endif
+#    ifndef __ARM_FEATURE_AES
+#        define __ARM_FEATURE_AES 1
+#    endif
 
-#include <arm_neon.h>
+#    include <arm_neon.h>
 
-#define AES_BLOCK_LENGTH 64
+#    define AES_BLOCK_LENGTH 64
 
 typedef struct {
     uint8x16_t b0;
@@ -91,7 +92,7 @@ aegis128x4_update(aes_block_t *const state, const aes_block_t d1, const aes_bloc
     state[0] = AES_BLOCK_XOR(AES_ENC(tmp, state[0]), d1);
 }
 
-#include "aegis128x4_common.h"
+#    include "aegis128x4_common.h"
 
 struct aegis128x4_implementation aegis128x4_armcrypto_implementation = {
     .encrypt_detached              = encrypt_detached,
@@ -104,8 +105,8 @@ struct aegis128x4_implementation aegis128x4_armcrypto_implementation = {
     .state_decrypt_detached_final  = state_decrypt_detached_final,
 };
 
-#ifdef __clang__
-#pragma clang attribute pop
-#endif
+#    ifdef __clang__
+#        pragma clang attribute pop
+#    endif
 
 #endif

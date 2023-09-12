@@ -9,11 +9,11 @@
 
 #ifndef HAS_HW_AES
 
-#include "../common/softaes.h"
-#include "aegis128x4.h"
-#include "aegis128x4_soft.h"
+#    include "../common/softaes.h"
+#    include "aegis128x4.h"
+#    include "aegis128x4_soft.h"
 
-#define AES_BLOCK_LENGTH 64
+#    define AES_BLOCK_LENGTH 64
 
 typedef struct {
     SoftAesBlock b0;
@@ -84,7 +84,7 @@ aegis128x4_update(aes_block_t *const state, const aes_block_t d1, const aes_bloc
     state[4] = AES_BLOCK_XOR(state[4], d2);
 }
 
-#include "aegis128x4_common.h"
+#    include "aegis128x4_common.h"
 
 struct aegis128x4_implementation aegis128x4_soft_implementation = {
     .encrypt_detached              = encrypt_detached,
