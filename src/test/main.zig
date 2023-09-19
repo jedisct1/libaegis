@@ -568,9 +568,9 @@ test "aegis128l - Random stream" {
     var msg: [100]u8 = undefined;
     var msg2: [100]u8 = undefined;
     aegis.aegis128l_randombytes_deterministic(&msg, msg.len, &nonce, &key);
-    aegis.aegis128l_randombytes_deterministic(&msg2, msg.len, &nonce, &key);
+    aegis.aegis128l_randombytes_deterministic(&msg2, msg2.len, &nonce, &key);
     try testing.expectEqualSlices(u8, &msg, &msg2);
     nonce[0] ^= 0x01;
-    aegis.aegis128l_randombytes_deterministic(&msg2, msg.len, &nonce, &key);
+    aegis.aegis128l_randombytes_deterministic(&msg2, msg2.len, &nonce, &key);
     try testing.expect(!std.mem.eql(u8, &msg, &msg2));
 }
