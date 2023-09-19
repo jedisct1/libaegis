@@ -81,6 +81,9 @@ aegis128x2_update(aes_block_t *const state, const aes_block_t d1, const aes_bloc
 struct aegis128x2_implementation aegis128x2_soft_implementation = {
     .encrypt_detached              = encrypt_detached,
     .decrypt_detached              = decrypt_detached,
+    .encrypt_unauthenticated       = encrypt_unauthenticated,
+    .decrypt_unauthenticated       = decrypt_unauthenticated,
+    .randombytes_deterministic     = randombytes_deterministic,
     .state_init                    = state_init,
     .state_encrypt_update          = state_encrypt_update,
     .state_encrypt_detached_final  = state_encrypt_detached_final,

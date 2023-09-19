@@ -151,6 +151,26 @@ aegis256_state_decrypt_detached_final(aegis256_state *st_, uint8_t *m, size_t ml
     return implementation->state_decrypt_detached_final(st_, m, mlen_max, written, mac, maclen);
 }
 
+void
+aegis256_randombytes_deterministic(uint8_t *out, size_t len, const uint8_t *npub, const uint8_t *k)
+{
+    implementation->randombytes_deterministic(out, len, npub, k);
+}
+
+void
+aegis256_encrypt_unauthenticated(uint8_t *c, const uint8_t *m, size_t mlen, const uint8_t *npub,
+                                 const uint8_t *k)
+{
+    implementation->encrypt_unauthenticated(c, m, mlen, npub, k);
+}
+
+void
+aegis256_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *npub,
+                                 const uint8_t *k)
+{
+    implementation->decrypt_unauthenticated(m, c, clen, npub, k);
+}
+
 int
 aegis256_pick_best_implementation(void)
 {

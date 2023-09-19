@@ -548,3 +548,29 @@ test "aegis-256x2 - test vector" {
     try testing.expectEqual(ret, 0);
     try std.testing.expectEqualSlices(u8, &msg, &msg2);
 }
+
+test "aegis128l - Unauthenticated encryption" {
+    const key = [32]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
+    const nonce = [32]u8{ 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47 };
+    var msg: [100]u8 = undefined;
+    var msg2: [100]u8 = undefined;
+
+    random.bytes(&msg);
+    aegis.aegis128l_encrypt_unauthenticated(&msg2, &msg, msg.len, &nonce, &key);
+    try testing.expect(!std.mem.eql(u8, &msg, &msg2));
+    aegis.aegis128l_decrypt_unauthenticated(&msg2, &msg2, msg2.len, &nonce, &key);
+    try testing.expectEqualSlices(u8, &msg, &msg2);
+}
+
+test "aegis128l - Random stream" {
+    const key = [32]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
+    var nonce = [32]u8{ 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47 };
+    var msg: [100]u8 = undefined;
+    var msg2: [100]u8 = undefined;
+    aegis.aegis128l_randombytes_deterministic(&msg, msg.len, &nonce, &key);
+    aegis.aegis128l_randombytes_deterministic(&msg2, msg.len, &nonce, &key);
+    try testing.expectEqualSlices(u8, &msg, &msg2);
+    nonce[0] ^= 0x01;
+    aegis.aegis128l_randombytes_deterministic(&msg2, msg.len, &nonce, &key);
+    try testing.expect(!std.mem.eql(u8, &msg, &msg2));
+}

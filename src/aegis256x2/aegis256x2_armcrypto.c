@@ -90,6 +90,9 @@ aegis256x2_update(aes_block_t *const state, const aes_block_t d)
 struct aegis256x2_implementation aegis256x2_armcrypto_implementation = {
     .encrypt_detached              = encrypt_detached,
     .decrypt_detached              = decrypt_detached,
+    .encrypt_unauthenticated       = encrypt_unauthenticated,
+    .decrypt_unauthenticated       = decrypt_unauthenticated,
+    .randombytes_deterministic     = randombytes_deterministic,
     .state_init                    = state_init,
     .state_encrypt_update          = state_encrypt_update,
     .state_encrypt_detached_final  = state_encrypt_detached_final,
