@@ -259,6 +259,70 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
     return ret;
 }
 
+static void
+randombytes_deterministic(uint8_t *out, size_t len, const uint8_t *npub, const uint8_t *k)
+{
+    aes_block_t                state[6];
+    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
+    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
+    size_t                     i;
+
+    memset(src, 0, sizeof src);
+    if (npub == NULL) {
+        npub = src;
+    }
+
+    aegis256x2_init(k, npub, state);
+
+    for (i = 0; i + RATE <= len; i += RATE) {
+        aegis256x2_enc(out + i, src, state);
+    }
+    if (len % RATE) {
+        aegis256x2_enc(dst, src, state);
+        memcpy(out + i, dst, len % RATE);
+    }
+}
+
+static void
+encrypt_unauthenticated(uint8_t *c, const uint8_t *m, size_t mlen, const uint8_t *npub,
+                        const uint8_t *k)
+{
+    aes_block_t                state[6];
+    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
+    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
+    size_t                     i;
+
+    aegis256x2_init(k, npub, state);
+
+    for (i = 0; i + RATE <= mlen; i += RATE) {
+        aegis256x2_enc(c + i, m + i, state);
+    }
+    if (mlen % RATE) {
+        memset(src, 0, RATE);
+        memcpy(src, m + i, mlen % RATE);
+        aegis256x2_enc(dst, src, state);
+        memcpy(c + i, dst, mlen % RATE);
+    }
+}
+
+static void
+decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *npub,
+                        const uint8_t *k)
+{
+    aes_block_t  state[6];
+    const size_t mlen = clen;
+    size_t       i;
+
+    aegis256x2_init(k, npub, state);
+
+    for (i = 0; i + RATE <= mlen; i += RATE) {
+        aegis256x2_dec(m + i, c + i, state);
+    }
+    if (mlen % RATE) {
+        aegis256x2_declast(m + i, c + i, mlen % RATE, state);
+    }
+}
+
 typedef struct _aegis256x2_state {
     aes_block_t state[6];
     uint8_t     buf[RATE];
