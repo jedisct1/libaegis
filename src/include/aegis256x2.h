@@ -222,7 +222,7 @@ void aegis256x2_randombytes_deterministic(uint8_t *out, size_t len, const uint8_
  * Encrypt a message WITHOUT AUTHENTICATION, similar to AES-CTR.
  *
  * WARNING: this is an insecure mode of operation, provided for compatibility with specific
- * protocols such as for QUIC header protection.
+ * protocols that bring their own authentication scheme.
  *
  * c: ciphertext output buffer
  * m: plaintext input buffer
@@ -237,7 +237,7 @@ void aegis256x2_encrypt_unauthenticated(uint8_t *c, const uint8_t *m, size_t mle
  * Decrypt a message WITHOUT AUTHENTICATION, similar to AES-CTR.
  *
  * WARNING: this is an insecure mode of operation, provided for compatibility with specific
- * protocols such as for QUIC header protection.
+ * protocols that bring their own authentication scheme.
  *
  * m: plaintext output buffer
  * c: ciphertext input buffer
