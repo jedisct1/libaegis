@@ -229,7 +229,7 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
 }
 
 static void
-randombytes_deterministic(uint8_t *out, size_t len, const uint8_t *npub, const uint8_t *k)
+stream(uint8_t *out, size_t len, const uint8_t *npub, const uint8_t *k)
 {
     aes_block_t                state[8];
     CRYPTO_ALIGN(RATE) uint8_t src[RATE];

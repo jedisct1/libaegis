@@ -12,8 +12,7 @@ typedef struct aegis128x2_implementation {
     int (*decrypt_detached)(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac,
                             size_t maclen, const uint8_t *ad, size_t adlen, const uint8_t *npub,
                             const uint8_t *k);
-    void (*randombytes_deterministic)(uint8_t *out, size_t len, const uint8_t *npub,
-                                      const uint8_t *k);
+    void (*stream)(uint8_t *out, size_t len, const uint8_t *npub, const uint8_t *k);
     void (*encrypt_unauthenticated)(uint8_t *c, const uint8_t *m, size_t mlen, const uint8_t *npub,
                                     const uint8_t *k);
     void (*decrypt_unauthenticated)(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *npub,

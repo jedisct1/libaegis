@@ -215,8 +215,7 @@ int aegis128l_state_decrypt_detached_final(aegis128l_state *st_, uint8_t *m, siz
  * generated from a given key.
  * k: key input buffer (16 bytes)
  */
-void aegis128l_randombytes_deterministic(uint8_t *out, size_t len, const uint8_t *npub,
-                                         const uint8_t *k);
+void aegis128l_stream(uint8_t *out, size_t len, const uint8_t *npub, const uint8_t *k);
 
 /*
  * Encrypt a message WITHOUT AUTHENTICATION, similar to AES-CTR.

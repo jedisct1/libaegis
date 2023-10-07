@@ -152,9 +152,9 @@ aegis128l_state_decrypt_detached_final(aegis128l_state *st_, uint8_t *m, size_t 
 }
 
 void
-aegis128l_randombytes_deterministic(uint8_t *out, size_t len, const uint8_t *npub, const uint8_t *k)
+aegis128l_stream(uint8_t *out, size_t len, const uint8_t *npub, const uint8_t *k)
 {
-    implementation->randombytes_deterministic(out, len, npub, k);
+    implementation->stream(out, len, npub, k);
 }
 
 void
