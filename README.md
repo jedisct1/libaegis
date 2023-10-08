@@ -75,21 +75,25 @@ Benchmarks of the `aegis` crate against other options for Rust:
 
 ### AMD Zen4
 
+rust 1.73, zig cc 0.11
+
 | cipher                       |     speed |
 | ---------------------------- | --------: |
-| aes128-gcm (`aes-gcm` crate) |  1.73 G/s |
-| aes256-gcm (`aes-gcm` crate) |  1.86 G/s |
-| chacha20-poly1305            |  2.47 G/s |
-| aes256-gcm (`boring` crate)  |  5.14 G/s |
-| aes128-gcm (`boring` crate)  |  5.92 G/s |
-| aegis256                     | 14.36 G/s |
-| aegis256x2                   | 26.92 G/s |
-| aegis256x4                   | 42.82 G/s |
-| aegis128l                    | 23.35 G/s |
-| aegis128x2                   | 42.68 G/s |
-| aegis128x4                   | 55.28 G/s |
+| aes128-gcm (`aes-gcm` crate) |  2.19 G/s |
+| aes256-gcm (`aes-gcm` crate) |  2.03 G/s |
+| chacha20-poly1305            |  2.00 G/s |
+| aes256-gcm (`boring` crate)  |  5.93 G/s |
+| aes128-gcm (`boring` crate)  |  6.33 G/s |
+| aegis256                     | 15.40 G/s |
+| aegis256x2                   | 30.60 G/s |
+| aegis256x4                   | 46.17 G/s |
+| aegis128l                    | 26.16 G/s |
+| aegis128x2                   | 50.35 G/s |
+| aegis128x4                   | 66.22 G/s |
 
 ### Macbook Pro - Apple M1
+
+rust 1.73, Xcode
 
 | cipher                       |      speed |
 | ---------------------------- | ---------: |
