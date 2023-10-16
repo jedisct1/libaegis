@@ -10,13 +10,6 @@
 #    include "aegis128x2.h"
 #    include "aegis128x2_armcrypto.h"
 
-#    ifdef __clang__
-#        pragma clang attribute push(__attribute__((target("neon,crypto,aes"))), \
-                                         apply_to = function)
-#    elif defined(__GNUC__)
-#        pragma GCC target("+simd+crypto")
-#    endif
-
 #    ifndef __ARM_FEATURE_CRYPTO
 #        define __ARM_FEATURE_CRYPTO 1
 #    endif
@@ -25,6 +18,13 @@
 #    endif
 
 #    include <arm_neon.h>
+
+#    ifdef __clang__
+#        pragma clang attribute push(__attribute__((target("neon,crypto,aes"))), \
+                                         apply_to = function)
+#    elif defined(__GNUC__)
+#        pragma GCC target("+simd+crypto")
+#    endif
 
 #    define AES_BLOCK_LENGTH 32
 
