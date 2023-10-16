@@ -29,7 +29,7 @@ pub fn build(b: *std.Build) void {
 
     lib.addIncludePath(.{ .path = "src/include" });
 
-    lib.addCSourceFiles(&.{
+    const source_files = &.{
         "src/aegis128l/aegis128l_aesni.c",
         "src/aegis128l/aegis128l_armcrypto.c",
         "src/aegis128l/aegis128l_soft.c",
@@ -69,7 +69,13 @@ pub fn build(b: *std.Build) void {
         "src/common/common.c",
         "src/common/cpu.c",
         "src/common/softaes.c",
-    }, &.{});
+    };
+
+    if (@hasDecl(std.Build.Step.Compile, "AddCSourceFilesOptions")) {
+        lib.addCSourceFiles(.{ .files = source_files });
+    } else {
+        lib.addCSourceFiles(source_files, &.{});
+    }
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
