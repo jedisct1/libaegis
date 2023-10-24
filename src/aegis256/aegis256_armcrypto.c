@@ -29,6 +29,7 @@
 #    define AES_BLOCK_LENGTH 16
 
 typedef uint8x16_t aes_block_t;
+
 #    define AES_BLOCK_XOR(A, B)       veorq_u8((A), (B))
 #    define AES_BLOCK_AND(A, B)       vandq_u8((A), (B))
 #    define AES_BLOCK_LOAD(A)         vld1q_u8(A)

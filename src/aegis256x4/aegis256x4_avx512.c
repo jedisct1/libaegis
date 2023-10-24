@@ -24,6 +24,7 @@
 #        define AES_BLOCK_LENGTH 64
 
 typedef __m512i aes_block_t;
+
 #        define AES_BLOCK_XOR(A, B) _mm512_xor_si512((A), (B))
 #        define AES_BLOCK_AND(A, B) _mm512_and_si512((A), (B))
 #        define AES_BLOCK_LOAD128_BROADCAST(A) \

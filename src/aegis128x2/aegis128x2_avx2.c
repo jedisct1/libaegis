@@ -21,6 +21,7 @@
 #    define AES_BLOCK_LENGTH 32
 
 typedef __m256i aes_block_t;
+
 #    define AES_BLOCK_XOR(A, B) _mm256_xor_si256((A), (B))
 #    define AES_BLOCK_AND(A, B) _mm256_and_si256((A), (B))
 #    define AES_BLOCK_LOAD128_BROADCAST(A) \
