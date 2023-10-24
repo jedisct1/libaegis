@@ -35,6 +35,12 @@
 #    endif
 #endif
 
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#    ifndef NATIVE_LITTLE_ENDIAN
+#        define NATIVE_LITTLE_ENDIAN
+#    endif
+#endif
+
 #if defined(__INTEL_COMPILER) || defined(_MSC_VER)
 #    define CRYPTO_ALIGN(x) __declspec(align(x))
 #else
