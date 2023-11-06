@@ -416,13 +416,16 @@ test "aegis-128x2 - test vector" {
     const msg = [_]u8{ 4, 5, 6, 7 } ** 30;
     var c = [_]u8{0} ** msg.len;
     var mac = [_]u8{0} ** 16;
+    var mac256 = [_]u8{0} ** 32;
     var ret = aegis.aegis128x2_encrypt_detached(&c, &mac, mac.len, &msg, msg.len, &ad, ad.len, &nonce, &key);
     try testing.expectEqual(ret, 0);
+    ret = aegis.aegis128x2_encrypt_detached(&c, &mac256, mac256.len, &msg, msg.len, &ad, ad.len, &nonce, &key);
+    try testing.expectEqual(ret, 0);
 
-    const expected_ciphertext_hex = "9958ad79ff1feea50a27d5dd88728d157a4ce0cd996b9fffb4fde113ef646de4aa67278fb1ebcb6571526b309d708447c818ffc3d84c9c73b0cca3040bb85b81d366311956f4cb1a66b02b25b58a7f759797169b0e398c4db16c9a577d4de1805d646b823fa095ec34feefb58768efc06d9516c55b653f91";
+    const expected_ciphertext_hex = "5795544301997f93621b278809d6331b3bfa6f18e90db12c4aa35965b5e98c5fc6fb4e54bcb6111842c20637252eff747cb3a8f85b37de80919a589fe0f24872bc926360696739e05520647e390989e1eb5fd42f99678a0276a498f8c454761c9d6aacb647ad56be62b29c22cd4b5761b38f43d5a5ee062f";
     try testing.expectEqualSlices(u8, &std.fmt.bytesToHex(c, .lower), expected_ciphertext_hex);
 
-    const expected_tag_hex = "179247ab85ea2c4f9f712cac8bb7c9d3";
+    const expected_tag_hex = "1aebc200804f405cab637f2adebb6d77";
     try testing.expectEqualSlices(u8, &std.fmt.bytesToHex(mac, .lower), expected_tag_hex);
 
     var msg2 = [_]u8{0} ** msg.len;
@@ -512,13 +515,16 @@ test "aegis-128x4 - test vector" {
     const msg = [_]u8{ 4, 5, 6, 7 } ** 30;
     var c = [_]u8{0} ** msg.len;
     var mac = [_]u8{0} ** 16;
+    var mac256 = [_]u8{0} ** 32;
     var ret = aegis.aegis128x4_encrypt_detached(&c, &mac, mac.len, &msg, msg.len, &ad, ad.len, &nonce, &key);
     try testing.expectEqual(ret, 0);
+    ret = aegis.aegis128x4_encrypt_detached(&c, &mac256, mac256.len, &msg, msg.len, &ad, ad.len, &nonce, &key);
+    try testing.expectEqual(ret, 0);
 
-    const expected_ciphertext_hex = "9958ad79ff1feea50a27d5dd88728d157a4ce0cd996b9fffb4fde113ef646de46e4c5230174a6268f89f01d557879360a9068d7cb825bb0e8a97ea2e82059f69aa67278fb1ebcb6571526b309d708447c818ffc3d84c9c73b0cca3040bb85b8193fc9a4499e384ae87bfeaa46f514b6330c147c3ddbb6e94";
+    const expected_ciphertext_hex = "e836118562f4479c9d35c17356a833114c21f9aa39e4dda5e5c87f4152a00fce9a7c38f832eafe8b1c12f8a7cf12a81a1ad8a9c24ba9dedfbdaa586ffea67ddc801ea97d9ab4a872f42d0e352e2713dacd609f9442c17517c5a29daf3e2a3fac4ff6b1380c4e46df7b086af6ce6bc1ed594b8dd64aed2a7e";
     try testing.expectEqualSlices(u8, &std.fmt.bytesToHex(c, .lower), expected_ciphertext_hex);
 
-    const expected_tag_hex = "58038e00f6b7e861e2badb160beb71d4";
+    const expected_tag_hex = "0e56ab94e2e85db80f9d54010caabfb4";
     try testing.expectEqualSlices(u8, &std.fmt.bytesToHex(mac, .lower), expected_tag_hex);
 
     var msg2 = [_]u8{0} ** msg.len;
@@ -531,16 +537,19 @@ test "aegis-256x2 - test vector" {
     const key = [32]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
     const nonce = [32]u8{ 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47 };
     const ad = [_]u8{ 1, 2, 3, 4 } ** 2;
-    const msg = [_]u8{ 5, 6, 7, 8 } ** 3;
+    const msg = [_]u8{ 5, 6, 7, 8 } ** 30;
     var c = [_]u8{0} ** msg.len;
     var mac = [_]u8{0} ** 16;
+    var mac256 = [_]u8{0} ** 32;
     var ret = aegis.aegis256x2_encrypt_detached(&c, &mac, mac.len, &msg, msg.len, &ad, ad.len, &nonce, &key);
     try testing.expectEqual(ret, 0);
+    ret = aegis.aegis256x2_encrypt_detached(&c, &mac256, mac256.len, &msg, msg.len, &ad, ad.len, &nonce, &key);
+    try testing.expectEqual(ret, 0);
 
-    const expected_ciphertext_hex = "a0b3f5b6b93db779c9d1b9de";
+    const expected_ciphertext_hex = "73110d21a920608fd77b580f1e4428087a7365cb153b4eeca6b62e1a70f7f9a8d1f31f17da4c3acfacb2517f2f5e15758c35532e33751a964d18d29a599d2dc07f9378339b9d8c9fa03d30a4d7837cc8eb8b99bcbba2d11cd1a0f994af2b8f947ef18473bd519e5283736758480abc990e79d4ccab93dde9";
     try testing.expectEqualSlices(u8, &std.fmt.bytesToHex(c, .lower), expected_ciphertext_hex);
 
-    const expected_tag_hex = "fd2e93a6eb0b74dc30eb984fbec1d657";
+    const expected_tag_hex = "94a3bd44ad3381e36335014620ee638e";
     try testing.expectEqualSlices(u8, &std.fmt.bytesToHex(mac, .lower), expected_tag_hex);
 
     var msg2 = [_]u8{0} ** msg.len;
@@ -553,16 +562,19 @@ test "aegis-256x4 - test vector" {
     const key = [32]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
     const nonce = [32]u8{ 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47 };
     const ad = [_]u8{ 1, 2, 3, 4 } ** 2;
-    const msg = [_]u8{ 5, 6, 7, 8 } ** 3;
+    const msg = [_]u8{ 5, 6, 7, 8 } ** 30;
     var c = [_]u8{0} ** msg.len;
     var mac = [_]u8{0} ** 16;
+    var mac256 = [_]u8{0} ** 32;
     var ret = aegis.aegis256x4_encrypt_detached(&c, &mac, mac.len, &msg, msg.len, &ad, ad.len, &nonce, &key);
     try testing.expectEqual(ret, 0);
+    ret = aegis.aegis256x4_encrypt_detached(&c, &mac256, mac256.len, &msg, msg.len, &ad, ad.len, &nonce, &key);
+    try testing.expectEqual(ret, 0);
 
-    const expected_ciphertext_hex = "a0b3f5b6b93db779c9d1b9de";
+    const expected_ciphertext_hex = "bec109547f8316d598b3b7d947ad4c0ef5b98e217cffa0d858ad49ae34109a95abc5b5fada820c4d6ae2fca0f5e2444e52a04a1edb7bec71408de3e19950052194506be3ba6a4de51a15a577ea0e4c14f7539a13e751a555f48d0f49fecffb220525e60d381e2efa803b09b7164ba59fdc66656affd51e06";
     try testing.expectEqualSlices(u8, &std.fmt.bytesToHex(c, .lower), expected_ciphertext_hex);
 
-    const expected_tag_hex = "2b05e91bb786a64b41064351a375a54f";
+    const expected_tag_hex = "ec44b512d713f745547be345bcc66b6c";
     try testing.expectEqualSlices(u8, &std.fmt.bytesToHex(mac, .lower), expected_tag_hex);
 
     var msg2 = [_]u8{0} ** msg.len;

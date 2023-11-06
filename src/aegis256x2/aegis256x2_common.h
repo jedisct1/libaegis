@@ -42,8 +42,11 @@ aegis256x2_init(const uint8_t *key, const uint8_t *nonce, aes_block_t *const sta
     k1_n1 = AES_BLOCK_XOR(k1, n1);
 
     memset(context_bytes, 0, sizeof context_bytes);
-    context_bytes[1 * 16] = 0x01;
-    context               = AES_BLOCK_LOAD(context_bytes);
+    context_bytes[0 * 16]     = 0x00;
+    context_bytes[0 * 16 + 1] = 0x01;
+    context_bytes[1 * 16]     = 0x01;
+    context_bytes[1 * 16 + 1] = 0x01;
+    context                   = AES_BLOCK_LOAD(context_bytes);
 
     state[0] = k0_n0;
     state[1] = k1_n1;
