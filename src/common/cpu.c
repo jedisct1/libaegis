@@ -48,8 +48,6 @@ static CPUFeatures _cpu_features;
 static int
 _runtime_arm_cpu_features(CPUFeatures *const cpu_features)
 {
-    memset(cpu_features, 0, sizeof *cpu_features);
-
 #ifndef __ARM_ARCH
     return -1; /* LCOV_EXCL_LINE */
 #endif
@@ -71,7 +69,7 @@ _runtime_arm_cpu_features(CPUFeatures *const cpu_features)
 #    endif
 #elif defined(__arm__) && defined(AT_HWCAP)
 #    ifdef HAVE_GETAUXVAL
-    cpu_features->has_neon      = (getauxval(AT_HWCAP) & (1L << 12)) != 0;
+    cpu_features->has_neon = (getauxval(AT_HWCAP) & (1L << 12)) != 0;
 #    elif defined(HAVE_ELF_AUX_INFO)
     {
         unsigned long buf;
@@ -182,8 +180,6 @@ _runtime_intel_cpu_features(CPUFeatures *const cpu_features)
     unsigned int cpu_info[4];
     uint32_t     xcr0 = 0U;
 
-    memset(cpu_features, 0, sizeof *cpu_features);
-
     _cpuid(cpu_info, 0x0);
     if (cpu_info[0] == 0U) {
         return -1; /* LCOV_EXCL_LINE */
@@ -265,6 +261,8 @@ int
 aegis_runtime_get_cpu_features(void)
 {
     int ret = -1;
+
+    memset(&_cpu_features, 0, sizeof _cpu_features);
 
     ret &= _runtime_arm_cpu_features(&_cpu_features);
     ret &= _runtime_intel_cpu_features(&_cpu_features);
