@@ -22,8 +22,9 @@ test "aegis-128l - encrypt_detached oneshot" {
 
         for (0..iterations) |_| {
             const msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
-            var msg = msg_buf[0..msg_len];
+            const msg = msg_buf[0..msg_len];
             var c = c_buf[0..msg_len];
+            _ = &c;
 
             const ad_len = random.intRangeAtMost(usize, 0, ad_buf.len);
             const ad = &ad_buf[0..ad_len];
@@ -37,6 +38,7 @@ test "aegis-128l - encrypt_detached oneshot" {
             try testing.expectEqual(ret, 0);
 
             var msg2 = msg2_buf[0..msg_len];
+            _ = &msg2;
             ret = aegis.aegis128l_decrypt_detached(msg2.ptr, c.ptr, c.len, &mac, mac_len, ad.ptr, ad.len, &nonce, &key);
             try testing.expectEqual(ret, 0);
             try testing.expectEqualSlices(u8, msg, msg2);
@@ -59,8 +61,9 @@ test "aegis-256 - encrypt_detached oneshot" {
 
         for (0..iterations) |_| {
             const msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
-            var msg = msg_buf[0..msg_len];
+            const msg = msg_buf[0..msg_len];
             var c = c_buf[0..msg_len];
+            _ = &c;
 
             const ad_len = random.intRangeAtMost(usize, 0, ad_buf.len);
             const ad = &ad_buf[0..ad_len];
@@ -74,6 +77,7 @@ test "aegis-256 - encrypt_detached oneshot" {
             try testing.expectEqual(ret, 0);
 
             var msg2 = msg2_buf[0..msg_len];
+            _ = &msg2;
             ret = aegis.aegis256_decrypt_detached(msg2.ptr, c.ptr, c.len, &mac, mac_len, ad.ptr, ad.len, &nonce, &key);
             try testing.expectEqual(ret, 0);
             try testing.expectEqualSlices(u8, msg, msg2);
@@ -94,15 +98,17 @@ test "aegis-128l - incremental encryption" {
 
     random.bytes(&ad_buf);
 
-    var msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
+    const msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
 
     for (&msg_buf, 0..) |*m, i| {
         m.* = @truncate(i);
     }
 
-    var msg = msg_buf[0..msg_len];
+    const msg = msg_buf[0..msg_len];
     var c = c_buf[0..msg_len];
+    _ = &c;
     var c2 = c2_buf[0..msg_len];
+    _ = &c2;
 
     const ad_len = random.intRangeAtMost(usize, 0, ad_buf.len);
     const ad = ad_buf[0..ad_len];
@@ -146,6 +152,7 @@ test "aegis-128l - incremental encryption" {
     try testing.expectEqualSlices(u8, c, c2);
 
     var msg2 = msg2_buf[0..msg_len];
+    _ = &msg2;
     ret = aegis.aegis128l_decrypt_detached(msg2.ptr, c.ptr, c.len, &mac, mac_len, ad.ptr, ad.len, &nonce, &key);
     try testing.expectEqual(ret, 0);
     try testing.expectEqualSlices(u8, msg, msg2);
@@ -164,15 +171,17 @@ test "aegis-256 - incremental encryption" {
 
     random.bytes(&ad_buf);
 
-    var msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
+    const msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
 
     for (&msg_buf, 0..) |*m, i| {
         m.* = @truncate(i);
     }
 
-    var msg = msg_buf[0..msg_len];
+    const msg = msg_buf[0..msg_len];
     var c = c_buf[0..msg_len];
+    _ = &c;
     var c2 = c2_buf[0..msg_len];
+    _ = &c2;
 
     const ad_len = random.intRangeAtMost(usize, 0, ad_buf.len);
     const ad = ad_buf[0..ad_len];
@@ -216,6 +225,7 @@ test "aegis-256 - incremental encryption" {
     try testing.expectEqualSlices(u8, c, c2);
 
     var msg2 = msg2_buf[0..msg_len];
+    _ = &msg2;
     ret = aegis.aegis256_decrypt_detached(msg2.ptr, c.ptr, c.len, &mac, mac_len, ad.ptr, ad.len, &nonce, &key);
     try testing.expectEqual(ret, 0);
     try testing.expectEqualSlices(u8, msg, msg2);
@@ -294,14 +304,13 @@ test "aegis-128l - incremental decryption" {
 
     random.bytes(&ad_buf);
 
-    var msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
-    msg_len = 32;
+    const msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
 
     for (&msg_buf, 0..) |*m, i| {
         m.* = @truncate(i);
     }
 
-    var msg = msg_buf[0..msg_len];
+    const msg = msg_buf[0..msg_len];
     var c = c_buf[0..msg_len];
 
     const ad_len = random.intRangeAtMost(usize, 0, ad_buf.len);
@@ -320,7 +329,8 @@ test "aegis-128l - incremental decryption" {
 
     const c0 = c[0 .. c.len / 3];
     const c1 = c[c.len / 3 .. 2 * c.len / 3];
-    const c2 = c[2 * c.len / 3 ..];
+    var c2 = c[2 * c.len / 3 ..];
+    _ = &c2;
 
     var mx = msg2_buf[0..c.len];
 
@@ -358,13 +368,13 @@ test "aegis-256 - incremental decryption" {
 
     random.bytes(&ad_buf);
 
-    var msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
+    const msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
 
     for (&msg_buf, 0..) |*m, i| {
         m.* = @truncate(i);
     }
 
-    var msg = msg_buf[0..msg_len];
+    const msg = msg_buf[0..msg_len];
     var c = c_buf[0..msg_len];
 
     const ad_len = random.intRangeAtMost(usize, 0, ad_buf.len);
@@ -381,9 +391,12 @@ test "aegis-256 - incremental decryption" {
     var st: aegis.aegis256_state = undefined;
     var written: usize = undefined;
 
-    const c0 = c[0 .. c.len / 3];
-    const c1 = c[c.len / 3 .. 2 * c.len / 3];
-    const c2 = c[2 * c.len / 3 ..];
+    var c0 = c[0 .. c.len / 3];
+    _ = &c0;
+    var c1 = c[c.len / 3 .. 2 * c.len / 3];
+    _ = &c1;
+    var c2 = c[2 * c.len / 3 ..];
+    _ = &c2;
 
     var mx = msg2_buf[0..c.len];
 
@@ -449,8 +462,9 @@ test "aegis-128x2 - encrypt_detached oneshot" {
 
         for (0..iterations) |_| {
             const msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
-            var msg = msg_buf[0..msg_len];
+            const msg = msg_buf[0..msg_len];
             var c = c_buf[0..msg_len];
+            _ = &c;
 
             const ad_len = random.intRangeAtMost(usize, 0, ad_buf.len);
             const ad = &ad_buf[0..ad_len];
@@ -464,6 +478,7 @@ test "aegis-128x2 - encrypt_detached oneshot" {
             try testing.expectEqual(ret, 0);
 
             var msg2 = msg2_buf[0..msg_len];
+            _ = &msg2;
             ret = aegis.aegis128x2_decrypt_detached(msg2.ptr, c.ptr, c.len, &mac, mac_len, ad.ptr, ad.len, &nonce, &key);
             try testing.expectEqual(ret, 0);
             try testing.expectEqualSlices(u8, msg, msg2);
@@ -486,8 +501,8 @@ test "aegis-128x4 - encrypt_detached oneshot" {
 
         for (0..iterations) |_| {
             const msg_len = random.intRangeAtMost(usize, 0, msg_buf.len);
-            var msg = msg_buf[0..msg_len];
-            var c = c_buf[0..msg_len];
+            const msg = msg_buf[0..msg_len];
+            const c = c_buf[0..msg_len];
 
             const ad_len = random.intRangeAtMost(usize, 0, ad_buf.len);
             const ad = &ad_buf[0..ad_len];
@@ -501,6 +516,7 @@ test "aegis-128x4 - encrypt_detached oneshot" {
             try testing.expectEqual(ret, 0);
 
             var msg2 = msg2_buf[0..msg_len];
+            _ = &msg2;
             ret = aegis.aegis128x4_decrypt_detached(msg2.ptr, c.ptr, c.len, &mac, mac_len, ad.ptr, ad.len, &nonce, &key);
             try testing.expectEqual(ret, 0);
             try testing.expectEqualSlices(u8, msg, msg2);
