@@ -8,10 +8,10 @@ pub fn build(b: *std.Build) void {
         .name = "libaegis",
         .target = target,
         .optimize = optimize,
+        .strip = true,
     });
 
     lib.linkLibC();
-    lib.strip = true;
 
     const lib_options = b.addOptions();
 
@@ -71,11 +71,7 @@ pub fn build(b: *std.Build) void {
         "src/common/softaes.c",
     };
 
-    if (@hasDecl(std.Build.Step.Compile, "AddCSourceFilesOptions")) {
-        lib.addCSourceFiles(.{ .files = source_files });
-    } else {
-        lib.addCSourceFiles(source_files, &.{});
-    }
+    lib.addCSourceFiles(.{ .files = source_files });
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
