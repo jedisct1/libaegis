@@ -18,8 +18,6 @@ jobs:
 
       - name: Install Zig
         uses: goto-bus-stop/setup-zig@6fede2f0550d71291c0accf2834b216e69a2d67a
-        with:
-          version: 0.11.0
 
       - name: Unit tests
         run: |
