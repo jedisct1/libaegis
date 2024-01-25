@@ -17,6 +17,9 @@
 #include "aegis256x2.h"
 #include "aegis256x4.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* Initialize the AEGIS library.
  *
  * This function does runtime CPU capability detection, and must be called once
@@ -43,5 +46,9 @@ int aegis_verify_16(const uint8_t *x, const uint8_t *y) __attribute__((warn_unus
  * Returns 0 if the blocks are equal, -1 otherwise.
  */
 int aegis_verify_32(const uint8_t *x, const uint8_t *y) __attribute__((warn_unused_result));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
