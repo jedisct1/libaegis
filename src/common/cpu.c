@@ -17,7 +17,7 @@
 #    include <sys/auxv.h>
 #endif
 #if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
-# include <intrin.h>
+#    include <intrin.h>
 #endif
 
 typedef struct CPUFeatures_ {
