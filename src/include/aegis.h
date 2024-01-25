@@ -20,6 +20,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /* Initialize the AEGIS library.
  *
  * This function does runtime CPU capability detection, and must be called once

@@ -8,7 +8,6 @@
 extern "C" {
 #endif
 
-
 /* The length of an AEGIS key, in bytes */
 #define aegis128l_KEYBYTES 16
 
@@ -251,6 +250,7 @@ void aegis128l_encrypt_unauthenticated(uint8_t *c, const uint8_t *m, size_t mlen
  */
 void aegis128l_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen,
                                        const uint8_t *npub, const uint8_t *k);
+
 #ifdef __cplusplus
 }
 #endif
