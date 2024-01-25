@@ -4,6 +4,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* The length of an AEGIS key, in bytes */
 #define aegis256_KEYBYTES 32
 
@@ -246,5 +250,9 @@ void aegis256_encrypt_unauthenticated(uint8_t *c, const uint8_t *m, size_t mlen,
  */
 void aegis256_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen,
                                       const uint8_t *npub, const uint8_t *k);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
