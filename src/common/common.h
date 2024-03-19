@@ -12,6 +12,9 @@
 #    define HAVE_GETAUXVAL
 #endif
 #ifdef __ANDROID_API__
+#    if __ANDROID_API__ < 18
+#        undef HAVE_GETAUXVAL
+#    endif
 #    define HAVE_ANDROID_GETCPUFEATURES
 #endif
 #if defined(__i386__) || defined(__x86_64__)
