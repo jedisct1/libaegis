@@ -5,7 +5,7 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{ .preferred_optimize_mode = .ReleaseFast });
 
     const lib = b.addStaticLibrary(.{
-        .name = "libaegis",
+        .name = "aegis",
         .target = target,
         .optimize = optimize,
         .strip = true,
