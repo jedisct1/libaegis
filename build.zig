@@ -22,10 +22,7 @@ pub fn build(b: *std.Build) void {
     }
 
     const with_benchmark: bool = b.option(bool, "with-benchmark", "Compile benchmark") orelse false;
-    lib_options.addOption(bool, "non_temporal_stores", with_benchmark);
-    if (with_benchmark) {
-        lib.defineCMacro("NON_TEMPORAL_STORES", "1");
-    }
+    lib_options.addOption(bool, "benchmark", with_benchmark);
 
     lib.addIncludePath(.{ .path = "src/include" });
 
