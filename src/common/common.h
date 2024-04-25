@@ -17,14 +17,15 @@
 #    endif
 #    define HAVE_ANDROID_GETCPUFEATURES
 #endif
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(__i386__) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_AMD64)
+
 #    define HAVE_CPUID
 #    define NATIVE_LITTLE_ENDIAN
 #    if defined(__clang__) || defined(__GNUC__)
 #        define HAVE_AVX_ASM
 #    endif
 #endif
-#ifdef __x86_64__
+#if defined(__x86_64__) || defined(_M_AMD64)
 #    define HAVE_AVXINTRIN_H
 #    define HAVE_AVX2INTRIN_H
 #    define HAVE_AVX512FINTRIN_H
