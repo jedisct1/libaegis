@@ -186,7 +186,7 @@ aegis128x2_pick_best_implementation(void)
     }
 #endif
 
-#if defined(__x86_64__) || defined(__i386__)
+#if defined(__x86_64__) || defined(_M_AMD64) || defined(__i386__) || defined(_M_IX86)
     if (aegis_runtime_has_vaes() && aegis_runtime_has_avx2()) {
         implementation = &aegis128x2_avx2_implementation;
         return 0;
