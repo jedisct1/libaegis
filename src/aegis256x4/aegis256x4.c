@@ -193,11 +193,11 @@ aegis256x4_pick_best_implementation(void)
         implementation = &aegis256x4_avx512_implementation;
         return 0;
     }
-#    endif
     if (aegis_runtime_has_vaes() && aegis_runtime_has_avx2()) {
         implementation = &aegis256x4_avx2_implementation;
         return 0;
     }
+#    endif
     if (aegis_runtime_has_aesni() && aegis_runtime_has_avx()) {
         implementation = &aegis256x4_aesni_implementation;
         return 0;
