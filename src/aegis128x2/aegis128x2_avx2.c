@@ -68,9 +68,9 @@ struct aegis128x2_implementation aegis128x2_avx2_implementation = {
     .state_decrypt_detached_final  = state_decrypt_detached_final,
 };
 
-#         ifdef __clang__
-#             pragma clang attribute pop
-#         endif
+#        ifdef __clang__
+#            pragma clang attribute pop
+#        endif
 
 #    endif
 
