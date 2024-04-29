@@ -10,15 +10,17 @@
 #    include "aegis256x4.h"
 #    include "aegis256x4_avx2.h"
 
-#    ifdef __clang__
-#        pragma clang attribute push(__attribute__((target("vaes,avx2"))), apply_to = function)
-#    elif defined(__GNUC__)
-#        pragma GCC target("vaes,avx2")
-#    endif
+#    ifdef HAVE_VAESINTRIN_H
 
-#    include <immintrin.h>
+#        ifdef __clang__
+#            pragma clang attribute push(__attribute__((target("vaes,avx2"))), apply_to = function)
+#        elif defined(__GNUC__)
+#            pragma GCC target("vaes,avx2")
+#        endif
 
-#    define AES_BLOCK_LENGTH 64
+#        include <immintrin.h>
+
+#        define AES_BLOCK_LENGTH 64
 
 typedef struct {
     __m256i b0;
@@ -78,7 +80,7 @@ aegis256x4_update(aes_block_t *const state, const aes_block_t d)
     state[0] = AES_BLOCK_XOR(AES_ENC(tmp, state[0]), d);
 }
 
-#    include "aegis256x4_common.h"
+#        include "aegis256x4_common.h"
 
 struct aegis256x4_implementation aegis256x4_avx2_implementation = {
     .encrypt_detached              = encrypt_detached,
@@ -94,8 +96,10 @@ struct aegis256x4_implementation aegis256x4_avx2_implementation = {
     .state_decrypt_detached_final  = state_decrypt_detached_final,
 };
 
-#    ifdef __clang__
-#        pragma clang attribute pop
+#        ifdef __clang__
+#            pragma clang attribute pop
+#        endif
+
 #    endif
 
 #endif
