@@ -21,7 +21,7 @@
 
 #    ifdef __clang__
 #        pragma clang attribute push(__attribute__((target("neon,crypto,aes"))), \
-                                         apply_to = function)
+                                     apply_to = function)
 #    elif defined(__GNUC__)
 #        pragma GCC target("+simd+crypto")
 #    endif

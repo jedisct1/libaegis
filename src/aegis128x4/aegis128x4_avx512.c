@@ -14,7 +14,7 @@
 
 #        ifdef __clang__
 #            pragma clang attribute push(__attribute__((target("vaes,avx512f"))), \
-                                             apply_to = function)
+                                         apply_to = function)
 #        elif defined(__GNUC__)
 #            pragma GCC target("vaes,avx512f")
 #        endif
