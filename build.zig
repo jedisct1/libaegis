@@ -24,7 +24,7 @@ pub fn build(b: *std.Build) void {
     const with_benchmark: bool = b.option(bool, "with-benchmark", "Compile benchmark") orelse false;
     lib_options.addOption(bool, "benchmark", with_benchmark);
 
-    lib.addIncludePath(.{ .path = "src/include" });
+    lib.addIncludePath(b.path("src/include"));
 
     const source_files = &.{
         "src/aegis128l/aegis128l_aesni.c",
@@ -78,18 +78,18 @@ pub fn build(b: *std.Build) void {
     b.installDirectory(.{
         .install_dir = .header,
         .install_subdir = "",
-        .source_dir = .{ .path = "src/include" },
+        .source_dir = b.path("src/include"),
     });
 
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.
     const main_tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/test/main.zig" },
+        .root_source_file = b.path("src/test/main.zig"),
         .target = target,
         .optimize = optimize,
     });
 
-    main_tests.addIncludePath(.{ .path = "src/include" });
+    main_tests.addIncludePath(b.path("src/include"));
     main_tests.linkLibrary(lib);
 
     const run_main_tests = b.addRunArtifact(main_tests);
@@ -103,11 +103,11 @@ pub fn build(b: *std.Build) void {
     if (with_benchmark) {
         const benchmark = b.addExecutable(.{
             .name = "benchmark",
-            .root_source_file = .{ .path = "src/test/benchmark.zig" },
+            .root_source_file = b.path("src/test/benchmark.zig"),
             .target = target,
             .optimize = optimize,
         });
-        benchmark.addIncludePath(.{ .path = "src/include" });
+        benchmark.addIncludePath(b.path("src/include"));
         benchmark.linkLibrary(lib);
         b.installArtifact(benchmark);
     }
