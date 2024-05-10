@@ -66,6 +66,8 @@ struct aegis128x2_implementation aegis128x2_avx2_implementation = {
     .state_encrypt_final           = state_encrypt_final,
     .state_decrypt_detached_update = state_decrypt_detached_update,
     .state_decrypt_detached_final  = state_decrypt_detached_final,
+    .state_mac_update              = state_mac_update,
+    .state_mac_final               = state_mac_final,
 };
 
 #        ifdef __clang__

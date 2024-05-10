@@ -581,3 +581,50 @@ state_decrypt_detached_final(aegis256x4_state *st_, uint8_t *m, size_t mlen_max,
     }
     return ret;
 }
+
+static int
+state_mac_update(aegis256x4_state *st_, const uint8_t *ad, size_t adlen)
+{
+    _aegis256x4_state *const st =
+        (_aegis256x4_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
+    size_t i;
+    size_t left;
+
+    left = st->adlen % RATE;
+    st->adlen += adlen;
+    if (left != 0) {
+        if (left + adlen < RATE) {
+            memcpy(st->buf + left, ad, adlen);
+            return 0;
+        }
+        memcpy(st->buf + left, ad, RATE - left);
+        aegis256x4_absorb(st->buf, st->state);
+        ad += RATE - left;
+        adlen -= RATE - left;
+    }
+    for (i = 0; i + RATE <= adlen; i += RATE) {
+        aegis256x4_absorb(ad + i, st->state);
+    }
+    if (i < adlen) {
+        memset(st->buf, 0, RATE);
+        memcpy(st->buf, ad + i, adlen - i);
+    }
+    return 0;
+}
+
+static int
+state_mac_final(aegis256x4_state *st_, uint8_t *mac, size_t maclen)
+{
+    _aegis256x4_state *const st =
+        (_aegis256x4_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
+    size_t left;
+
+    left = st->adlen % RATE;
+    if (left != 0) {
+        memset(st->buf + left, 0, RATE - left);
+        aegis256x4_absorb(st->buf, st->state);
+    }
+    aegis256x4_mac(mac, maclen, st->adlen, 0, st->state);
+
+    return 0;
+}

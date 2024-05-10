@@ -29,6 +29,8 @@ typedef struct aegis256x2_implementation {
                                          size_t *written, const uint8_t *c, size_t clen);
     int (*state_decrypt_detached_final)(aegis256x2_state *st_, uint8_t *m, size_t mlen_max,
                                         size_t *written, const uint8_t *mac, size_t maclen);
+    int (*state_mac_update)(aegis256x2_state *st_, const uint8_t *ad, size_t adlen);
+    int (*state_mac_final)(aegis256x2_state *st_, uint8_t *mac, size_t maclen);
 } aegis256x2_implementation;
 
 #endif

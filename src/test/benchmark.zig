@@ -214,7 +214,7 @@ fn bench_aegis128l_mac() !void {
     for (0..iterations) |_| {
         var st = st0;
         _ = aegis.aegis128l_mac_update(&st, &buf, msg_len);
-        _ = aegis.aegis128l_mac_final(&st, &buf, aegis.aegis128l_ABYTES_MIN);
+        _ = aegis.aegis128l_mac_final(&st, &buf, aegis.aegis128l_ABYTES_MAX);
     }
     const end = timer.read();
     mem.doNotOptimizeAway(buf[0]);
@@ -227,27 +227,19 @@ fn bench_aegis128l_mac() !void {
 
 fn bench_aegis128x2_mac() !void {
     var key: [aegis.aegis128x2_KEYBYTES]u8 = undefined;
-    var nonce: [aegis.aegis128x2_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
+    var st0: aegis.aegis128x2_state = undefined;
 
     random.bytes(&key);
-    random.bytes(&nonce);
     random.bytes(&buf);
+    aegis.aegis128x2_mac_init(&st0, &key);
 
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        _ = aegis.aegis128x2_encrypt_detached(
-            null,
-            &buf,
-            aegis.aegis128x2_ABYTES_MAX,
-            null,
-            0,
-            &buf,
-            msg_len,
-            &nonce,
-            &key,
-        );
+        var st = st0;
+        _ = aegis.aegis128x2_mac_update(&st, &buf, msg_len);
+        _ = aegis.aegis128x2_mac_final(&st, &buf, aegis.aegis128x2_ABYTES_MAX);
     }
     const end = timer.read();
     mem.doNotOptimizeAway(buf[0]);
@@ -258,29 +250,22 @@ fn bench_aegis128x2_mac() !void {
     try stdout.print("AEGIS-128X2 MAC\t{d:10.2} Mb/s\n", .{throughput});
 }
 
+
 fn bench_aegis128x4_mac() !void {
     var key: [aegis.aegis128x4_KEYBYTES]u8 = undefined;
-    var nonce: [aegis.aegis128x4_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
+    var st0: aegis.aegis128x4_state = undefined;
 
     random.bytes(&key);
-    random.bytes(&nonce);
     random.bytes(&buf);
+    aegis.aegis128x4_mac_init(&st0, &key);
 
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        _ = aegis.aegis128x4_encrypt_detached(
-            null,
-            &buf,
-            aegis.aegis128x4_ABYTES_MAX,
-            null,
-            0,
-            &buf,
-            msg_len,
-            &nonce,
-            &key,
-        );
+        var st = st0;
+        _ = aegis.aegis128x4_mac_update(&st, &buf, msg_len);
+        _ = aegis.aegis128x4_mac_final(&st, &buf, aegis.aegis128x4_ABYTES_MAX);
     }
     const end = timer.read();
     mem.doNotOptimizeAway(buf[0]);
@@ -290,6 +275,8 @@ fn bench_aegis128x4_mac() !void {
     const stdout = std.io.getStdOut().writer();
     try stdout.print("AEGIS-128X4 MAC\t{d:10.2} Mb/s\n", .{throughput});
 }
+
+
 
 pub fn main() !void {
     try bench_aegis256();
