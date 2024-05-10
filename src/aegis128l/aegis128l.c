@@ -171,6 +171,49 @@ aegis128l_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen, con
     implementation->decrypt_unauthenticated(m, c, clen, npub, k);
 }
 
+void
+aegis128l_mac_init(aegis128l_state *st_, const uint8_t *k)
+{
+    const uint8_t npub[aegis128l_NPUBBYTES] = { 0 };
+
+    memset(st_, 0, sizeof *st_);
+    implementation->state_init(st_, NULL, 0, npub, k);
+}
+
+int
+aegis128l_mac_update(aegis128l_state *st_, const uint8_t *m, size_t mlen)
+{
+    return implementation->state_mac_update(st_, m, mlen);
+}
+
+int
+aegis128l_mac_final(aegis128l_state *st_, uint8_t *mac, size_t maclen)
+{
+    if (maclen != 16 && maclen != 32) {
+        errno = EINVAL;
+        return -1;
+    }
+    return implementation->state_mac_final(st_, mac, maclen);
+}
+
+int
+aegis128l_mac_verify(aegis128l_state *st_, const uint8_t *mac, size_t maclen)
+{
+    uint8_t expected_mac[32];
+
+    switch (maclen) {
+    case 16:
+        implementation->state_mac_final(st_, expected_mac, maclen);
+        return aegis_verify_16(expected_mac, mac);
+    case 32:
+        implementation->state_mac_final(st_, expected_mac, maclen);
+        return aegis_verify_32(expected_mac, mac);
+    default:
+        errno = EINVAL;
+        return -1;
+    }
+}
+
 int
 aegis128l_pick_best_implementation(void)
 {

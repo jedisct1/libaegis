@@ -202,27 +202,19 @@ fn bench_aegis128x4() !void {
 
 fn bench_aegis128l_mac() !void {
     var key: [aegis.aegis128l_KEYBYTES]u8 = undefined;
-    var nonce: [aegis.aegis128l_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
+    var st0: aegis.aegis128l_state = undefined;
 
     random.bytes(&key);
-    random.bytes(&nonce);
     random.bytes(&buf);
+    aegis.aegis128l_mac_init(&st0, &key);
 
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        _ = aegis.aegis128l_encrypt_detached(
-            null,
-            &buf,
-            aegis.aegis128l_ABYTES_MAX,
-            null,
-            0,
-            &buf,
-            msg_len,
-            &nonce,
-            &key,
-        );
+        var st = st0;
+        _ = aegis.aegis128l_mac_update(&st, &buf, msg_len);
+        _ = aegis.aegis128l_mac_final(&st, &buf, aegis.aegis128l_ABYTES_MIN);
     }
     const end = timer.read();
     mem.doNotOptimizeAway(buf[0]);

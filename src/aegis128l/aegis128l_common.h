@@ -325,6 +325,53 @@ state_init(aegis128l_state *st_, const uint8_t *ad, size_t adlen, const uint8_t 
 }
 
 static int
+state_mac_update(aegis128l_state *st_, const uint8_t *ad, size_t adlen)
+{
+    _aegis128l_state *const st =
+        (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
+    size_t i;
+    size_t left;
+
+    left = st->adlen % RATE;
+    st->adlen += adlen;
+    if (left != 0) {
+        if (left + adlen < RATE) {
+            memcpy(st->buf + left, ad, adlen);
+            return 0;
+        }
+        memcpy(st->buf + left, ad, RATE - left);
+        aegis128l_absorb(st->buf, st->state);
+        ad += RATE - left;
+        adlen -= RATE - left;
+    }
+    for (i = 0; i + RATE <= adlen; i += RATE) {
+        aegis128l_absorb(ad + i, st->state);
+    }
+    if (i < adlen) {
+        memset(st->buf, 0, RATE);
+        memcpy(st->buf, ad + i, adlen - i);
+    }
+    return 0;
+}
+
+static int
+state_mac_final(aegis128l_state *st_, uint8_t *mac, size_t maclen)
+{
+    _aegis128l_state *const st =
+        (_aegis128l_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
+    size_t left;
+
+    left = st->adlen % RATE;
+    if (left != 0) {
+        memset(st->buf + left, 0, RATE - left);
+        aegis128l_absorb(st->buf, st->state);
+    }
+    aegis128l_mac(mac, maclen, st->adlen, 0, st->state);
+
+    return 0;
+}
+
+static int
 state_encrypt_update(aegis128l_state *st_, uint8_t *c, size_t clen_max, size_t *written,
                      const uint8_t *m, size_t mlen)
 {

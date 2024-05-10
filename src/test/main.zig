@@ -624,3 +624,35 @@ test "aegis128l - Random stream" {
     aegis.aegis128l_stream(&msg2, msg2.len, &nonce, &key);
     try testing.expect(!std.mem.eql(u8, &msg, &msg2));
 }
+
+test "aegis128l - MAC" {
+    const key = [32]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
+    const msg = [_]u8{ 1, 2, 3 } ** 30;
+    const msg2 = [_]u8{ 4, 5, 6, 7, 8 } ** 30;
+    var st0: aegis.aegis128l_state = undefined;
+    aegis.aegis128l_mac_init(&st0, &key);
+
+    var st = st0;
+    var ret = aegis.aegis128l_mac_update(&st, &msg, msg.len);
+    try testing.expectEqual(ret, 0);
+    ret = aegis.aegis128l_mac_update(&st, &msg2, msg2.len);
+    try testing.expectEqual(ret, 0);
+    var mac: [32]u8 = undefined;
+    ret = aegis.aegis128l_mac_final(&st, &mac, mac.len);
+    try testing.expectEqual(ret, 0);
+
+    st = st0;
+    ret = aegis.aegis128l_mac_update(&st, &msg, msg.len);
+    try testing.expectEqual(ret, 0);
+    ret = aegis.aegis128l_mac_update(&st, &msg2, msg2.len);
+    try testing.expectEqual(ret, 0);
+    ret = aegis.aegis128l_mac_verify(&st, &mac, mac.len);
+    try testing.expectEqual(ret, 0);
+
+    st = st0;
+    const msg3 = msg ++ msg2;
+    ret = aegis.aegis128l_mac_update(&st, &msg3, msg3.len);
+    try testing.expectEqual(ret, 0);
+    ret = aegis.aegis128l_mac_verify(&st, &mac, mac.len);
+    try testing.expectEqual(ret, 0);
+}

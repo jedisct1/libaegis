@@ -251,6 +251,54 @@ void aegis128l_encrypt_unauthenticated(uint8_t *c, const uint8_t *m, size_t mlen
 void aegis128l_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen,
                                        const uint8_t *npub, const uint8_t *k);
 
+/*
+ * Initialize a state for generating a MAC.
+ *
+ * st_: state to initialize
+ * k: key input buffer (16 bytes)
+ *
+ * - The same key MUST NOT be used both for MAC and encryption.
+ * - The nonce is not used in the MAC mode (fixed to zero).
+ * - If the key is secret, the MAC is secure against forgery.
+ * - However, if the key is known, arbitrary inputs matching a tag can be efficiently computed.
+ *
+ * The recommended way to use the MAC mode is to generate a random key and keep it secret.
+ */
+void aegis128l_mac_init(aegis128l_state *st_, const uint8_t *k);
+
+/*
+ * Update the MAC state with input data.
+ *
+ * st_: state to update
+ * m: input data
+ * mlen: length of the input data
+ *
+ * This function can be called multiple times.
+ *
+ * Once the full input has been absorb, call either `_mac_final` or `_mac_verify`.
+ */
+int aegis128l_mac_update(aegis128l_state *st_, const uint8_t *m, size_t mlen);
+
+/*
+ * Finalize the MAC and generate the authentication tag.
+ *
+ * st_: state to finalize
+ * mac: authentication tag output buffer
+ * maclen: length of the authentication tag to generate (16 or 32. 32 is recommended).
+ */
+int aegis128l_mac_final(aegis128l_state *st_, uint8_t *mac, size_t maclen);
+
+/*
+ * Verify a MAC in constant time.
+ *
+ * st_: state to verify
+ * mac: authentication tag to verify
+ * maclen: length of the authentication tag (16 or 32)
+ *
+ * Returns 0 if the tag is authentic, -1 otherwise.
+ */
+int aegis128l_mac_verify(aegis128l_state *st_, const uint8_t *mac, size_t maclen);
+
 #ifdef __cplusplus
 }
 #endif
