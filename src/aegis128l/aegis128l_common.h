@@ -548,7 +548,19 @@ state_mac_update(aegis128l_state *st_, const uint8_t *ad, size_t adlen)
         ad += RATE - left;
         adlen -= RATE - left;
     }
-    for (i = 0; i + RATE <= adlen; i += RATE) {
+    for (i = 0; i + RATE * 2 <= adlen; i += RATE * 2) {
+        aes_block_t msg0, msg1, msg2, msg3;
+
+        msg0 = AES_BLOCK_LOAD(ad + i + AES_BLOCK_LENGTH * 0);
+        msg1 = AES_BLOCK_LOAD(ad + i + AES_BLOCK_LENGTH * 1);
+        msg2 = AES_BLOCK_LOAD(ad + i + AES_BLOCK_LENGTH * 2);
+        msg3 = AES_BLOCK_LOAD(ad + i + AES_BLOCK_LENGTH * 3);
+        COMPILER_ASSERT(AES_BLOCK_LENGTH * 4 == RATE * 2);
+
+        aegis128l_update(st->state, msg0, msg1);
+        aegis128l_update(st->state, msg2, msg3);
+    }
+    for (; i + RATE <= adlen; i += RATE) {
         aegis128l_absorb(ad + i, st->state);
     }
     if (i < adlen) {
