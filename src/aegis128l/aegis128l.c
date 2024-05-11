@@ -214,6 +214,12 @@ aegis128l_mac_verify(aegis128l_state *st_, const uint8_t *mac, size_t maclen)
     }
 }
 
+void
+aegis128l_mac_state_clone(aegis128l_state *dst, const aegis128l_state *src)
+{
+    implementation->state_clone(dst, src);
+}
+
 int
 aegis128l_pick_best_implementation(void)
 {

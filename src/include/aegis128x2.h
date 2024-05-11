@@ -263,6 +263,9 @@ void aegis128x2_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t cle
  * - However, if the key is known, arbitrary inputs matching a tag can be efficiently computed.
  *
  * The recommended way to use the MAC mode is to generate a random key and keep it secret.
+ *
+ * After initialization, the state can be reused to generate multiple MACs by cloning it
+ * with `aegis128x2_mac_state_clone()`.
  */
 void aegis128x2_mac_init(aegis128x2_state *st_, const uint8_t *k);
 
@@ -298,6 +301,16 @@ int aegis128x2_mac_final(aegis128x2_state *st_, uint8_t *mac, size_t maclen);
  * Returns 0 if the tag is authentic, -1 otherwise.
  */
 int aegis128x2_mac_verify(aegis128x2_state *st_, const uint8_t *mac, size_t maclen);
+
+/*
+ * Clone an AEGIS-MAC state.
+ *
+ * dst: destination state
+ * src: source state
+ *
+ * This function MUST be used in order to clone states.
+ */
+void aegis128x2_mac_state_clone(aegis128x2_state *dst, const aegis128x2_state *src);
 
 #ifdef __cplusplus
 }

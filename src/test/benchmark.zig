@@ -212,7 +212,8 @@ fn bench_aegis128l_mac() !void {
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        var st = st0;
+        var st: aegis.aegis128l_state = undefined;
+        aegis.aegis128l_mac_state_clone(&st, &st0);
         _ = aegis.aegis128l_mac_update(&st, &buf, msg_len);
         _ = aegis.aegis128l_mac_final(&st, &buf, aegis.aegis128l_ABYTES_MAX);
     }
@@ -237,7 +238,8 @@ fn bench_aegis128x2_mac() !void {
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        var st = st0;
+        var st: aegis.aegis128x2_state = undefined;
+        aegis.aegis128x2_mac_state_clone(&st, &st0);
         _ = aegis.aegis128x2_mac_update(&st, &buf, msg_len);
         _ = aegis.aegis128x2_mac_final(&st, &buf, aegis.aegis128x2_ABYTES_MAX);
     }
@@ -249,7 +251,6 @@ fn bench_aegis128x2_mac() !void {
     const stdout = std.io.getStdOut().writer();
     try stdout.print("AEGIS-128X2 MAC\t{d:10.2} Mb/s\n", .{throughput});
 }
-
 
 fn bench_aegis128x4_mac() !void {
     var key: [aegis.aegis128x4_KEYBYTES]u8 = undefined;
@@ -263,7 +264,8 @@ fn bench_aegis128x4_mac() !void {
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        var st = st0;
+        var st: aegis.aegis128x4_state = undefined;
+        aegis.aegis128x4_mac_state_clone(&st, &st0);
         _ = aegis.aegis128x4_mac_update(&st, &buf, msg_len);
         _ = aegis.aegis128x4_mac_final(&st, &buf, aegis.aegis128x4_ABYTES_MAX);
     }
@@ -275,8 +277,6 @@ fn bench_aegis128x4_mac() !void {
     const stdout = std.io.getStdOut().writer();
     try stdout.print("AEGIS-128X4 MAC\t{d:10.2} Mb/s\n", .{throughput});
 }
-
-
 
 pub fn main() !void {
     try bench_aegis256();

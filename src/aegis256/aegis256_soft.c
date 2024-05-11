@@ -54,6 +54,7 @@ struct aegis256_implementation aegis256_soft_implementation = {
     .state_decrypt_detached_final  = state_decrypt_detached_final,
     .state_mac_update              = state_mac_update,
     .state_mac_final               = state_mac_final,
+    .state_clone                   = state_clone,
 };
 
 #endif

@@ -109,6 +109,7 @@ struct aegis128x4_implementation aegis128x4_aesni_implementation = {
     .state_decrypt_detached_final  = state_decrypt_detached_final,
     .state_mac_update              = state_mac_update,
     .state_mac_final               = state_mac_final,
+    .state_clone                   = state_clone,
 };
 
 #    ifdef __clang__

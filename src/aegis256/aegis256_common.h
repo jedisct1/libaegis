@@ -560,3 +560,14 @@ state_mac_final(aegis256_state *st_, uint8_t *mac, size_t maclen)
 
     return 0;
 }
+
+static void
+state_clone(aegis256_state *dst, const aegis256_state *src)
+{
+    _aegis256_state *const dst_ =
+        (_aegis256_state *) ((((uintptr_t) &dst->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
+    const _aegis256_state *const src_ =
+        (const _aegis256_state *) ((((uintptr_t) &src->opaque) + (RATE - 1)) &
+                                   ~(uintptr_t) (RATE - 1));
+    *dst_ = *src_;
+}
