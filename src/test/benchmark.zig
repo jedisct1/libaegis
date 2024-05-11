@@ -278,6 +278,84 @@ fn bench_aegis128x4_mac() !void {
     try stdout.print("AEGIS-128X4 MAC\t{d:10.2} Mb/s\n", .{throughput});
 }
 
+fn bench_aegis256_mac() !void {
+    var key: [aegis.aegis256_KEYBYTES]u8 = undefined;
+    var buf: [msg_len]u8 = undefined;
+    var st0: aegis.aegis256_state = undefined;
+
+    random.bytes(&key);
+    random.bytes(&buf);
+    aegis.aegis256_mac_init(&st0, &key);
+
+    var timer = try Timer.start();
+    const start = timer.lap();
+    for (0..iterations) |_| {
+        var st: aegis.aegis256_state = undefined;
+        aegis.aegis256_mac_state_clone(&st, &st0);
+        _ = aegis.aegis256_mac_update(&st, &buf, msg_len);
+        _ = aegis.aegis256_mac_final(&st, &buf, aegis.aegis256_ABYTES_MAX);
+    }
+    const end = timer.read();
+    mem.doNotOptimizeAway(buf[0]);
+    const bits: f128 = @floatFromInt(@as(u128, msg_len) * iterations * 8);
+    const elapsed_s = @as(f128, @floatFromInt(end - start)) / time.ns_per_s;
+    const throughput = @as(f64, @floatCast(bits / (elapsed_s * 1000 * 1000)));
+    const stdout = std.io.getStdOut().writer();
+    try stdout.print("AEGIS-256 MAC\t{d:10.2} Mb/s\n", .{throughput});
+}
+
+fn bench_aegis256x2_mac() !void {
+    var key: [aegis.aegis256x2_KEYBYTES]u8 = undefined;
+    var buf: [msg_len]u8 = undefined;
+    var st0: aegis.aegis256x2_state = undefined;
+
+    random.bytes(&key);
+    random.bytes(&buf);
+    aegis.aegis256x2_mac_init(&st0, &key);
+
+    var timer = try Timer.start();
+    const start = timer.lap();
+    for (0..iterations) |_| {
+        var st: aegis.aegis256x2_state = undefined;
+        aegis.aegis256x2_mac_state_clone(&st, &st0);
+        _ = aegis.aegis256x2_mac_update(&st, &buf, msg_len);
+        _ = aegis.aegis256x2_mac_final(&st, &buf, aegis.aegis256x2_ABYTES_MAX);
+    }
+    const end = timer.read();
+    mem.doNotOptimizeAway(buf[0]);
+    const bits: f128 = @floatFromInt(@as(u128, msg_len) * iterations * 8);
+    const elapsed_s = @as(f128, @floatFromInt(end - start)) / time.ns_per_s;
+    const throughput = @as(f64, @floatCast(bits / (elapsed_s * 1000 * 1000)));
+    const stdout = std.io.getStdOut().writer();
+    try stdout.print("AEGIS-256X2 MAC\t{d:10.2} Mb/s\n", .{throughput});
+}
+
+fn bench_aegis256x4_mac() !void {
+    var key: [aegis.aegis256x4_KEYBYTES]u8 = undefined;
+    var buf: [msg_len]u8 = undefined;
+    var st0: aegis.aegis256x4_state = undefined;
+
+    random.bytes(&key);
+    random.bytes(&buf);
+    aegis.aegis256x4_mac_init(&st0, &key);
+
+    var timer = try Timer.start();
+    const start = timer.lap();
+    for (0..iterations) |_| {
+        var st: aegis.aegis256x4_state = undefined;
+        aegis.aegis256x4_mac_state_clone(&st, &st0);
+        _ = aegis.aegis256x4_mac_update(&st, &buf, msg_len);
+        _ = aegis.aegis256x4_mac_final(&st, &buf, aegis.aegis256x4_ABYTES_MAX);
+    }
+    const end = timer.read();
+    mem.doNotOptimizeAway(buf[0]);
+    const bits: f128 = @floatFromInt(@as(u128, msg_len) * iterations * 8);
+    const elapsed_s = @as(f128, @floatFromInt(end - start)) / time.ns_per_s;
+    const throughput = @as(f64, @floatCast(bits / (elapsed_s * 1000 * 1000)));
+    const stdout = std.io.getStdOut().writer();
+    try stdout.print("AEGIS-256X4 MAC\t{d:10.2} Mb/s\n", .{throughput});
+}
+
 pub fn main() !void {
     try bench_aegis256();
     try bench_aegis256x2();
@@ -289,4 +367,7 @@ pub fn main() !void {
     try bench_aegis128l_mac();
     try bench_aegis128x2_mac();
     try bench_aegis128x4_mac();
+    try bench_aegis256_mac();
+    try bench_aegis256x2_mac();
+    try bench_aegis256x4_mac();
 }
