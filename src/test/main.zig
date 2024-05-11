@@ -628,7 +628,7 @@ test "aegis128l - Random stream" {
 test "aegis128l - MAC" {
     const key = [16]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
     const msg = [_]u8{ 1, 2, 3 } ** 100;
-    const msg2 = [_]u8{ 4, 5, 6, 7, 8 } ** 100;
+    const msg2 = [_]u8{ 4, 5, 6, 7, 8 } ** 100 ++ [_]u8{0};
     var st0: aegis.aegis128l_state = undefined;
     aegis.aegis128l_mac_init(&st0, &key);
 
@@ -667,7 +667,7 @@ test "aegis128l - MAC" {
 test "aegis128x2 - MAC" {
     const key = [16]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
     const msg = [_]u8{ 1, 2, 3 } ** 100;
-    const msg2 = [_]u8{ 4, 5, 6, 7, 8 } ** 100;
+    const msg2 = [_]u8{ 4, 5, 6, 7, 8 } ** 100 ++ [_]u8{0};
     var st0: aegis.aegis128x2_state = undefined;
     aegis.aegis128x2_mac_init(&st0, &key);
 
@@ -705,7 +705,7 @@ test "aegis128x2 - MAC" {
 
 test "aegis128x4 - MAC" {
     const key = [16]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-    const msg = [_]u8{ 1, 2, 3 } ** 100;
+    const msg = [_]u8{ 1, 2, 3 } ** 100 ++ [_]u8{0};
     const msg2 = [_]u8{ 4, 5, 6, 7, 8 } ** 100;
     var st0: aegis.aegis128x4_state = undefined;
     aegis.aegis128x4_mac_init(&st0, &key);
