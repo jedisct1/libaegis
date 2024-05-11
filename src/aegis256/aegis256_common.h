@@ -534,7 +534,17 @@ state_mac_update(aegis256_state *st_, const uint8_t *ad, size_t adlen)
         ad += RATE - left;
         adlen -= RATE - left;
     }
-    for (i = 0; i + RATE <= adlen; i += RATE) {
+    for (i = 0; i + RATE * 2 <= adlen; i += RATE * 2) {
+        aes_block_t msg0, msg1;
+
+        msg0 = AES_BLOCK_LOAD(ad + i + AES_BLOCK_LENGTH * 0);
+        msg1 = AES_BLOCK_LOAD(ad + i + AES_BLOCK_LENGTH * 1);
+        COMPILER_ASSERT(AES_BLOCK_LENGTH * 2 == RATE * 2);
+
+        aegis256_update(st->state, msg0);
+        aegis256_update(st->state, msg1);
+    }
+    for (; i + RATE <= adlen; i += RATE) {
         aegis256_absorb(ad + i, st->state);
     }
     if (i < adlen) {
