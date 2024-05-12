@@ -72,6 +72,8 @@ Include `<aegis.h>` and call `aegis_init()` prior to doing anything else with th
 
 ## Benchmarks
 
+AEGIS is very fast on CPUs with parallel execution pipelines and AES support.
+
 ### Encryption (16 KB)
 
 ![AEGIS benchmark results](img/bench-encryption.png)
