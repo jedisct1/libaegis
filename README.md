@@ -72,72 +72,10 @@ Include `<aegis.h>` and call `aegis_init()` prior to doing anything else with th
 
 ## Benchmarks
 
-Benchmarks of the `aegis` crate against other options for Rust:
+### Encryption (16 KB)
 
-### AMD Zen4
+![AEGIS benchmark results](img/bench-encryption.png)
 
-rust 1.73, zig cc 0.11
+### Authentication (64 KB)
 
-| cipher                       |     speed |
-| ---------------------------- | --------: |
-| aes128-gcm (`aes-gcm` crate) |  2.19 G/s |
-| aes256-gcm (`aes-gcm` crate) |  2.03 G/s |
-| chacha20-poly1305            |  2.00 G/s |
-| aes256-gcm (`boring` crate)  |  5.93 G/s |
-| aes128-gcm (`boring` crate)  |  6.33 G/s |
-| aegis256                     | 15.40 G/s |
-| aegis256x2                   | 30.60 G/s |
-| aegis256x4                   | 46.17 G/s |
-| aegis128l                    | 26.16 G/s |
-| aegis128x2                   | 50.35 G/s |
-| aegis128x4                   | 66.22 G/s |
-
-### Macbook Pro - Apple M1
-
-rust 1.73, Xcode
-
-| cipher                       |     speed |
-| ---------------------------- | --------: |
-| aes256-gcm (`aes-gcm` crate) |  0.13 G/s |
-| aes128-gcm (`aes-gcm` crate) |  0.17 G/s |
-| chacha20-poly1305            |  0.26 G/s |
-| aes256-gcm (`boring` crate)  |  5.14 G/s |
-| aes128-gcm (`boring` crate)  |  6.08 G/s |
-| aegis256                     |  7.94 G/s |
-| aegis256x2                   | 10.56 G/s |
-| aegis256x4                   | 11.20 G/s |
-| aegis128l                    | 14.27 G/s |
-| aegis128x2                   | 15.98 G/s |
-| aegis128x4                   | 12.01 G/s |
-
-### AWS t4g (aarch64, Graviton)
-
-rust 1.74, clang 15
-
-| cipher                       |    speed |
-| ---------------------------- | -------: |
-| aes256-gcm (`aes-gcm` crate) | 0.05 G/s |
-| aes128-gcm (`aes-gcm` crate) | 0.06 G/s |
-| chacha20-poly1305            | 0.10 G/s |
-| aes256-gcm (`boring` crate)  | 1.79 G/s |
-| aes128-gcm (`boring` crate)  | 2.12 G/s |
-| aegis256                     | 3.14 G/s |
-| aegis128l                    | 4.30 G/s |
-
-### WebAssembly (Wasmtime, Zen4)
-
-| cipher            |      speed |
-| ----------------- | ---------: |
-| aes256-gcm        |  62.97 M/s |
-| aes128-gcm        |  73.83 M/s |
-| chacha20-poly1305 |  88.92 M/s |
-| aegis128l         | 537.49 M/s |
-
-### WebAssembly (Wasmtime, Apple M1)
-
-| cipher            |      speed |
-| ----------------- | ---------: |
-| aes256-gcm        |  49.43 M/s |
-| aes128-gcm        |  59.37 M/s |
-| chacha20-poly1305 | 177.85 M/s |
-| aegis128l         | 533.85 M/s |
+![AEGIS-MAC benchmark results](img/bench-mac.png)
