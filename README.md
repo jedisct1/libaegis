@@ -67,7 +67,7 @@ Include `<aegis.h>` and call `aegis_init()` prior to doing anything else with th
 
 ## Libaegis users
 
-* [`fizz`](https://github.com/facebookincubator/fizz) is Facebook's implementation of TLS.
+* [`fizz`](https://github.com/facebookincubator/fizz) is Facebook's implementation of TLS 1.3.
 * [`picotls`](https://github.com/h2o/picotls) is a TLS 1.3 implementation in C, with support for the AEGIS cipher suites.
 * [`h2o`](https://h2o.examp1e.net) is an HTTP/{1,2,3} serverwith support for the AEGIS cipher suites.
 
