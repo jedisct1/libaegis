@@ -199,14 +199,14 @@ aegis128l_mac_init_with_commitment(aegis128l_state *st_, uint8_t *kc, const uint
 int
 aegis128l_mac_init_verify_commitment(aegis128l_state *st_, const uint8_t *kc, const uint8_t *k)
 {
-    uint8_t expeted_kc[aegis128l_COMMITBYTES];
+    uint8_t expected_kc[aegis128l_COMMITBYTES];
 
-    if (aegis128l_mac_init_with_commitment(st_, expeted_kc, k) != 0) {
+    if (aegis128l_mac_init_with_commitment(st_, expected_kc, k) != 0) {
         return -1;
     }
 
     COMPILER_ASSERT(aegis128l_COMMITBYTES == 16);
-    return aegis_verify_16(expeted_kc, kc);
+    return aegis_verify_16(expected_kc, kc);
 }
 
 int

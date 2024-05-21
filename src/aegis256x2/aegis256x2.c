@@ -182,6 +182,34 @@ aegis256x2_mac_init(aegis256x2_state *st_, const uint8_t *k)
 }
 
 int
+aegis256x2_mac_init_with_commitment(aegis256x2_state *st_, uint8_t *kc, const uint8_t *k)
+{
+    size_t written;
+
+    memset(kc, 0, aegis256x2_COMMITBYTES);
+    aegis256x2_mac_init(st_, k);
+    aegis256x2_state_encrypt_update(st_, kc, aegis256x2_COMMITBYTES, &written, kc,
+                                    aegis256x2_COMMITBYTES);
+    if (written != aegis256x2_COMMITBYTES) {
+        return -1;
+    }
+    return 0;
+}
+
+int
+aegis256x2_mac_init_verify_commitment(aegis256x2_state *st_, const uint8_t *kc, const uint8_t *k)
+{
+    uint8_t expected_kc[aegis256x2_COMMITBYTES];
+
+    if (aegis256x2_mac_init_with_commitment(st_, expected_kc, k) != 0) {
+        return -1;
+    }
+
+    COMPILER_ASSERT(aegis256x2_COMMITBYTES == 32);
+    return aegis_verify_32(expected_kc, kc);
+}
+
+int
 aegis256x2_mac_update(aegis256x2_state *st_, const uint8_t *m, size_t mlen)
 {
     return implementation->state_mac_update(st_, m, mlen);

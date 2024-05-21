@@ -273,46 +273,6 @@ void aegis128l_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen
 void aegis128l_mac_init(aegis128l_state *st_, const uint8_t *k);
 
 /*
- * Initialize a state for generating a MAC, with key commitment.
- *
- * st_: state to initialize
- * kc: key commitment output buffer (16 bytes)
- * k: key input buffer (16 bytes)
- *
- * - The same key MUST NOT be used both for MAC and encryption.
- * - The nonce is not used in the MAC mode (fixed to zero).
- * - If the key is secret, the MAC is secure against forgery.
- * - However, if the key is known, arbitrary inputs matching a tag can be efficiently computed.
- *
- * The recommended way to use the MAC mode is to generate a random key and keep it secret.
- *
- * After initialization, the state can be reused to generate multiple MACs by cloning it
- * with `aegis128l_mac_state_clone()`.
- */
-int aegis128l_mac_init_with_commitment(aegis128l_state *st_, uint8_t *kc, const uint8_t *k);
-
-/*
- * Initialize a state for verifying a MAC with key commitment.
- *
- * st_: state to initialize
- * kc: key commitment input buffer (16 bytes)
- * k: key input buffer (16 bytes)
- *
- * - The same key MUST NOT be used both for MAC and encryption.
- * - The nonce is not used in the MAC mode (fixed to zero).
- * - If the key is secret, the MAC is secure against forgery.
- * - However, if the key is known, arbitrary inputs matching a tag can be efficiently computed.
- *
- * The recommended way to use the MAC mode is to generate a random key and keep it secret.
- *
- * After initialization, the state can be reused to verify multiple MACs by cloning it
- * with `aegis128l_mac_state_clone()`.
- *
- * Returns 0 if the key commitment matches, -1 otherwise.
- */
-int aegis128l_mac_init_verify_commitment(aegis128l_state *st_, const uint8_t *kc, const uint8_t *k);
-
-/*
  * Update the MAC state with input data.
  *
  * st_: state to update
@@ -354,6 +314,46 @@ int aegis128l_mac_verify(aegis128l_state *st_, const uint8_t *mac, size_t maclen
  * This function MUST be used in order to clone states.
  */
 void aegis128l_mac_state_clone(aegis128l_state *dst, const aegis128l_state *src);
+
+/*
+ * Initialize a state for generating a MAC, with key commitment.
+ *
+ * st_: state to initialize
+ * kc: key commitment output buffer (16 bytes)
+ * k: key input buffer (16 bytes)
+ *
+ * - The same key MUST NOT be used both for MAC and encryption.
+ * - The nonce is not used in the MAC mode (fixed to zero).
+ * - If the key is secret, the MAC is secure against forgery.
+ * - However, if the key is known, arbitrary inputs matching a tag can be efficiently computed.
+ *
+ * The recommended way to use the MAC mode is to generate a random key and keep it secret.
+ *
+ * After initialization, the state can be reused to generate multiple MACs by cloning it
+ * with `aegis128l_mac_state_clone()`.
+ */
+int aegis128l_mac_init_with_commitment(aegis128l_state *st_, uint8_t *kc, const uint8_t *k);
+
+/*
+ * Initialize a state for verifying a MAC with key commitment.
+ *
+ * st_: state to initialize
+ * kc: key commitment input buffer (16 bytes)
+ * k: key input buffer (16 bytes)
+ *
+ * - The same key MUST NOT be used both for MAC and encryption.
+ * - The nonce is not used in the MAC mode (fixed to zero).
+ * - If the key is secret, the MAC is secure against forgery.
+ * - However, if the key is known, arbitrary inputs matching a tag can be efficiently computed.
+ *
+ * The recommended way to use the MAC mode is to generate a random key and keep it secret.
+ *
+ * After initialization, the state can be reused to verify multiple MACs by cloning it
+ * with `aegis128l_mac_state_clone()`.
+ *
+ * Returns 0 if the key commitment matches, -1 otherwise.
+ */
+int aegis128l_mac_init_verify_commitment(aegis128l_state *st_, const uint8_t *kc, const uint8_t *k);
 
 #ifdef __cplusplus
 }
