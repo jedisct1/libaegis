@@ -10,9 +10,9 @@ Portable C implementations of the [AEGIS](https://datatracker.ietf.org/doc/draft
 - AEGIS-256 with 16 and 32 bytes tags (software, AES-NI, ARM Crypto)
 - AEGIS-256X2 with 16 and 32 bytes tags (software, VAES + AVX2, AES-NI, ARM Crypto)
 - AEGIS-256X4 with 16 and 32 bytes tags (software, AVX512, VAES + AVX2, AES-NI, ARM Crypto)
-- All variants of AEGIS-MAC, supporting incremental updates.
+- All variants of AEGIS-MAC, supporting incremental updates and key commitment
 - Encryption and decryption with attached and detached tags
-- Incremental encryption and decryption.
+- Incremental encryption and decryption
 - Unauthenticated encryption and decryption (not recommended - only implemented for specific protocols)
 - Deterministic pseudorandom stream generation.
 
