@@ -741,3 +741,52 @@ test "aegis128x4 - MAC" {
     try testing.expectEqual(ret, 0);
     try testing.expectEqualSlices(u8, &mac, &mac2);
 }
+
+test "aegis128l - MAC with unaligned state" {
+    const key = [16]u8{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+    const msg = [_]u8{ 1, 2, 3 } ** 100;
+    const msg2 = [_]u8{ 4, 5, 6, 7, 8 } ** 100 ++ [_]u8{0};
+
+    const UnalignedState1 = struct {
+        pad: u8 = 0xd0,
+        x: aegis.aegis128l_state,
+    };
+    const UnalignedState2 = struct {
+        pad: u16 = 0xd0,
+        x: aegis.aegis128l_state,
+    };
+
+    var st0: UnalignedState1 = undefined;
+    aegis.aegis128l_mac_init(&st0.x, &key);
+
+    var st: UnalignedState2 = undefined;
+    aegis.aegis128l_mac_state_clone(&st.x, &st0.x);
+    var ret = aegis.aegis128l_mac_update(&st.x, &msg, msg.len);
+    try testing.expectEqual(ret, 0);
+    ret = aegis.aegis128l_mac_update(&st.x, &msg2, msg2.len);
+    try testing.expectEqual(ret, 0);
+    var mac: [32]u8 = undefined;
+    ret = aegis.aegis128l_mac_final(&st.x, &mac, mac.len);
+    try testing.expectEqual(ret, 0);
+
+    aegis.aegis128l_mac_state_clone(&st.x, &st0.x);
+    ret = aegis.aegis128l_mac_update(&st.x, &msg, msg.len);
+    try testing.expectEqual(ret, 0);
+    ret = aegis.aegis128l_mac_update(&st.x, &msg2, msg2.len);
+    try testing.expectEqual(ret, 0);
+    ret = aegis.aegis128l_mac_verify(&st.x, &mac, mac.len);
+    try testing.expectEqual(ret, 0);
+
+    aegis.aegis128l_mac_state_clone(&st.x, &st0.x);
+    const msg3 = msg ++ msg2;
+    ret = aegis.aegis128l_mac_update(&st.x, &msg3, msg3.len);
+    try testing.expectEqual(ret, 0);
+    ret = aegis.aegis128l_mac_verify(&st.x, &mac, mac.len);
+    try testing.expectEqual(ret, 0);
+
+    const nonce = [_]u8{0} ** 16;
+    var mac2: [mac.len]u8 = undefined;
+    ret = aegis.aegis128l_encrypt_detached(&mac2, &mac2, mac2.len, "", 0, &msg3, msg3.len, &nonce, &key);
+    try testing.expectEqual(ret, 0);
+    try testing.expectEqualSlices(u8, &mac, &mac2);
+}
