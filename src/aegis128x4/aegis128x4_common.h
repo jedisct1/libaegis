@@ -1,4 +1,5 @@
-#define RATE 128
+#define RATE      128
+#define ALIGNMENT 64
 
 static void
 aegis128x4_init(const uint8_t *key, const uint8_t *nonce, aes_block_t *const state)
@@ -193,10 +194,10 @@ static int
 encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size_t mlen,
                  const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
 {
-    aes_block_t                state[8];
-    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
-    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
-    size_t                     i;
+    aes_block_t                     state[8];
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
+    size_t                          i;
 
     aegis128x4_init(k, npub, state);
 
@@ -227,13 +228,13 @@ static int
 decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, size_t maclen,
                  const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
 {
-    aes_block_t                state[8];
-    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
-    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
-    CRYPTO_ALIGN(16) uint8_t   computed_mac[32];
-    const size_t               mlen = clen;
-    size_t                     i;
-    int                        ret;
+    aes_block_t                     state[8];
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
+    CRYPTO_ALIGN(16) uint8_t        computed_mac[32];
+    const size_t                    mlen = clen;
+    size_t                          i;
+    int                             ret;
 
     aegis128x4_init(k, npub, state);
 
@@ -279,10 +280,10 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
 static void
 stream(uint8_t *out, size_t len, const uint8_t *npub, const uint8_t *k)
 {
-    aes_block_t                state[8];
-    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
-    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
-    size_t                     i;
+    aes_block_t                     state[8];
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
+    size_t                          i;
 
     memset(src, 0, sizeof src);
     if (npub == NULL) {
@@ -304,10 +305,10 @@ static void
 encrypt_unauthenticated(uint8_t *c, const uint8_t *m, size_t mlen, const uint8_t *npub,
                         const uint8_t *k)
 {
-    aes_block_t                state[8];
-    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
-    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
-    size_t                     i;
+    aes_block_t                     state[8];
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
+    size_t                          i;
 
     aegis128x4_init(k, npub, state);
 
@@ -353,10 +354,11 @@ state_init(aegis128x4_state *st_, const uint8_t *ad, size_t adlen, const uint8_t
            const uint8_t *k)
 {
     _aegis128x4_state *const st =
-        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
+        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                               ~(uintptr_t) (ALIGNMENT - 1));
     size_t i;
 
-    COMPILER_ASSERT((sizeof *st) + RATE <= sizeof *st_);
+    COMPILER_ASSERT((sizeof *st) + ALIGNMENT <= sizeof *st_);
     st->mlen = 0;
     st->pos  = 0;
 
@@ -377,7 +379,8 @@ state_encrypt_update(aegis128x4_state *st_, uint8_t *c, size_t clen_max, size_t 
                      const uint8_t *m, size_t mlen)
 {
     _aegis128x4_state *const st =
-        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
+        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                               ~(uintptr_t) (ALIGNMENT - 1));
     size_t i = 0;
     size_t left;
 
@@ -407,7 +410,7 @@ state_encrypt_update(aegis128x4_state *st_, uint8_t *c, size_t clen_max, size_t 
             return 0;
         }
     }
-    if (clen_max < (mlen & ~(size_t) (RATE - 1))) {
+    if (clen_max < (mlen & ~(size_t) (ALIGNMENT - 1))) {
         errno = ERANGE;
         return -1;
     }
@@ -428,9 +431,10 @@ state_encrypt_detached_final(aegis128x4_state *st_, uint8_t *c, size_t clen_max,
                              uint8_t *mac, size_t maclen)
 {
     _aegis128x4_state *const st =
-        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
-    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
-    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
+        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                               ~(uintptr_t) (ALIGNMENT - 1));
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
 
     *written = 0;
     if (clen_max < st->pos) {
@@ -455,9 +459,10 @@ state_encrypt_final(aegis128x4_state *st_, uint8_t *c, size_t clen_max, size_t *
                     size_t maclen)
 {
     _aegis128x4_state *const st =
-        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
-    CRYPTO_ALIGN(RATE) uint8_t src[RATE];
-    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
+        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                               ~(uintptr_t) (ALIGNMENT - 1));
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
 
     *written = 0;
     if (clen_max < st->pos + maclen) {
@@ -482,10 +487,11 @@ state_decrypt_detached_update(aegis128x4_state *st_, uint8_t *m, size_t mlen_max
                               const uint8_t *c, size_t clen)
 {
     _aegis128x4_state *const st =
-        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
-    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
-    size_t                     i = 0;
-    size_t                     left;
+        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                               ~(uintptr_t) (ALIGNMENT - 1));
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
+    size_t                          i = 0;
+    size_t                          left;
 
     *written = 0;
     st->mlen += clen;
@@ -544,10 +550,11 @@ static int
 state_decrypt_detached_final(aegis128x4_state *st_, uint8_t *m, size_t mlen_max, size_t *written,
                              const uint8_t *mac, size_t maclen)
 {
-    CRYPTO_ALIGN(16) uint8_t   computed_mac[32];
-    CRYPTO_ALIGN(RATE) uint8_t dst[RATE];
-    _aegis128x4_state *const   st =
-        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
+    CRYPTO_ALIGN(16) uint8_t        computed_mac[32];
+    CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
+    _aegis128x4_state *const        st =
+        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                               ~(uintptr_t) (ALIGNMENT - 1));
     int ret;
 
     *written = 0;
@@ -581,7 +588,8 @@ static int
 state_mac_update(aegis128x4_state *st_, const uint8_t *ad, size_t adlen)
 {
     _aegis128x4_state *const st =
-        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
+        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                               ~(uintptr_t) (ALIGNMENT - 1));
     size_t i;
     size_t left;
 
@@ -623,7 +631,8 @@ static int
 state_mac_final(aegis128x4_state *st_, uint8_t *mac, size_t maclen)
 {
     _aegis128x4_state *const st =
-        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
+        (_aegis128x4_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                               ~(uintptr_t) (ALIGNMENT - 1));
     size_t left;
 
     left = st->adlen % RATE;
@@ -640,9 +649,10 @@ static void
 state_clone(aegis128x4_state *dst, const aegis128x4_state *src)
 {
     _aegis128x4_state *const dst_ =
-        (_aegis128x4_state *) ((((uintptr_t) &dst->opaque) + (RATE - 1)) & ~(uintptr_t) (RATE - 1));
+        (_aegis128x4_state *) ((((uintptr_t) &dst->opaque) + (ALIGNMENT - 1)) &
+                               ~(uintptr_t) (ALIGNMENT - 1));
     const _aegis128x4_state *const src_ =
-        (const _aegis128x4_state *) ((((uintptr_t) &src->opaque) + (RATE - 1)) &
-                                     ~(uintptr_t) (RATE - 1));
+        (const _aegis128x4_state *) ((((uintptr_t) &src->opaque) + (ALIGNMENT - 1)) &
+                                     ~(uintptr_t) (ALIGNMENT - 1));
     *dst_ = *src_;
 }

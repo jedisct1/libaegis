@@ -28,7 +28,7 @@ extern "C" {
 
 /* An AEGIS state, for incremental updates */
 typedef struct aegis128x2_state {
-    uint8_t opaque[448];
+    CRYPTO_ALIGN(64) uint8_t opaque[448];
 } aegis128x2_state;
 
 /* The length of an AEGIS key, in bytes */
