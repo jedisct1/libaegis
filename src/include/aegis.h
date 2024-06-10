@@ -10,6 +10,16 @@
 #    define __attribute__(a)
 #endif
 
+#ifndef CRYPTO_ALIGN
+#    if defined(__INTEL_COMPILER) || defined(_MSC_VER)
+#        define CRYPTO_ALIGN(x) __declspec(align(x))
+#    elif defined(__GNUC__) || defined(__clang__)
+#        define CRYPTO_ALIGN(x) __attribute__((aligned(x)))
+#    else
+#        define CRYPTO_ALIGN(x)
+#    endif
+#endif
+
 #include "aegis128l.h"
 #include "aegis128x2.h"
 #include "aegis128x4.h"
