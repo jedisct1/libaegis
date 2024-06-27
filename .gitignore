@@ -52,6 +52,7 @@ Mkfile.old
 dkms.conf
 
 # zig cc
+.zig-cache
 zig-cache
 zig-out
 
