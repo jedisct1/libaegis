@@ -1,6 +1,7 @@
 #ifndef common_H
 #define common_H
 
+#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -93,5 +94,12 @@ rotl32(const uint32_t x, const int b)
 }
 
 #define COMPILER_ASSERT(X) (void) sizeof(char[(X) ? 1 : -1])
+
+#ifndef ERANGE
+#    define ERANGE 34
+#endif
+#ifndef EINVAL
+#    define EINVAL 22
+#endif
 
 #endif
