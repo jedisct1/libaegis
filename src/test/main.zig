@@ -741,3 +741,109 @@ test "aegis128x4 - MAC" {
     try testing.expectEqual(ret, 0);
     try testing.expectEqualSlices(u8, &mac, &mac2);
 }
+
+// Wycheproof tests
+
+const JsonTest = struct {
+    tcId: u64,
+    key: []const u8,
+    iv: []const u8,
+    aad: []const u8,
+    msg: []const u8,
+    ct: []const u8,
+    tag: []const u8,
+    result: []const u8,
+};
+const JsonTestGroup = struct {
+    type: []const u8,
+    tests: []const JsonTest,
+};
+const JsonTests = struct {
+    testGroups: []JsonTestGroup,
+};
+const Result = enum {
+    valid,
+    invalid,
+};
+
+test "aegis128l - wycheproof" {
+    const alloc = std.testing.allocator;
+    const parsed = try std.json.parseFromSlice(
+        JsonTests,
+        alloc,
+        @embedFile("wycheproof/aegis128L_test.json"),
+        .{ .ignore_unknown_fields = true },
+    );
+    defer parsed.deinit();
+    for (parsed.value.testGroups) |test_group| {
+        if (!std.mem.eql(u8, "AeadTest", test_group.type)) continue;
+        for (test_group.tests) |t| {
+            var arena = std.heap.ArenaAllocator.init(alloc);
+            defer arena.deinit();
+            var arena_alloc = arena.allocator();
+            var key: [16]u8 = undefined;
+            var nonce: [16]u8 = undefined;
+            var tag: [16]u8 = undefined;
+            const aad = try arena_alloc.alloc(u8, t.aad.len / 2);
+            const ct = try arena_alloc.alloc(u8, t.ct.len / 2);
+            const msg = try arena_alloc.alloc(u8, t.msg.len / 2);
+            const expected_msg = try arena_alloc.alloc(u8, t.msg.len / 2);
+            _ = try std.fmt.hexToBytes(&key, t.key);
+            _ = try std.fmt.hexToBytes(&nonce, t.iv);
+            _ = try std.fmt.hexToBytes(&tag, t.tag);
+            _ = try std.fmt.hexToBytes(aad, t.aad);
+            _ = try std.fmt.hexToBytes(expected_msg, t.msg);
+            _ = try std.fmt.hexToBytes(ct, t.ct);
+            const c_res = aegis.aegis128l_decrypt_detached(msg.ptr, ct.ptr, ct.len, &tag, tag.len, aad.ptr, aad.len, &nonce, &key);
+            const res: Result = if (c_res == 0) res: {
+                if (std.mem.eql(u8, msg, expected_msg)) break :res .valid;
+                break :res .invalid;
+            } else .invalid;
+            if ((std.mem.eql(u8, "invalid", t.result) and res == .valid) or (std.mem.eql(u8, "valid", t.result) and res == .invalid)) {
+                std.debug.print("Test failed: {}\n", .{t.tcId});
+                try std.testing.expect(false);
+            }
+        }
+    }
+}
+
+test "aegis256 - wycheproof" {
+    const alloc = std.testing.allocator;
+    const parsed = try std.json.parseFromSlice(
+        JsonTests,
+        alloc,
+        @embedFile("wycheproof/aegis256_test.json"),
+        .{ .ignore_unknown_fields = true },
+    );
+    defer parsed.deinit();
+    for (parsed.value.testGroups) |test_group| {
+        if (!std.mem.eql(u8, "AeadTest", test_group.type)) continue;
+        for (test_group.tests) |t| {
+            var arena = std.heap.ArenaAllocator.init(alloc);
+            defer arena.deinit();
+            var arena_alloc = arena.allocator();
+            var key: [32]u8 = undefined;
+            var nonce: [32]u8 = undefined;
+            var tag: [16]u8 = undefined;
+            const aad = try arena_alloc.alloc(u8, t.aad.len / 2);
+            const ct = try arena_alloc.alloc(u8, t.ct.len / 2);
+            const msg = try arena_alloc.alloc(u8, t.msg.len / 2);
+            const expected_msg = try arena_alloc.alloc(u8, t.msg.len / 2);
+            _ = try std.fmt.hexToBytes(&key, t.key);
+            _ = try std.fmt.hexToBytes(&nonce, t.iv);
+            _ = try std.fmt.hexToBytes(&tag, t.tag);
+            _ = try std.fmt.hexToBytes(aad, t.aad);
+            _ = try std.fmt.hexToBytes(expected_msg, t.msg);
+            _ = try std.fmt.hexToBytes(ct, t.ct);
+            const c_res = aegis.aegis256_decrypt_detached(msg.ptr, ct.ptr, ct.len, &tag, tag.len, aad.ptr, aad.len, &nonce, &key);
+            const res: Result = if (c_res == 0) res: {
+                if (std.mem.eql(u8, msg, expected_msg)) break :res .valid;
+                break :res .invalid;
+            } else .invalid;
+            if ((std.mem.eql(u8, "invalid", t.result) and res == .valid) or (std.mem.eql(u8, "valid", t.result) and res == .invalid)) {
+                std.debug.print("Test failed: {}\n", .{t.tcId});
+                try std.testing.expect(false);
+            }
+        }
+    }
+}
