@@ -71,6 +71,10 @@ Include `<aegis.h>` and call `aegis_init()` prior to doing anything else with th
 * [`picotls`](https://github.com/h2o/picotls) is a TLS 1.3 implementation in C, with support for the AEGIS cipher suites.
 * [`h2o`](https://h2o.examp1e.net) is an HTTP/{1,2,3} server with support for the AEGIS cipher suites.
 
+## Other implementations
+
+[Other AEGIS implementations](https://github.com/cfrg/draft-irtf-cfrg-aegis-aead?tab=readme-ov-file#known-implementations) are also available for most programming languages.
+
 ## Benchmarks
 
 AEGIS is very fast on CPUs with parallel execution pipelines and AES support.
