@@ -766,19 +766,22 @@ const Result = enum {
     invalid,
 };
 
+const heap = std.heap;
+const zstd = std.compress.zstd;
+
 test "aegis128l - wycheproof" {
     const alloc = std.testing.allocator;
-    const parsed = try std.json.parseFromSlice(
-        JsonTests,
-        alloc,
-        @embedFile("wycheproof/aegis128L_test.json"),
-        .{ .ignore_unknown_fields = true },
-    );
+    var fbs = std.io.fixedBufferStream(@embedFile("wycheproof/aegis128L_test.json.zst"));
+    var window_buffer: [zstd.DecompressorOptions.default_window_buffer_len]u8 = undefined;
+    var decompressor = zstd.decompressor(fbs.reader(), .{ .window_buffer = &window_buffer });
+    const json = try decompressor.reader().readAllAlloc(alloc, 1000000);
+    defer alloc.free(json);
+    const parsed = try std.json.parseFromSlice(JsonTests, alloc, json, .{ .ignore_unknown_fields = true });
     defer parsed.deinit();
     for (parsed.value.testGroups) |test_group| {
         if (!std.mem.eql(u8, "AeadTest", test_group.type)) continue;
         for (test_group.tests) |t| {
-            var arena = std.heap.ArenaAllocator.init(alloc);
+            var arena = heap.ArenaAllocator.init(alloc);
             defer arena.deinit();
             var arena_alloc = arena.allocator();
             var key: [16]u8 = undefined;
@@ -809,17 +812,17 @@ test "aegis128l - wycheproof" {
 
 test "aegis256 - wycheproof" {
     const alloc = std.testing.allocator;
-    const parsed = try std.json.parseFromSlice(
-        JsonTests,
-        alloc,
-        @embedFile("wycheproof/aegis256_test.json"),
-        .{ .ignore_unknown_fields = true },
-    );
+    var fbs = std.io.fixedBufferStream(@embedFile("wycheproof/aegis256_test.json.zst"));
+    var window_buffer: [zstd.DecompressorOptions.default_window_buffer_len]u8 = undefined;
+    var decompressor = zstd.decompressor(fbs.reader(), .{ .window_buffer = &window_buffer });
+    const json = try decompressor.reader().readAllAlloc(alloc, 1000000);
+    defer alloc.free(json);
+    const parsed = try std.json.parseFromSlice(JsonTests, alloc, json, .{ .ignore_unknown_fields = true });
     defer parsed.deinit();
     for (parsed.value.testGroups) |test_group| {
         if (!std.mem.eql(u8, "AeadTest", test_group.type)) continue;
         for (test_group.tests) |t| {
-            var arena = std.heap.ArenaAllocator.init(alloc);
+            var arena = heap.ArenaAllocator.init(alloc);
             defer arena.deinit();
             var arena_alloc = arena.allocator();
             var key: [32]u8 = undefined;
