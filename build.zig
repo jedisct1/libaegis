@@ -3,12 +3,14 @@ const std = @import("std");
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{ .preferred_optimize_mode = .ReleaseFast });
+    const version = std.SemanticVersion.parse("0.1.24") catch unreachable;
 
     const lib = b.addStaticLibrary(.{
         .name = "aegis",
         .target = target,
         .optimize = optimize,
         .strip = true,
+        .version = version,
     });
 
     lib.linkLibC();
