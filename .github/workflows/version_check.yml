@@ -15,4 +15,6 @@ jobs:
       - name: Version check
         run: |
             grep -E 'const version =' build.zig | grep -E '"${{  github.ref_name }}"' || exit 78
-            echo "Version check passed."
+            echo "Zig build version check passed."
+            grep -E 'COMPATIBILITY AnyNewerVersion' build.zig | grep -E ' ${{  github.ref_name }} ' || exit 78
+            echo "CMake version check passed."
