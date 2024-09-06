@@ -40,7 +40,9 @@ A benchmark can also be built with the `-Dwith-benchmark` option:
 zig build -Drelease -Dfavor-performance -Dwith-benchmark
 ```
 
-`libaegis` doesn't need WASI nor any extension to work on WebAssembly. The `wasm32-freestanding` target is fully supported. WebAssembly extensions such as `bulk_memory` and `simd128` can be enabled by adding `-Dcpu=baseline+bulk_memory+simd128` to the command line.
+`libaegis` doesn't need WASI nor any extension to work on WebAssembly. The `wasm32-freestanding` target is fully supported.
+
+WebAssembly extensions such as `bulk_memory` and `simd128` can be enabled by adding `-Dcpu=baseline+bulk_memory+simd128` to the command line.
 
 ### Compilation with `cmake`:
 
