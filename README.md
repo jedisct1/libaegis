@@ -28,7 +28,7 @@ zig build -Drelease
 
 The library and headers are installed in the `zig-out` folder.
 
-To favor performance over side-channel mitigations on WebAssembly and on devices without hardware acceleration, add `-Dfavor-performance`:
+To favor performance over side-channel mitigations on devices without hardware acceleration, add `-Dfavor-performance`:
 
 ```sh
 zig build -Drelease -Dfavor-performance
@@ -37,8 +37,10 @@ zig build -Drelease -Dfavor-performance
 A benchmark can also be built with the `-Dwith-benchmark` option:
 
 ```sh
-zig build -Drelease -Dwith-benchmark
+zig build -Drelease -Dfavor-performance -Dwith-benchmark
 ```
+
+`libaegis` doesn't need WASI nor any extension to work on WebAssembly. The `wasm32-freestanding` target is fully supported. WebAssembly extensions such as `bulk_memory` and `simd128` can be enabled by adding `-Dcpu=baseline+bulk_memory+simd128` to the command line.
 
 ### Compilation with `cmake`:
 
@@ -49,7 +51,7 @@ cmake -DCMAKE_INSTALL_PREFIX=/install/prefix ..
 make install
 ```
 
-To favor performance over side-channel mitigations on WebAssembly and on devices without hardware acceleration, add `-DFAVOR_PERFORMANCE`.
+To favor performance over side-channel mitigations on devices without hardware acceleration, add `-DFAVOR_PERFORMANCE`.
 
 ### Direct inclusion
 

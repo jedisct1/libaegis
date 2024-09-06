@@ -43,6 +43,10 @@ uint32_t _aes_lut[256] __attribute__((visibility("hidden"))) = {
 
 static const uint32_t* const LUT = _aes_lut;
 
+#if defined(__wasm__) && !defined(FAVOR_PERFORMANCE)
+#    define FAVOR_PERFORMANCE
+#endif
+
 #ifndef SOFTAES_STRIDE
 #    ifdef FAVOR_PERFORMANCE
 #        define SOFTAES_STRIDE 256
