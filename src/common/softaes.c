@@ -6,6 +6,18 @@
 #include "common.h"
 #include "softaes.h"
 
+#if defined(__wasm__) && !defined(FAVOR_PERFORMANCE)
+#    define FAVOR_PERFORMANCE
+#endif
+
+#ifndef SOFTAES_STRIDE
+#    ifdef FAVOR_PERFORMANCE
+#        define SOFTAES_STRIDE 256
+#    else
+#        define SOFTAES_STRIDE 16
+#    endif
+#endif
+
 uint32_t _aes_lut[256] __attribute__((visibility("hidden"))) = {
     0xa56363c6, 0x847c7cf8, 0x997777ee, 0x8d7b7bf6, 0x0df2f2ff, 0xbd6b6bd6, 0xb16f6fde, 0x54c5c591,
     0x50303060, 0x03010102, 0xa96767ce, 0x7d2b2b56, 0x19fefee7, 0x62d7d7b5, 0xe6abab4d, 0x9a7676ec,
@@ -42,18 +54,6 @@ uint32_t _aes_lut[256] __attribute__((visibility("hidden"))) = {
 };
 
 static const uint32_t* const LUT = _aes_lut;
-
-#if defined(__wasm__) && !defined(FAVOR_PERFORMANCE)
-#    define FAVOR_PERFORMANCE
-#endif
-
-#ifndef SOFTAES_STRIDE
-#    ifdef FAVOR_PERFORMANCE
-#        define SOFTAES_STRIDE 256
-#    else
-#        define SOFTAES_STRIDE 16
-#    endif
-#endif
 
 static SoftAesBlock
 _encrypt(const uint8_t ix0[4], const uint8_t ix1[4], const uint8_t ix2[4], const uint8_t ix3[4])
