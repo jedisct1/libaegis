@@ -15,7 +15,7 @@
 #endif
 
 #ifdef FAVOR_PERFORMANCE
-static const uint32_t LUT[1024] = {
+static const uint32_t _aes_lut[1024] = {
     0xa56363c6, 0x847c7cf8, 0x997777ee, 0x8d7b7bf6, 0x0df2f2ff, 0xbd6b6bd6, 0xb16f6fde, 0x54c5c591,
     0x50303060, 0x03010102, 0xa96767ce, 0x7d2b2b56, 0x19fefee7, 0x62d7d7b5, 0xe6abab4d, 0x9a7676ec,
     0x45caca8f, 0x9d82821f, 0x40c9c989, 0x877d7dfa, 0x15fafaef, 0xeb5959b2, 0xc947478e, 0x0bf0f0fb,
@@ -146,30 +146,35 @@ static const uint32_t LUT[1024] = {
     0x82c34141, 0x29b09999, 0x5a772d2d, 0x1e110f0f, 0x7bcbb0b0, 0xa8fc5454, 0x6dd6bbbb, 0x2c3a1616
 };
 
+static const uint32_t* const LUT0 = _aes_lut + 0 * 256;
+static const uint32_t* const LUT1 = _aes_lut + 1 * 256;
+static const uint32_t* const LUT2 = _aes_lut + 2 * 256;
+static const uint32_t* const LUT3 = _aes_lut + 3 * 256;
+
 static SoftAesBlock
 _encrypt(const uint8_t ix0[4], const uint8_t ix1[4], const uint8_t ix2[4], const uint8_t ix3[4])
 {
     CRYPTO_ALIGN(64) SoftAesBlock out;
 
-    out.w0 = LUT[ix0[0] + 256 * 0];
-    out.w1 = LUT[ix0[1] + 256 * 0];
-    out.w2 = LUT[ix0[2] + 256 * 0];
-    out.w3 = LUT[ix0[3] + 256 * 0];
+    out.w0 = LUT0[ix0[0]];
+    out.w1 = LUT0[ix0[1]];
+    out.w2 = LUT0[ix0[2]];
+    out.w3 = LUT0[ix0[3]];
 
-    out.w0 ^= LUT[ix1[0] + 256 * 1];
-    out.w1 ^= LUT[ix1[1] + 256 * 1];
-    out.w2 ^= LUT[ix1[2] + 256 * 1];
-    out.w3 ^= LUT[ix1[3] + 256 * 1];
+    out.w0 ^= LUT1[ix1[0]];
+    out.w1 ^= LUT1[ix1[1]];
+    out.w2 ^= LUT1[ix1[2]];
+    out.w3 ^= LUT1[ix1[3]];
 
-    out.w0 ^= LUT[ix2[0] + 256 * 2];
-    out.w1 ^= LUT[ix2[1] + 256 * 2];
-    out.w2 ^= LUT[ix2[2] + 256 * 2];
-    out.w3 ^= LUT[ix2[3] + 256 * 2];
+    out.w0 ^= LUT2[ix2[0]];
+    out.w1 ^= LUT2[ix2[1]];
+    out.w2 ^= LUT2[ix2[2]];
+    out.w3 ^= LUT2[ix2[3]];
 
-    out.w0 ^= LUT[ix3[0] + 256 * 3];
-    out.w1 ^= LUT[ix3[1] + 256 * 3];
-    out.w2 ^= LUT[ix3[2] + 256 * 3];
-    out.w3 ^= LUT[ix3[3] + 256 * 3];
+    out.w0 ^= LUT3[ix3[0]];
+    out.w1 ^= LUT3[ix3[1]];
+    out.w2 ^= LUT3[ix3[2]];
+    out.w3 ^= LUT3[ix3[3]];
 
     return out;
 }
