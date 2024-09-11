@@ -191,6 +191,7 @@ _encrypt(const uint8_t ix0[4], const uint8_t ix1[4], const uint8_t ix2[4], const
 
     return out;
 }
+
 #else
 
 static SoftAesBlock
