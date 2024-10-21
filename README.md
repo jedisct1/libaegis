@@ -93,20 +93,4 @@ AEGIS is very fast on CPUs with parallel execution pipelines and AES support.
 
 ### Mobile benchmarks
 
-Apple iPhone 15 Pro:
-
-| Algorithm                    | Throughput (Mb/s) |
-| ---------------------------- | ----------------- |
-| AEGIS128X2 (libaegis)        | 129.53            |
-| AEGIS256x2 (libaegis)        | 89.87             |
-| AES128-GCM (Apple CryptoKit) | 34.40             |
-| AES256-GCM (Apple CryptoKit) | 32.21             |
-
-Apple iPhone 8:
-
-| Algorithm                    | Throughput (Mb/s) |
-| ---------------------------- | ----------------- |
-| AEGIS128X2 (libaegis)        | 65.22             |
-| AEGIS256x2 (libaegis)        | 38.49             |
-| AES128-GCM (Apple CryptoKit) | 18.16             |
-| AES256-GCM (Apple CryptoKit) | 15.42             |
+![AEGIS mobile benchmark results](img/bench-mobile.png)
