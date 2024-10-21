@@ -151,10 +151,35 @@ static const uint32_t* const LUT1 = _aes_lut + 1 * 256;
 static const uint32_t* const LUT2 = _aes_lut + 2 * 256;
 static const uint32_t* const LUT3 = _aes_lut + 3 * 256;
 
-static SoftAesBlock
-_encrypt(const uint8_t ix0[4], const uint8_t ix1[4], const uint8_t ix2[4], const uint8_t ix3[4])
+SoftAesBlock
+softaes_block_encrypt(const SoftAesBlock block, const SoftAesBlock rk)
 {
-    CRYPTO_ALIGN(64) SoftAesBlock out;
+    SoftAesBlock   out;
+    uint8_t        ix0[4], ix1[4], ix2[4], ix3[4];
+    const uint32_t s0 = block.w0;
+    const uint32_t s1 = block.w1;
+    const uint32_t s2 = block.w2;
+    const uint32_t s3 = block.w3;
+
+    ix0[0] = (uint8_t) s0;
+    ix0[1] = (uint8_t) s1;
+    ix0[2] = (uint8_t) s2;
+    ix0[3] = (uint8_t) s3;
+
+    ix1[0] = (uint8_t) (s1 >> 8);
+    ix1[1] = (uint8_t) (s2 >> 8);
+    ix1[2] = (uint8_t) (s3 >> 8);
+    ix1[3] = (uint8_t) (s0 >> 8);
+
+    ix2[0] = (uint8_t) (s2 >> 16);
+    ix2[1] = (uint8_t) (s3 >> 16);
+    ix2[2] = (uint8_t) (s0 >> 16);
+    ix2[3] = (uint8_t) (s1 >> 16);
+
+    ix3[0] = (uint8_t) (s3 >> 24);
+    ix3[1] = (uint8_t) (s0 >> 24);
+    ix3[2] = (uint8_t) (s1 >> 24);
+    ix3[3] = (uint8_t) (s2 >> 24);
 
     out.w0 = LUT0[ix0[0]];
     out.w1 = LUT0[ix0[1]];
@@ -176,9 +201,13 @@ _encrypt(const uint8_t ix0[4], const uint8_t ix1[4], const uint8_t ix2[4], const
     out.w2 ^= LUT3[ix3[2]];
     out.w3 ^= LUT3[ix3[3]];
 
+    out.w0 ^= rk.w0;
+    out.w1 ^= rk.w1;
+    out.w2 ^= rk.w2;
+    out.w3 ^= rk.w3;
+
     return out;
 }
-
 #else
 
 uint32_t _aes_lut[256] __attribute__((visibility("hidden"))) = {
@@ -268,7 +297,6 @@ _encrypt(const uint8_t ix0[4], const uint8_t ix1[4], const uint8_t ix2[4], const
 
     return out;
 }
-#endif
 
 SoftAesBlock
 softaes_block_encrypt(const SoftAesBlock block, const SoftAesBlock rk)
@@ -309,3 +337,4 @@ softaes_block_encrypt(const SoftAesBlock block, const SoftAesBlock rk)
 
     return out;
 }
+#endif
