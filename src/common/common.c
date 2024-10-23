@@ -4,13 +4,15 @@
 #include "common.h"
 #include "cpu.h"
 
+static volatile uint16_t optblocker_u16;
+
 static inline int
 aegis_verify_n(const uint8_t *x_, const uint8_t *y_, const int n)
 {
     const volatile uint8_t *volatile x = (const volatile uint8_t *volatile) x_;
     const volatile uint8_t *volatile y = (const volatile uint8_t *volatile) y_;
-    volatile uint_fast16_t d           = 0U;
-    int                    i;
+    volatile uint16_t d                = 0U;
+    int               i;
 
     for (i = 0; i < n; i++) {
         d |= x[i] ^ y[i];
@@ -18,7 +20,10 @@ aegis_verify_n(const uint8_t *x_, const uint8_t *y_, const int n)
 #if defined(__GNUC__) || defined(__clang__)
     __asm__("" : "+r"(d) :);
 #endif
-    return (1 & ((d - 1) >> 8)) - 1;
+    d--;
+    d = ((d >> 13) ^ optblocker_u16) >> 2;
+
+    return (int) d - 1;
 }
 
 int
