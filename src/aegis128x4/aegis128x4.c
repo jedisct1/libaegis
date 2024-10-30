@@ -8,6 +8,7 @@
 #include "../common/cpu.h"
 #include "aegis128x4.h"
 #include "aegis128x4_aesni.h"
+#include "aegis128x4_altivec.h"
 #include "aegis128x4_armcrypto.h"
 #include "aegis128x4_avx2.h"
 #include "aegis128x4_avx512.h"
@@ -249,6 +250,13 @@ aegis128x4_pick_best_implementation(void)
 #    endif
     if (aegis_runtime_has_aesni() && aegis_runtime_has_avx()) {
         implementation = &aegis128x4_aesni_implementation;
+        return 0;
+    }
+#endif
+
+#if defined(__ALTIVEC__) && defined(__CRYPTO__)
+    if (aegis_runtime_has_altivec()) {
+        implementation = &aegis128x4_altivec_implementation;
         return 0;
     }
 #endif
