@@ -8,6 +8,7 @@
 #include "../common/cpu.h"
 #include "aegis256.h"
 #include "aegis256_aesni.h"
+#include "aegis256_altivec.h"
 #include "aegis256_armcrypto.h"
 
 #ifndef HAS_HW_AES
@@ -18,6 +19,8 @@ static const aegis256_implementation *implementation = &aegis256_soft_implementa
 static const aegis256_implementation *implementation = &aegis256_armcrypto_implementation;
 #    elif defined(__x86_64__) || defined(__i386__)
 static const aegis256_implementation *implementation = &aegis256_aesni_implementation;
+#    elif defined(__ALTIVEC__) && defined(__CRYPTO__)
+static const aegis256_implementation *implementation = &aegis256_altivec_implementation;
 #    else
 #        error "Unsupported architecture"
 #    endif
@@ -237,6 +240,13 @@ aegis256_pick_best_implementation(void)
 #if defined(__x86_64__) || defined(_M_AMD64) || defined(__i386__) || defined(_M_IX86)
     if (aegis_runtime_has_aesni() && aegis_runtime_has_avx()) {
         implementation = &aegis256_aesni_implementation;
+        return 0;
+    }
+#endif
+
+#if defined(__ALTIVEC__) && defined(__CRYPTO__)
+    if (aegis_runtime_has_altivec()) {
+        implementation = &aegis256_altivec_implementation;
         return 0;
     }
 #endif

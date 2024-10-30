@@ -47,21 +47,25 @@ pub fn build(b: *std.Build) void {
         "src/aegis128x4/aegis128x4_avx2.c",
         "src/aegis128x4/aegis128x4_avx512.c",
         "src/aegis128x4/aegis128x4_armcrypto.c",
+        "src/aegis128x4/aegis128x4_armcrypto.c",
         "src/aegis128x4/aegis128x4_soft.c",
         "src/aegis128x4/aegis128x4.c",
 
         "src/aegis256/aegis256_aesni.c",
+        "src/aegis256/aegis256_altivec.c",
         "src/aegis256/aegis256_armcrypto.c",
         "src/aegis256/aegis256_soft.c",
         "src/aegis256/aegis256.c",
 
         "src/aegis256x2/aegis256x2_aesni.c",
+        "src/aegis256x2/aegis256x2_altivec.c",
         "src/aegis256x2/aegis256x2_avx2.c",
         "src/aegis256x2/aegis256x2_armcrypto.c",
         "src/aegis256x2/aegis256x2_soft.c",
         "src/aegis256x2/aegis256x2.c",
 
         "src/aegis256x4/aegis256x4_aesni.c",
+        "src/aegis256x4/aegis256x4_altivec.c",
         "src/aegis256x4/aegis256x4_avx2.c",
         "src/aegis256x4/aegis256x4_avx512.c",
         "src/aegis256x4/aegis256x4_armcrypto.c",
@@ -99,9 +103,6 @@ pub fn build(b: *std.Build) void {
 
     const run_main_tests = b.addRunArtifact(main_tests);
 
-    // This creates a build step. It will be visible in the `zig build --help` menu,
-    // and can be selected like this: `zig build test`
-    // This will evaluate the `test` step rather than the default, which is "install".
     const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&run_main_tests.step);
 
