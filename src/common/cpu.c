@@ -264,6 +264,7 @@ _runtime_intel_cpu_features(CPUFeatures *const cpu_features)
 static int
 _runtime_powerpc_cpu_features(CPUFeatures *const cpu_features)
 {
+    cpu_features->has_altivec = 0;
 #if defined(__ALTIVEC__) && defined(__CRYPTO__)
     cpu_features->has_altivec = 1;
 #endif
