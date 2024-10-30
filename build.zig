@@ -30,6 +30,7 @@ pub fn build(b: *std.Build) void {
 
     const source_files = &.{
         "src/aegis128l/aegis128l_aesni.c",
+        "src/aegis128l/aegis128l_altivec.c",
         "src/aegis128l/aegis128l_armcrypto.c",
         "src/aegis128l/aegis128l_soft.c",
         "src/aegis128l/aegis128l.c",

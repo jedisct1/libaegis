@@ -23,4 +23,6 @@ int aegis_runtime_has_aesni(void);
 
 int aegis_runtime_has_vaes(void);
 
+int aegis_runtime_has_altivec(void);
+
 #endif

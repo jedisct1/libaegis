@@ -29,6 +29,7 @@ typedef struct CPUFeatures_ {
     int has_avx512f;
     int has_aesni;
     int has_vaes;
+    int has_altivec;
 } CPUFeatures;
 
 static CPUFeatures _cpu_features;
@@ -260,6 +261,15 @@ _runtime_intel_cpu_features(CPUFeatures *const cpu_features)
     return 0;
 }
 
+static int
+_runtime_powerpc_cpu_features(CPUFeatures *const cpu_features)
+{
+#if defined(__ALTIVEC__) && defined(__CRYPTO__)
+    cpu_features->has_altivec = 1;
+#endif
+    return 0;
+}
+
 int
 aegis_runtime_get_cpu_features(void)
 {
@@ -269,6 +279,7 @@ aegis_runtime_get_cpu_features(void)
 
     ret &= _runtime_arm_cpu_features(&_cpu_features);
     ret &= _runtime_intel_cpu_features(&_cpu_features);
+    ret &= _runtime_powerpc_cpu_features(&_cpu_features);
     _cpu_features.initialized = 1;
 
     return ret;
@@ -314,4 +325,10 @@ int
 aegis_runtime_has_vaes(void)
 {
     return _cpu_features.has_vaes;
+}
+
+int
+aegis_runtime_has_altivec(void)
+{
+    return _cpu_features.has_altivec;
 }

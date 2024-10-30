@@ -8,6 +8,7 @@
 #include "../common/cpu.h"
 #include "aegis128l.h"
 #include "aegis128l_aesni.h"
+#include "aegis128l_altivec.h"
 #include "aegis128l_armcrypto.h"
 
 #ifndef HAS_HW_AES
@@ -18,6 +19,8 @@ static const aegis128l_implementation *implementation = &aegis128l_soft_implemen
 static const aegis128l_implementation *implementation = &aegis128l_armcrypto_implementation;
 #    elif defined(__x86_64__) || defined(__i386__)
 static const aegis128l_implementation *implementation = &aegis128l_aesni_implementation;
+#    elif defined(__ALTIVEC__) && defined(__CRYPTO__)
+static const aegis128l_implementation *implementation = &aegis128l_altivec_implementation;
 #    else
 #        error "Unsupported architecture"
 #    endif
@@ -237,6 +240,13 @@ aegis128l_pick_best_implementation(void)
 #if defined(__x86_64__) || defined(_M_AMD64) || defined(__i386__) || defined(_M_IX86)
     if (aegis_runtime_has_aesni() && aegis_runtime_has_avx()) {
         implementation = &aegis128l_aesni_implementation;
+        return 0;
+    }
+#endif
+
+#if defined(__ALTIVEC__) && defined(__CRYPTO__)
+    if (aegis_runtime_has_altivec()) {
+        implementation = &aegis128l_altivec_implementation;
         return 0;
     }
 #endif
