@@ -2,8 +2,8 @@ name: version check
 
 on:
   push:
-    tags:        
-      - '**' 
+    tags:
+      - '**'
 
 jobs:
   build:
