@@ -5,6 +5,8 @@
 #    define HAS_HW_AES
 #elif defined(__AES__) && defined(__AVX__)
 #    define HAS_HW_AES
+#elif defined(__ALTIVEC__) && defined(__CRYPTO__)
+#    define HAS_HW_AES
 #endif
 
 int aegis_runtime_get_cpu_features(void);
