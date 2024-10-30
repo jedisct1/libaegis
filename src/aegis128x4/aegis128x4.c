@@ -21,6 +21,8 @@ static const aegis128x4_implementation *implementation = &aegis128x4_soft_implem
 static const aegis128x4_implementation *implementation = &aegis128x4_armcrypto_implementation;
 #    elif defined(__x86_64__) || defined(__i386__)
 static const aegis128x4_implementation *implementation = &aegis128x4_aesni_implementation;
+#    elif defined(__ALTIVEC__) && defined(__CRYPTO__)
+static const aegis128x4_implementation *implementation = &aegis128x4_altivec_implementation;
 #    else
 #        error "Unsupported architecture"
 #    endif
