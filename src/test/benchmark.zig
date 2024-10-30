@@ -357,6 +357,10 @@ fn bench_aegis256x4_mac() !void {
 }
 
 pub fn main() !void {
+    if (aegis.aegis_init() != 0) {
+        return error.InitFailed;
+    }
+
     try bench_aegis256();
     try bench_aegis256x2();
     try bench_aegis256x4();
