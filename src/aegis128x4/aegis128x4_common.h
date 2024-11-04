@@ -121,6 +121,88 @@ aegis128x4_absorb(const uint8_t *const src, aes_block_t *const state)
     aegis128x4_update(state, msg0, msg1);
 }
 
+#ifdef CHUNK_SIZE
+static void
+aegis128x4_enc_b0(uint8_t *const dst, const uint8_t *const src, aes_block_t *const state)
+{
+    aes_block1_t msg0, msg1;
+    aes_block1_t tmp0, tmp1;
+
+    msg0 = AES_BLOCK1_LOAD(src);
+    msg1 = AES_BLOCK1_LOAD(src + AES_BLOCK_LENGTH);
+    tmp0 = AES_BLOCK1_XOR(msg0, state[6].b0);
+    tmp0 = AES_BLOCK1_XOR(tmp0, state[1].b0);
+    tmp1 = AES_BLOCK1_XOR(msg1, state[5].b0);
+    tmp1 = AES_BLOCK1_XOR(tmp1, state[2].b0);
+    tmp0 = AES_BLOCK1_XOR(tmp0, AES_BLOCK1_AND(state[2].b0, state[3].b0));
+    tmp1 = AES_BLOCK1_XOR(tmp1, AES_BLOCK1_AND(state[6].b0, state[7].b0));
+    AES_BLOCK1_STORE(dst, tmp0);
+    AES_BLOCK1_STORE(dst + AES_BLOCK_LENGTH, tmp1);
+
+    aegis128x4_update_b0(state, msg0, msg1);
+}
+
+static void
+aegis128x4_enc_b1(uint8_t *const dst, const uint8_t *const src, aes_block_t *const state)
+{
+    aes_block1_t msg0, msg1;
+    aes_block1_t tmp0, tmp1;
+
+    msg0 = AES_BLOCK1_LOAD(src);
+    msg1 = AES_BLOCK1_LOAD(src + AES_BLOCK_LENGTH);
+    tmp0 = AES_BLOCK1_XOR(msg0, state[6].b1);
+    tmp0 = AES_BLOCK1_XOR(tmp0, state[1].b1);
+    tmp1 = AES_BLOCK1_XOR(msg1, state[5].b1);
+    tmp1 = AES_BLOCK1_XOR(tmp1, state[2].b1);
+    tmp0 = AES_BLOCK1_XOR(tmp0, AES_BLOCK1_AND(state[2].b1, state[3].b1));
+    tmp1 = AES_BLOCK1_XOR(tmp1, AES_BLOCK1_AND(state[6].b1, state[7].b1));
+    AES_BLOCK1_STORE(dst, tmp0);
+    AES_BLOCK1_STORE(dst + AES_BLOCK_LENGTH, tmp1);
+
+    aegis128x4_update_b1(state, msg0, msg1);
+}
+
+static void
+aegis128x4_enc_b2(uint8_t *const dst, const uint8_t *const src, aes_block_t *const state)
+{
+    aes_block1_t msg0, msg1;
+    aes_block1_t tmp0, tmp1;
+
+    msg0 = AES_BLOCK1_LOAD(src);
+    msg1 = AES_BLOCK1_LOAD(src + AES_BLOCK_LENGTH);
+    tmp0 = AES_BLOCK1_XOR(msg0, state[6].b2);
+    tmp0 = AES_BLOCK1_XOR(tmp0, state[1].b2);
+    tmp1 = AES_BLOCK1_XOR(msg1, state[5].b2);
+    tmp1 = AES_BLOCK1_XOR(tmp1, state[2].b2);
+    tmp0 = AES_BLOCK1_XOR(tmp0, AES_BLOCK1_AND(state[2].b2, state[3].b2));
+    tmp1 = AES_BLOCK1_XOR(tmp1, AES_BLOCK1_AND(state[6].b2, state[7].b2));
+    AES_BLOCK1_STORE(dst, tmp0);
+    AES_BLOCK1_STORE(dst + AES_BLOCK_LENGTH, tmp1);
+
+    aegis128x4_update_b2(state, msg0, msg1);
+}
+
+static void
+aegis128x4_enc_b3(uint8_t *const dst, const uint8_t *const src, aes_block_t *const state)
+{
+    aes_block1_t msg0, msg1;
+    aes_block1_t tmp0, tmp1;
+
+    msg0 = AES_BLOCK1_LOAD(src);
+    msg1 = AES_BLOCK1_LOAD(src + AES_BLOCK_LENGTH);
+    tmp0 = AES_BLOCK1_XOR(msg0, state[6].b3);
+    tmp0 = AES_BLOCK1_XOR(tmp0, state[1].b3);
+    tmp1 = AES_BLOCK1_XOR(msg1, state[5].b3);
+    tmp1 = AES_BLOCK1_XOR(tmp1, state[2].b3);
+    tmp0 = AES_BLOCK1_XOR(tmp0, AES_BLOCK1_AND(state[2].b3, state[3].b3));
+    tmp1 = AES_BLOCK1_XOR(tmp1, AES_BLOCK1_AND(state[6].b3, state[7].b3));
+    AES_BLOCK1_STORE(dst, tmp0);
+    AES_BLOCK1_STORE(dst + AES_BLOCK_LENGTH, tmp1);
+
+    aegis128x4_update_b3(state, msg0, msg1);
+}
+#endif
+
 static void
 aegis128x4_enc(uint8_t *const dst, const uint8_t *const src, aes_block_t *const state)
 {
@@ -209,7 +291,31 @@ encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size
         memcpy(src, ad + i, adlen % RATE);
         aegis128x4_absorb(src, state);
     }
-    for (i = 0; i + RATE <= mlen; i += RATE) {
+    i = 0;
+
+#ifdef CHUNK_SIZE
+    {
+        const size_t mlenx = mlen - mlen % CHUNK_SIZE;
+        size_t       j;
+
+        for (; i < mlenx; i += CHUNK_SIZE) {
+            for (j = 0; j < CHUNK_SIZE; j += RATE) {
+                aegis128x4_enc_b0(c + i + j, m + i + j, state);
+            }
+            for (j = AES_BLOCK1_LENGTH; j < CHUNK_SIZE; j += RATE) {
+                aegis128x4_enc_b1(c + i + j, m + i + j, state);
+            }
+            for (j = AES_BLOCK1_LENGTH * 2; j < CHUNK_SIZE; j += RATE) {
+                aegis128x4_enc_b2(c + i + j, m + i + j, state);
+            }
+            for (j = AES_BLOCK1_LENGTH * 3; j < CHUNK_SIZE; j += RATE) {
+                aegis128x4_enc_b3(c + i + j, m + i + j, state);
+            }
+        }
+    }
+#endif
+
+    for (; i + RATE <= mlen; i += RATE) {
         aegis128x4_enc(c + i, m + i, state);
     }
     if (mlen % RATE) {
