@@ -79,9 +79,11 @@ Include `<aegis.h>` and call `aegis_init()` prior to doing anything else with th
 
 [Other AEGIS implementations](https://github.com/cfrg/draft-irtf-cfrg-aegis-aead?tab=readme-ov-file#known-implementations) are also available for most programming languages.
 
-## Benchmarks
+## Benchmark results
 
 AEGIS is very fast on CPUs with parallel execution pipelines and AES support.
+
+The following results are derived from libaegis, which has been optimized primarily for portability and readability. Other implementations, such as `jasmin-aegis` or the Zig implementations, may demonstrate better performance.
 
 ### Encryption (16 KB)
 
