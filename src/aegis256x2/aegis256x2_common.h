@@ -1,6 +1,8 @@
 #define RATE      32
 #define ALIGNMENT 32
 
+typedef aes_block_t aegis_blocks[6];
+
 static void
 aegis256x2_init(const uint8_t *key, const uint8_t *nonce, aes_block_t *const state)
 {
@@ -180,7 +182,7 @@ static int
 encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size_t mlen,
                  const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
 {
-    aes_block_t                     state[6];
+    aegis_blocks                    state;
     CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
     CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
     size_t                          i;
@@ -214,7 +216,7 @@ static int
 decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, size_t maclen,
                  const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
 {
-    aes_block_t                     state[6];
+    aegis_blocks                    state;
     CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
     CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
     CRYPTO_ALIGN(16) uint8_t        computed_mac[32];
@@ -266,7 +268,7 @@ decrypt_detached(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *mac, 
 static void
 stream(uint8_t *out, size_t len, const uint8_t *npub, const uint8_t *k)
 {
-    aes_block_t                     state[6];
+    aegis_blocks                    state;
     CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
     CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
     size_t                          i;
@@ -291,7 +293,7 @@ static void
 encrypt_unauthenticated(uint8_t *c, const uint8_t *m, size_t mlen, const uint8_t *npub,
                         const uint8_t *k)
 {
-    aes_block_t                     state[6];
+    aegis_blocks                    state;
     CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
     CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
     size_t                          i;
@@ -313,7 +315,7 @@ static void
 decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t *npub,
                         const uint8_t *k)
 {
-    aes_block_t  state[6];
+    aegis_blocks state;
     const size_t mlen = clen;
     size_t       i;
 
@@ -328,11 +330,11 @@ decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t
 }
 
 typedef struct _aegis256x2_state {
-    aes_block_t state[6];
-    uint8_t     buf[RATE];
-    uint64_t    adlen;
-    uint64_t    mlen;
-    size_t      pos;
+    aegis_blocks state;
+    uint8_t      buf[RATE];
+    uint64_t     adlen;
+    uint64_t     mlen;
+    size_t       pos;
 } _aegis256x2_state;
 
 static void
