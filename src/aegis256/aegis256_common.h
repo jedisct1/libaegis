@@ -281,7 +281,7 @@ decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen, const uint8_t
 }
 
 typedef struct _aegis256_state {
-    aegis_blocks state;
+    aegis_blocks blocks;
     uint8_t      buf[RATE];
     uint64_t     adlen;
     uint64_t     mlen;
@@ -292,36 +292,44 @@ static void
 state_init(aegis256_state *st_, const uint8_t *ad, size_t adlen, const uint8_t *npub,
            const uint8_t *k)
 {
+    aegis_blocks           blocks;
     _aegis256_state *const st =
         (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
                              ~(uintptr_t) (ALIGNMENT - 1));
     size_t i;
 
+    memcpy(blocks, st->blocks, sizeof blocks);
+
     COMPILER_ASSERT((sizeof *st) + ALIGNMENT <= sizeof *st_);
     st->mlen = 0;
     st->pos  = 0;
 
-    aegis256_init(k, npub, st->state);
+    aegis256_init(k, npub, blocks);
     for (i = 0; i + RATE <= adlen; i += RATE) {
-        aegis256_absorb(ad + i, st->state);
+        aegis256_absorb(ad + i, blocks);
     }
     if (adlen % RATE) {
         memset(st->buf, 0, RATE);
         memcpy(st->buf, ad + i, adlen % RATE);
-        aegis256_absorb(st->buf, st->state);
+        aegis256_absorb(st->buf, blocks);
     }
     st->adlen = adlen;
+
+    memset(st->buf, 0, sizeof st->buf);
 }
 
 static int
 state_encrypt_update(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *written,
                      const uint8_t *m, size_t mlen)
 {
+    aegis_blocks           blocks;
     _aegis256_state *const st =
         (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
                              ~(uintptr_t) (ALIGNMENT - 1));
     size_t i = 0;
     size_t left;
+
+    memcpy(blocks, st->blocks, sizeof blocks);
 
     *written = 0;
     st->mlen += mlen;
@@ -341,7 +349,7 @@ state_encrypt_update(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *w
                 return -1;
             }
             clen_max -= RATE;
-            aegis256_enc(c, st->buf, st->state);
+            aegis256_enc(c, st->buf, blocks);
             *written += RATE;
             c += RATE;
             st->pos = 0;
@@ -354,7 +362,7 @@ state_encrypt_update(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *w
         return -1;
     }
     for (i = 0; i + RATE <= mlen; i += RATE) {
-        aegis256_enc(c + i, m + i, st->state);
+        aegis256_enc(c + i, m + i, blocks);
     }
     *written += i;
     left = mlen % RATE;
@@ -362,6 +370,9 @@ state_encrypt_update(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *w
         memcpy(st->buf, m + i, left);
         st->pos = left;
     }
+
+    memcpy(st->blocks, blocks, sizeof blocks);
+
     return 0;
 }
 
@@ -369,11 +380,14 @@ static int
 state_encrypt_detached_final(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *written,
                              uint8_t *mac, size_t maclen)
 {
+    aegis_blocks           blocks;
     _aegis256_state *const st =
         (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
                              ~(uintptr_t) (ALIGNMENT - 1));
     CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
     CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
+
+    memcpy(blocks, st->blocks, sizeof blocks);
 
     *written = 0;
     if (clen_max < st->pos) {
@@ -383,12 +397,14 @@ state_encrypt_detached_final(aegis256_state *st_, uint8_t *c, size_t clen_max, s
     if (st->pos != 0) {
         memset(src, 0, sizeof src);
         memcpy(src, st->buf, st->pos);
-        aegis256_enc(dst, src, st->state);
+        aegis256_enc(dst, src, blocks);
         memcpy(c, dst, st->pos);
     }
-    aegis256_mac(mac, maclen, st->adlen, st->mlen, st->state);
+    aegis256_mac(mac, maclen, st->adlen, st->mlen, blocks);
 
     *written = st->pos;
+
+    memcpy(st->blocks, blocks, sizeof blocks);
 
     return 0;
 }
@@ -397,11 +413,14 @@ static int
 state_encrypt_final(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *written,
                     size_t maclen)
 {
+    aegis_blocks           blocks;
     _aegis256_state *const st =
         (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
                              ~(uintptr_t) (ALIGNMENT - 1));
     CRYPTO_ALIGN(ALIGNMENT) uint8_t src[RATE];
     CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
+
+    memcpy(blocks, st->blocks, sizeof blocks);
 
     *written = 0;
     if (clen_max < st->pos + maclen) {
@@ -411,12 +430,14 @@ state_encrypt_final(aegis256_state *st_, uint8_t *c, size_t clen_max, size_t *wr
     if (st->pos != 0) {
         memset(src, 0, sizeof src);
         memcpy(src, st->buf, st->pos);
-        aegis256_enc(dst, src, st->state);
+        aegis256_enc(dst, src, blocks);
         memcpy(c, dst, st->pos);
     }
-    aegis256_mac(c + st->pos, maclen, st->adlen, st->mlen, st->state);
+    aegis256_mac(c + st->pos, maclen, st->adlen, st->mlen, blocks);
 
     *written = st->pos + maclen;
+
+    memcpy(st->blocks, blocks, sizeof blocks);
 
     return 0;
 }
@@ -425,12 +446,15 @@ static int
 state_decrypt_detached_update(aegis256_state *st_, uint8_t *m, size_t mlen_max, size_t *written,
                               const uint8_t *c, size_t clen)
 {
+    aegis_blocks           blocks;
     _aegis256_state *const st =
         (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
                              ~(uintptr_t) (ALIGNMENT - 1));
     CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
     size_t                          i = 0;
     size_t                          left;
+
+    memcpy(blocks, st->blocks, sizeof blocks);
 
     *written = 0;
     st->mlen += clen;
@@ -455,10 +479,10 @@ state_decrypt_detached_update(aegis256_state *st_, uint8_t *m, size_t mlen_max, 
                 return -1;
             }
             mlen_max -= RATE;
-            aegis256_dec(m, st->buf, st->state);
+            aegis256_dec(m, st->buf, blocks);
             m += RATE;
         } else {
-            aegis256_dec(dst, st->buf, st->state);
+            aegis256_dec(dst, st->buf, blocks);
         }
         *written += RATE;
     }
@@ -469,11 +493,11 @@ state_decrypt_detached_update(aegis256_state *st_, uint8_t *m, size_t mlen_max, 
             return -1;
         }
         for (i = 0; i + RATE <= clen; i += RATE) {
-            aegis256_dec(m + i, c + i, st->state);
+            aegis256_dec(m + i, c + i, blocks);
         }
     } else {
         for (i = 0; i + RATE <= clen; i += RATE) {
-            aegis256_dec(dst, c + i, st->state);
+            aegis256_dec(dst, c + i, blocks);
         }
     }
     *written += i;
@@ -482,6 +506,9 @@ state_decrypt_detached_update(aegis256_state *st_, uint8_t *m, size_t mlen_max, 
         memcpy(st->buf, c + i, left);
         st->pos = left;
     }
+
+    memcpy(st->blocks, blocks, sizeof blocks);
+
     return 0;
 }
 
@@ -489,12 +516,15 @@ static int
 state_decrypt_detached_final(aegis256_state *st_, uint8_t *m, size_t mlen_max, size_t *written,
                              const uint8_t *mac, size_t maclen)
 {
+    aegis_blocks                    blocks;
     CRYPTO_ALIGN(16) uint8_t        computed_mac[32];
     CRYPTO_ALIGN(ALIGNMENT) uint8_t dst[RATE];
     _aegis256_state *const          st =
         (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
                              ~(uintptr_t) (ALIGNMENT - 1));
     int ret;
+
+    memcpy(blocks, st->blocks, sizeof blocks);
 
     *written = 0;
     if (st->pos != 0) {
@@ -503,12 +533,12 @@ state_decrypt_detached_final(aegis256_state *st_, uint8_t *m, size_t mlen_max, s
                 errno = ERANGE;
                 return -1;
             }
-            aegis256_declast(m, st->buf, st->pos, st->state);
+            aegis256_declast(m, st->buf, st->pos, blocks);
         } else {
-            aegis256_declast(dst, st->buf, st->pos, st->state);
+            aegis256_declast(dst, st->buf, st->pos, blocks);
         }
     }
-    aegis256_mac(computed_mac, maclen, st->adlen, st->mlen, st->state);
+    aegis256_mac(computed_mac, maclen, st->adlen, st->mlen, blocks);
     ret = -1;
     if (maclen == 16) {
         ret = aegis_verify_16(computed_mac, mac);
@@ -520,17 +550,23 @@ state_decrypt_detached_final(aegis256_state *st_, uint8_t *m, size_t mlen_max, s
     } else {
         memset(m, 0, st->pos);
     }
+
+    memcpy(st->blocks, blocks, sizeof blocks);
+
     return ret;
 }
 
 static int
 state_mac_update(aegis256_state *st_, const uint8_t *ad, size_t adlen)
 {
+    aegis_blocks           blocks;
     _aegis256_state *const st =
         (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
                              ~(uintptr_t) (ALIGNMENT - 1));
     size_t i;
     size_t left;
+
+    memcpy(blocks, st->blocks, sizeof blocks);
 
     left = st->adlen % RATE;
     st->adlen += adlen;
@@ -540,7 +576,7 @@ state_mac_update(aegis256_state *st_, const uint8_t *ad, size_t adlen)
             return 0;
         }
         memcpy(st->buf + left, ad, RATE - left);
-        aegis256_absorb(st->buf, st->state);
+        aegis256_absorb(st->buf, blocks);
         ad += RATE - left;
         adlen -= RATE - left;
     }
@@ -551,33 +587,41 @@ state_mac_update(aegis256_state *st_, const uint8_t *ad, size_t adlen)
         msg1 = AES_BLOCK_LOAD(ad + i + AES_BLOCK_LENGTH * 1);
         COMPILER_ASSERT(AES_BLOCK_LENGTH * 2 == RATE * 2);
 
-        aegis256_update(st->state, msg0);
-        aegis256_update(st->state, msg1);
+        aegis256_update(blocks, msg0);
+        aegis256_update(blocks, msg1);
     }
     for (; i + RATE <= adlen; i += RATE) {
-        aegis256_absorb(ad + i, st->state);
+        aegis256_absorb(ad + i, blocks);
     }
     if (i < adlen) {
         memset(st->buf, 0, RATE);
         memcpy(st->buf, ad + i, adlen - i);
     }
+
+    memcpy(st->blocks, blocks, sizeof blocks);
+
     return 0;
 }
 
 static int
 state_mac_final(aegis256_state *st_, uint8_t *mac, size_t maclen)
 {
+    aegis_blocks           blocks;
     _aegis256_state *const st =
         (_aegis256_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
                              ~(uintptr_t) (ALIGNMENT - 1));
     size_t left;
 
+    memcpy(blocks, st->blocks, sizeof blocks);
+
     left = st->adlen % RATE;
     if (left != 0) {
         memset(st->buf + left, 0, RATE - left);
-        aegis256_absorb(st->buf, st->state);
+        aegis256_absorb(st->buf, blocks);
     }
-    aegis256_mac(mac, maclen, st->adlen, 0, st->state);
+    aegis256_mac(mac, maclen, st->adlen, 0, blocks);
+
+    memcpy(st->blocks, blocks, sizeof blocks);
 
     return 0;
 }
