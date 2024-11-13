@@ -410,7 +410,7 @@ state_encrypt_update(aegis128x4_state *st_, uint8_t *c, size_t clen_max, size_t 
             return 0;
         }
     }
-    if (clen_max < (mlen & ~(size_t) (ALIGNMENT - 1))) {
+    if (clen_max < (mlen & ~(size_t) (RATE - 1))) {
         errno = ERANGE;
         return -1;
     }
