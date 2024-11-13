@@ -316,6 +316,8 @@ state_init(aegis256_state *st_, const uint8_t *ad, size_t adlen, const uint8_t *
     st->adlen = adlen;
 
     memset(st->buf, 0, sizeof st->buf);
+
+    memcpy(st->blocks, blocks, sizeof blocks);
 }
 
 static int
