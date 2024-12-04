@@ -31,6 +31,11 @@ typedef struct aegis256_state {
     CRYPTO_ALIGN(16) uint8_t opaque[192];
 } aegis256_state;
 
+/* An AEGIS state, only for MAC updates */
+typedef struct aegis256_mac_state {
+    CRYPTO_ALIGN(16) uint8_t opaque[384];
+} aegis256_mac_state;
+
 /* The length of an AEGIS key, in bytes */
 size_t aegis256_keybytes(void);
 
@@ -267,7 +272,7 @@ void aegis256_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen,
  * with `aegis256_mac_state_clone()`. It is only safe to copy a state directly without using
  * the clone function if the state is guaranteed to be properly aligned.
  */
-void aegis256_mac_init(aegis256_state *st_, const uint8_t *k, const uint8_t *npub);
+void aegis256_mac_init(aegis256_mac_state *st_, const uint8_t *k, const uint8_t *npub);
 
 /*
  * Update the MAC state with input data.
@@ -280,7 +285,7 @@ void aegis256_mac_init(aegis256_state *st_, const uint8_t *k, const uint8_t *npu
  *
  * Once the full input has been absorb, call either `_mac_final` or `_mac_verify`.
  */
-int aegis256_mac_update(aegis256_state *st_, const uint8_t *m, size_t mlen);
+int aegis256_mac_update(aegis256_mac_state *st_, const uint8_t *m, size_t mlen);
 
 /*
  * Finalize the MAC and generate the authentication tag.
@@ -289,7 +294,7 @@ int aegis256_mac_update(aegis256_state *st_, const uint8_t *m, size_t mlen);
  * mac: authentication tag output buffer
  * maclen: length of the authentication tag to generate (16 or 32. 32 is recommended).
  */
-int aegis256_mac_final(aegis256_state *st_, uint8_t *mac, size_t maclen);
+int aegis256_mac_final(aegis256_mac_state *st_, uint8_t *mac, size_t maclen);
 
 /*
  * Verify a MAC in constant time.
@@ -300,7 +305,12 @@ int aegis256_mac_final(aegis256_state *st_, uint8_t *mac, size_t maclen);
  *
  * Returns 0 if the tag is authentic, -1 otherwise.
  */
-int aegis256_mac_verify(aegis256_state *st_, const uint8_t *mac, size_t maclen);
+int aegis256_mac_verify(aegis256_mac_state *st_, const uint8_t *mac, size_t maclen);
+
+/*
+ * Reset an AEGIS_MAC state.
+ */
+void aegis256_mac_reset(aegis256_mac_state *st_);
 
 /*
  * Clone an AEGIS-MAC state.
@@ -310,7 +320,7 @@ int aegis256_mac_verify(aegis256_state *st_, const uint8_t *mac, size_t maclen);
  *
  * This function MUST be used in order to clone states.
  */
-void aegis256_mac_state_clone(aegis256_state *dst, const aegis256_state *src);
+void aegis256_mac_state_clone(aegis256_mac_state *dst, const aegis256_mac_state *src);
 
 #ifdef __cplusplus
 }

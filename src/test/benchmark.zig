@@ -288,7 +288,7 @@ fn bench_aegis256_mac() !void {
     var key: [aegis.aegis256_KEYBYTES]u8 = undefined;
     var nonce: [aegis.aegis256_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
-    var st0: aegis.aegis256_state = undefined;
+    var st0: aegis.aegis256_mac_state = undefined;
 
     random.bytes(&key);
     random.bytes(&nonce);
@@ -298,7 +298,7 @@ fn bench_aegis256_mac() !void {
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        var st: aegis.aegis256_state = undefined;
+        var st: aegis.aegis256_mac_state = undefined;
         aegis.aegis256_mac_state_clone(&st, &st0);
         _ = aegis.aegis256_mac_update(&st, &buf, msg_len);
         _ = aegis.aegis256_mac_final(&st, &buf, aegis.aegis256_ABYTES_MAX);

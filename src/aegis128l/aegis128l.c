@@ -224,7 +224,7 @@ aegis128l_mac_reset(aegis128l_mac_state *st_)
 void
 aegis128l_mac_state_clone(aegis128l_mac_state *dst, const aegis128l_mac_state *src)
 {
-    implementation->state_mac_state_clone(dst, src);
+    implementation->state_mac_clone(dst, src);
 }
 
 int

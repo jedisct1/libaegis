@@ -67,7 +67,8 @@ struct aegis256_implementation aegis256_armcrypto_implementation = {
     .state_decrypt_detached_final  = state_decrypt_detached_final,
     .state_mac_update              = state_mac_update,
     .state_mac_final               = state_mac_final,
-    .state_clone                   = state_clone,
+    .state_mac_reset               = state_mac_reset,
+    .state_mac_clone               = state_mac_clone,
 };
 
 #    ifdef __clang__

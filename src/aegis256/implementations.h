@@ -29,9 +29,11 @@ typedef struct aegis256_implementation {
                                          size_t *written, const uint8_t *c, size_t clen);
     int (*state_decrypt_detached_final)(aegis256_state *st_, uint8_t *m, size_t mlen_max,
                                         size_t *written, const uint8_t *mac, size_t maclen);
-    int (*state_mac_update)(aegis256_state *st_, const uint8_t *ad, size_t adlen);
-    int (*state_mac_final)(aegis256_state *st_, uint8_t *mac, size_t maclen);
-    void (*state_clone)(aegis256_state *dst, const aegis256_state *src);
+    void (*state_mac_init)(aegis256_mac_state *st_, const uint8_t *npub, const uint8_t *k);
+    int (*state_mac_update)(aegis256_mac_state *st_, const uint8_t *ad, size_t adlen);
+    int (*state_mac_final)(aegis256_mac_state *st_, uint8_t *mac, size_t maclen);
+    void (*state_mac_reset)(aegis256_mac_state *st);
+    void (*state_mac_clone)(aegis256_mac_state *dst, const aegis256_mac_state *src);
 } aegis256_implementation;
 
 #endif

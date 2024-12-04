@@ -683,7 +683,7 @@ state_mac_reset(aegis128l_mac_state *st_)
 }
 
 static void
-state_mac_state_clone(aegis128l_mac_state *dst, const aegis128l_mac_state *src)
+state_mac_clone(aegis128l_mac_state *dst, const aegis128l_mac_state *src)
 {
     _aegis128l_mac_state *const dst_ =
         (_aegis128l_mac_state *) ((((uintptr_t) &dst->opaque) + (ALIGNMENT - 1)) &
