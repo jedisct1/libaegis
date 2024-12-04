@@ -69,14 +69,14 @@ aegis128x4_init(const uint8_t *key, const uint8_t *nonce, aes_block_t *const sta
 }
 
 static void
-aegis128x4_mac(uint8_t *mac, size_t maclen, size_t adlen, size_t mlen, aes_block_t *const state)
+aegis128x4_mac(uint8_t *mac, size_t maclen, uint64_t adlen, uint64_t mlen, aes_block_t *const state)
 {
     uint8_t     mac_multi_0[AES_BLOCK_LENGTH];
     uint8_t     mac_multi_1[AES_BLOCK_LENGTH];
     aes_block_t tmp;
     int         i;
 
-    tmp = AES_BLOCK_LOAD_64x2(((uint64_t) mlen) << 3, ((uint64_t) adlen) << 3);
+    tmp = AES_BLOCK_LOAD_64x2(mlen << 3, adlen << 3);
     tmp = AES_BLOCK_XOR(tmp, state[2]);
 
     for (i = 0; i < 7; i++) {
