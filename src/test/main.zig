@@ -630,10 +630,10 @@ test "aegis128l - MAC" {
     const nonce = [_]u8{0} ** 16;
     const msg = [_]u8{ 1, 2, 3 } ** 100;
     const msg2 = [_]u8{ 4, 5, 6, 7, 8 } ** 100 ++ [_]u8{0};
-    var st0: aegis.aegis128l_state = undefined;
+    var st0: aegis.aegis128l_mac_state = undefined;
     aegis.aegis128l_mac_init(&st0, &key, &nonce);
 
-    var st: aegis.aegis128l_state = undefined;
+    var st: aegis.aegis128l_mac_state = undefined;
     aegis.aegis128l_mac_state_clone(&st, &st0);
     var ret = aegis.aegis128l_mac_update(&st, &msg, msg.len);
     try testing.expectEqual(ret, 0);

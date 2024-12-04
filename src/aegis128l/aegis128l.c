@@ -175,20 +175,20 @@ aegis128l_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen, con
 }
 
 void
-aegis128l_mac_init(aegis128l_state *st_, const uint8_t *k, const uint8_t *npub)
+aegis128l_mac_init(aegis128l_mac_state *st_, const uint8_t *k, const uint8_t *npub)
 {
     memset(st_, 0, sizeof *st_);
-    implementation->state_init(st_, NULL, 0, npub, k);
+    implementation->state_mac_init(st_, npub, k);
 }
 
 int
-aegis128l_mac_update(aegis128l_state *st_, const uint8_t *m, size_t mlen)
+aegis128l_mac_update(aegis128l_mac_state *st_, const uint8_t *m, size_t mlen)
 {
     return implementation->state_mac_update(st_, m, mlen);
 }
 
 int
-aegis128l_mac_final(aegis128l_state *st_, uint8_t *mac, size_t maclen)
+aegis128l_mac_final(aegis128l_mac_state *st_, uint8_t *mac, size_t maclen)
 {
     if (maclen != 16 && maclen != 32) {
         errno = EINVAL;
@@ -198,7 +198,7 @@ aegis128l_mac_final(aegis128l_state *st_, uint8_t *mac, size_t maclen)
 }
 
 int
-aegis128l_mac_verify(aegis128l_state *st_, const uint8_t *mac, size_t maclen)
+aegis128l_mac_verify(aegis128l_mac_state *st_, const uint8_t *mac, size_t maclen)
 {
     uint8_t expected_mac[32];
 
@@ -216,9 +216,15 @@ aegis128l_mac_verify(aegis128l_state *st_, const uint8_t *mac, size_t maclen)
 }
 
 void
-aegis128l_mac_state_clone(aegis128l_state *dst, const aegis128l_state *src)
+aegis128l_mac_reset(aegis128l_mac_state *st_)
 {
-    implementation->state_clone(dst, src);
+    implementation->state_mac_reset(st_);
+}
+
+void
+aegis128l_mac_state_clone(aegis128l_mac_state *dst, const aegis128l_mac_state *src)
+{
+    implementation->state_mac_state_clone(dst, src);
 }
 
 int

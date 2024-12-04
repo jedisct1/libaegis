@@ -29,9 +29,11 @@ typedef struct aegis128l_implementation {
                                          size_t *written, const uint8_t *c, size_t clen);
     int (*state_decrypt_detached_final)(aegis128l_state *st_, uint8_t *m, size_t mlen_max,
                                         size_t *written, const uint8_t *mac, size_t maclen);
-    int (*state_mac_update)(aegis128l_state *st_, const uint8_t *ad, size_t adlen);
-    int (*state_mac_final)(aegis128l_state *st_, uint8_t *mac, size_t maclen);
-    void (*state_clone)(aegis128l_state *dst, const aegis128l_state *src);
+    void (*state_mac_init)(aegis128l_mac_state *st_, const uint8_t *npub, const uint8_t *k);
+    int (*state_mac_update)(aegis128l_mac_state *st_, const uint8_t *ad, size_t adlen);
+    int (*state_mac_final)(aegis128l_mac_state *st_, uint8_t *mac, size_t maclen);
+    void (*state_mac_reset)(aegis128l_mac_state *st);
+    void (*state_mac_state_clone)(aegis128l_mac_state *dst, const aegis128l_mac_state *src);
 } aegis128l_implementation;
 
 #endif
