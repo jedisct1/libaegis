@@ -669,10 +669,10 @@ test "aegis128x2 - MAC" {
     const nonce = [_]u8{0} ** 16;
     const msg = [_]u8{ 1, 2, 3 } ** 100;
     const msg2 = [_]u8{ 4, 5, 6, 7, 8 } ** 100 ++ [_]u8{0};
-    var st0: aegis.aegis128x2_state = undefined;
+    var st0: aegis.aegis128x2_mac_state = undefined;
     aegis.aegis128x2_mac_init(&st0, &key, &nonce);
 
-    var st: aegis.aegis128x2_state = undefined;
+    var st: aegis.aegis128x2_mac_state = undefined;
     aegis.aegis128x2_mac_state_clone(&st, &st0);
     var ret = aegis.aegis128x2_mac_update(&st, &msg, msg.len);
     try testing.expectEqual(ret, 0);
@@ -700,7 +700,7 @@ test "aegis128x2 - MAC" {
     var mac2: [mac.len]u8 = undefined;
     ret = aegis.aegis128x2_encrypt_detached(&mac2, &mac2, mac2.len, "", 0, &msg3, msg3.len, &nonce, &key);
     try testing.expectEqual(ret, 0);
-    try testing.expectEqualSlices(u8, &mac, &mac2);
+    try testing.expect(!std.mem.eql(u8, &mac, &mac2));
 }
 
 test "aegis128x4 - MAC" {

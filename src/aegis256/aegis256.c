@@ -215,6 +215,12 @@ aegis256_mac_verify(aegis256_mac_state *st_, const uint8_t *mac, size_t maclen)
 }
 
 void
+aegis256_mac_reset(aegis256_mac_state *st_)
+{
+    implementation->state_mac_reset(st_);
+}
+
+void
 aegis256_mac_state_clone(aegis256_mac_state *dst, const aegis256_mac_state *src)
 {
     implementation->state_mac_clone(dst, src);

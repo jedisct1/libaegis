@@ -177,6 +177,49 @@ aegis128x2_declast(uint8_t *const dst, const uint8_t *const src, size_t len,
     aegis128x2_update(state, msg0, msg1);
 }
 
+static void
+aegis128x2_mac_nr(uint8_t *mac, size_t maclen, uint64_t adlen, aes_block_t *state,
+                  const aes_block_t *state0)
+{
+    uint8_t     u[2 * AES_BLOCK_LENGTH];
+    aes_block_t tmp;
+    int         i;
+    size_t      len;
+
+    tmp = AES_BLOCK_LOAD_64x2(0, adlen << 3);
+    tmp = AES_BLOCK_XOR(tmp, state[2]);
+
+    for (i = 0; i < 7; i++) {
+        aegis128x2_update(state, tmp, tmp);
+    }
+
+    if (maclen == 16) {
+        tmp = AES_BLOCK_XOR(state[6], AES_BLOCK_XOR(state[5], state[4]));
+        tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[3], state[2]));
+        tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[1], state[0]));
+        AES_BLOCK_STORE(u, tmp);
+        memset(u + AES_BLOCK_LENGTH, 0, AES_BLOCK_LENGTH);
+
+        len = AES_BLOCK_LENGTH;
+    } else if (maclen == 32) {
+        tmp = AES_BLOCK_XOR(state[3], state[2]);
+        tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[1], state[0]));
+        AES_BLOCK_STORE(u, tmp);
+
+        tmp = AES_BLOCK_XOR(state[7], state[6]);
+        tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[5], state[4]));
+        AES_BLOCK_STORE(u + AES_BLOCK_LENGTH, tmp);
+
+        len = 2 * AES_BLOCK_LENGTH;
+    } else {
+        memset(mac, 0, maclen);
+        return;
+    }
+    memcpy(state, state0, sizeof(aegis_blocks));
+    aegis128x2_absorb(u, state);
+    aegis128x2_mac(mac, maclen, len, 0, state);
+}
+
 static int
 encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size_t mlen,
                  const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
@@ -335,6 +378,14 @@ typedef struct _aegis128x2_state {
     uint64_t     mlen;
     size_t       pos;
 } _aegis128x2_state;
+
+typedef struct _aegis128x2_mac_state {
+    aegis_blocks blocks0;
+    aegis_blocks blocks;
+    uint8_t      buf[RATE];
+    uint64_t     adlen;
+    size_t       pos;
+} _aegis128x2_mac_state;
 
 static void
 state_init(aegis128x2_state *st_, const uint8_t *ad, size_t adlen, const uint8_t *npub,
@@ -604,13 +655,34 @@ state_decrypt_detached_final(aegis128x2_state *st_, uint8_t *m, size_t mlen_max,
     return ret;
 }
 
-static int
-state_mac_update(aegis128x2_state *st_, const uint8_t *ad, size_t adlen)
+static void
+state_mac_init(aegis128x2_mac_state *st_, const uint8_t *npub, const uint8_t *k)
 {
-    aegis_blocks             blocks;
-    _aegis128x2_state *const st =
-        (_aegis128x2_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
-                               ~(uintptr_t) (ALIGNMENT - 1));
+    aegis_blocks                 blocks;
+    _aegis128x2_mac_state *const st =
+        (_aegis128x2_mac_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                                   ~(uintptr_t) (ALIGNMENT - 1));
+    size_t i;
+
+    COMPILER_ASSERT((sizeof *st) + ALIGNMENT <= sizeof *st_);
+    st->pos = 0;
+
+    memcpy(blocks, st->blocks, sizeof blocks);
+
+    aegis128x2_init(k, npub, blocks);
+
+    memcpy(st->blocks0, blocks, sizeof blocks);
+    memcpy(st->blocks, blocks, sizeof blocks);
+    st->adlen = 0;
+}
+
+static int
+state_mac_update(aegis128x2_mac_state *st_, const uint8_t *ad, size_t adlen)
+{
+    aegis_blocks                 blocks;
+    _aegis128x2_mac_state *const st =
+        (_aegis128x2_mac_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                                   ~(uintptr_t) (ALIGNMENT - 1));
     size_t i;
     size_t left;
 
@@ -654,12 +726,12 @@ state_mac_update(aegis128x2_state *st_, const uint8_t *ad, size_t adlen)
 }
 
 static int
-state_mac_final(aegis128x2_state *st_, uint8_t *mac, size_t maclen)
+state_mac_final(aegis128x2_mac_state *st_, uint8_t *mac, size_t maclen)
 {
-    aegis_blocks             blocks;
-    _aegis128x2_state *const st =
-        (_aegis128x2_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
-                               ~(uintptr_t) (ALIGNMENT - 1));
+    aegis_blocks                 blocks;
+    _aegis128x2_mac_state *const st =
+        (_aegis128x2_mac_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                                   ~(uintptr_t) (ALIGNMENT - 1));
     size_t left;
 
     memcpy(blocks, st->blocks, sizeof blocks);
@@ -669,7 +741,7 @@ state_mac_final(aegis128x2_state *st_, uint8_t *mac, size_t maclen)
         memset(st->buf + left, 0, RATE - left);
         aegis128x2_absorb(st->buf, blocks);
     }
-    aegis128x2_mac(mac, maclen, st->adlen, 0, blocks);
+    aegis128x2_mac_nr(mac, maclen, st->adlen, st->blocks, st->blocks0);
 
     memcpy(st->blocks, blocks, sizeof blocks);
 
@@ -677,13 +749,24 @@ state_mac_final(aegis128x2_state *st_, uint8_t *mac, size_t maclen)
 }
 
 static void
-state_clone(aegis128x2_state *dst, const aegis128x2_state *src)
+state_mac_reset(aegis128x2_mac_state *st_)
 {
-    _aegis128x2_state *const dst_ =
-        (_aegis128x2_state *) ((((uintptr_t) &dst->opaque) + (ALIGNMENT - 1)) &
-                               ~(uintptr_t) (ALIGNMENT - 1));
-    const _aegis128x2_state *const src_ =
-        (const _aegis128x2_state *) ((((uintptr_t) &src->opaque) + (ALIGNMENT - 1)) &
-                                     ~(uintptr_t) (ALIGNMENT - 1));
+    _aegis128x2_mac_state *const st =
+        (_aegis128x2_mac_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                                   ~(uintptr_t) (ALIGNMENT - 1));
+    st->adlen = 0;
+    st->pos   = 0;
+    memcpy(st->blocks, st->blocks0, sizeof(aegis_blocks));
+}
+
+static void
+state_mac_clone(aegis128x2_mac_state *dst, const aegis128x2_mac_state *src)
+{
+    _aegis128x2_mac_state *const dst_ =
+        (_aegis128x2_mac_state *) ((((uintptr_t) &dst->opaque) + (ALIGNMENT - 1)) &
+                                   ~(uintptr_t) (ALIGNMENT - 1));
+    const _aegis128x2_mac_state *const src_ =
+        (const _aegis128x2_mac_state *) ((((uintptr_t) &src->opaque) + (ALIGNMENT - 1)) &
+                                         ~(uintptr_t) (ALIGNMENT - 1));
     *dst_ = *src_;
 }

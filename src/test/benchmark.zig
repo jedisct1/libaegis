@@ -204,18 +204,17 @@ fn bench_aegis128l_mac() !void {
     var key: [aegis.aegis128l_KEYBYTES]u8 = undefined;
     var nonce: [aegis.aegis128l_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
-    var st0: aegis.aegis128l_mac_state = undefined;
+    var st: aegis.aegis128l_mac_state = undefined;
 
     random.bytes(&key);
     random.bytes(&nonce);
     random.bytes(&buf);
-    aegis.aegis128l_mac_init(&st0, &key, &nonce);
+    aegis.aegis128l_mac_init(&st, &key, &nonce);
 
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        var st: aegis.aegis128l_mac_state = undefined;
-        aegis.aegis128l_mac_state_clone(&st, &st0);
+        aegis.aegis128l_mac_reset(&st);
         _ = aegis.aegis128l_mac_update(&st, &buf, msg_len);
         _ = aegis.aegis128l_mac_final(&st, &buf, aegis.aegis128l_ABYTES_MAX);
     }
@@ -232,18 +231,17 @@ fn bench_aegis128x2_mac() !void {
     var key: [aegis.aegis128x2_KEYBYTES]u8 = undefined;
     var nonce: [aegis.aegis128x2_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
-    var st0: aegis.aegis128x2_state = undefined;
+    var st: aegis.aegis128x2_mac_state = undefined;
 
     random.bytes(&key);
     random.bytes(&nonce);
     random.bytes(&buf);
-    aegis.aegis128x2_mac_init(&st0, &key, &nonce);
+    aegis.aegis128x2_mac_init(&st, &key, &nonce);
 
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        var st: aegis.aegis128x2_state = undefined;
-        aegis.aegis128x2_mac_state_clone(&st, &st0);
+        aegis.aegis128x2_mac_reset(&st);
         _ = aegis.aegis128x2_mac_update(&st, &buf, msg_len);
         _ = aegis.aegis128x2_mac_final(&st, &buf, aegis.aegis128x2_ABYTES_MAX);
     }
@@ -288,18 +286,17 @@ fn bench_aegis256_mac() !void {
     var key: [aegis.aegis256_KEYBYTES]u8 = undefined;
     var nonce: [aegis.aegis256_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
-    var st0: aegis.aegis256_mac_state = undefined;
+    var st: aegis.aegis256_mac_state = undefined;
 
     random.bytes(&key);
     random.bytes(&nonce);
     random.bytes(&buf);
-    aegis.aegis256_mac_init(&st0, &key, &nonce);
+    aegis.aegis256_mac_init(&st, &key, &nonce);
 
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        var st: aegis.aegis256_mac_state = undefined;
-        aegis.aegis256_mac_state_clone(&st, &st0);
+        aegis.aegis256_mac_reset(&st);
         _ = aegis.aegis256_mac_update(&st, &buf, msg_len);
         _ = aegis.aegis256_mac_final(&st, &buf, aegis.aegis256_ABYTES_MAX);
     }

@@ -31,6 +31,11 @@ typedef struct aegis128x2_state {
     CRYPTO_ALIGN(64) uint8_t opaque[448];
 } aegis128x2_state;
 
+/* An AEGIS state, only for MAC updates */
+typedef struct aegis128x2_mac_state {
+    CRYPTO_ALIGN(64) uint8_t opaque[896];
+} aegis128x2_mac_state;
+
 /* The length of an AEGIS key, in bytes */
 size_t aegis128x2_keybytes(void);
 
@@ -258,13 +263,16 @@ void aegis128x2_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t cle
  * k: key input buffer (16 bytes)
  *
  * - The same key MUST NOT be used both for MAC and encryption.
- * - The nonce MUST NOT be reused with the same key.
  * - If the key is secret, the MAC is secure against forgery.
  * - However, if the key is known, arbitrary inputs matching a tag can be efficiently computed.
  *
  * The recommended way to use the MAC mode is to generate a random key and keep it secret.
+ *
+ * After initialization, the state can be reused to generate multiple MACs by cloning it
+ * with `aegis128x2_mac_state_clone()`. It is only safe to copy a state directly without using
+ * the clone function if the state is guaranteed to be properly aligned.
  */
-void aegis128x2_mac_init(aegis128x2_state *st_, const uint8_t *k, const uint8_t *npub);
+void aegis128x2_mac_init(aegis128x2_mac_state *st_, const uint8_t *k, const uint8_t *npub);
 
 /*
  * Update the MAC state with input data.
@@ -277,7 +285,7 @@ void aegis128x2_mac_init(aegis128x2_state *st_, const uint8_t *k, const uint8_t 
  *
  * Once the full input has been absorb, call either `_mac_final` or `_mac_verify`.
  */
-int aegis128x2_mac_update(aegis128x2_state *st_, const uint8_t *m, size_t mlen);
+int aegis128x2_mac_update(aegis128x2_mac_state *st_, const uint8_t *m, size_t mlen);
 
 /*
  * Finalize the MAC and generate the authentication tag.
@@ -286,7 +294,7 @@ int aegis128x2_mac_update(aegis128x2_state *st_, const uint8_t *m, size_t mlen);
  * mac: authentication tag output buffer
  * maclen: length of the authentication tag to generate (16 or 32. 32 is recommended).
  */
-int aegis128x2_mac_final(aegis128x2_state *st_, uint8_t *mac, size_t maclen);
+int aegis128x2_mac_final(aegis128x2_mac_state *st_, uint8_t *mac, size_t maclen);
 
 /*
  * Verify a MAC in constant time.
@@ -297,7 +305,12 @@ int aegis128x2_mac_final(aegis128x2_state *st_, uint8_t *mac, size_t maclen);
  *
  * Returns 0 if the tag is authentic, -1 otherwise.
  */
-int aegis128x2_mac_verify(aegis128x2_state *st_, const uint8_t *mac, size_t maclen);
+int aegis128x2_mac_verify(aegis128x2_mac_state *st_, const uint8_t *mac, size_t maclen);
+
+/*
+ * Reset an AEGIS_MAC state.
+ */
+void aegis128x2_mac_reset(aegis128x2_mac_state *st_);
 
 /*
  * Clone an AEGIS-MAC state.
@@ -307,7 +320,7 @@ int aegis128x2_mac_verify(aegis128x2_state *st_, const uint8_t *mac, size_t macl
  *
  * This function MUST be used in order to clone states.
  */
-void aegis128x2_mac_state_clone(aegis128x2_state *dst, const aegis128x2_state *src);
+void aegis128x2_mac_state_clone(aegis128x2_mac_state *dst, const aegis128x2_mac_state *src);
 
 #ifdef __cplusplus
 }

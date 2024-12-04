@@ -58,6 +58,7 @@ struct aegis256_implementation aegis256_altivec_implementation = {
     .state_encrypt_final           = state_encrypt_final,
     .state_decrypt_detached_update = state_decrypt_detached_update,
     .state_decrypt_detached_final  = state_decrypt_detached_final,
+    .state_mac_init                = state_mac_init,
     .state_mac_update              = state_mac_update,
     .state_mac_final               = state_mac_final,
     .state_mac_reset               = state_mac_reset,
