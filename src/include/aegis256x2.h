@@ -263,10 +263,6 @@ void aegis256x2_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t cle
  * - However, if the key is known, arbitrary inputs matching a tag can be efficiently computed.
  *
  * The recommended way to use the MAC mode is to generate a random key and keep it secret.
- *
- * After initialization, the state can be reused to generate multiple MACs by cloning it
- * with `aegis256x2_mac_state_clone()`. It is only safe to copy a state directly without using
- * the clone function if the state is guaranteed to be properly aligned.
  */
 void aegis256x2_mac_init(aegis256x2_state *st_, const uint8_t *k, const uint8_t *npub);
 
