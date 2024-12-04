@@ -258,7 +258,7 @@ void aegis128x2_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t cle
  * k: key input buffer (16 bytes)
  *
  * - The same key MUST NOT be used both for MAC and encryption.
- * - The nonce is not used in the MAC mode (fixed to zero).
+ * - The nonce MUST NOT be reused with the same key.
  * - If the key is secret, the MAC is secure against forgery.
  * - However, if the key is known, arbitrary inputs matching a tag can be efficiently computed.
  *
@@ -268,7 +268,7 @@ void aegis128x2_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t cle
  * with `aegis128x2_mac_state_clone()`. It is only safe to copy a state directly without using
  * the clone function if the state is guaranteed to be properly aligned.
  */
-void aegis128x2_mac_init(aegis128x2_state *st_, const uint8_t *k);
+void aegis128x2_mac_init(aegis128x2_state *st_, const uint8_t *k, const uint8_t *npub);
 
 /*
  * Update the MAC state with input data.

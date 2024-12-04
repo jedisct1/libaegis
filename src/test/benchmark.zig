@@ -202,12 +202,14 @@ fn bench_aegis128x4() !void {
 
 fn bench_aegis128l_mac() !void {
     var key: [aegis.aegis128l_KEYBYTES]u8 = undefined;
+    var nonce: [aegis.aegis128l_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
     var st0: aegis.aegis128l_state = undefined;
 
     random.bytes(&key);
+    random.bytes(&nonce);
     random.bytes(&buf);
-    aegis.aegis128l_mac_init(&st0, &key);
+    aegis.aegis128l_mac_init(&st0, &key, &nonce);
 
     var timer = try Timer.start();
     const start = timer.lap();
@@ -228,12 +230,14 @@ fn bench_aegis128l_mac() !void {
 
 fn bench_aegis128x2_mac() !void {
     var key: [aegis.aegis128x2_KEYBYTES]u8 = undefined;
+    var nonce: [aegis.aegis128x2_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
     var st0: aegis.aegis128x2_state = undefined;
 
     random.bytes(&key);
+    random.bytes(&nonce);
     random.bytes(&buf);
-    aegis.aegis128x2_mac_init(&st0, &key);
+    aegis.aegis128x2_mac_init(&st0, &key, &nonce);
 
     var timer = try Timer.start();
     const start = timer.lap();
@@ -254,12 +258,14 @@ fn bench_aegis128x2_mac() !void {
 
 fn bench_aegis128x4_mac() !void {
     var key: [aegis.aegis128x4_KEYBYTES]u8 = undefined;
+    var nonce: [aegis.aegis128x4_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
     var st0: aegis.aegis128x4_state = undefined;
 
     random.bytes(&key);
+    random.bytes(&nonce);
     random.bytes(&buf);
-    aegis.aegis128x4_mac_init(&st0, &key);
+    aegis.aegis128x4_mac_init(&st0, &key, &nonce);
 
     var timer = try Timer.start();
     const start = timer.lap();
@@ -280,12 +286,14 @@ fn bench_aegis128x4_mac() !void {
 
 fn bench_aegis256_mac() !void {
     var key: [aegis.aegis256_KEYBYTES]u8 = undefined;
+    var nonce: [aegis.aegis256_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
     var st0: aegis.aegis256_state = undefined;
 
     random.bytes(&key);
+    random.bytes(&nonce);
     random.bytes(&buf);
-    aegis.aegis256_mac_init(&st0, &key);
+    aegis.aegis256_mac_init(&st0, &key, &nonce);
 
     var timer = try Timer.start();
     const start = timer.lap();
@@ -306,12 +314,14 @@ fn bench_aegis256_mac() !void {
 
 fn bench_aegis256x2_mac() !void {
     var key: [aegis.aegis256x2_KEYBYTES]u8 = undefined;
+    var nonce: [aegis.aegis256x2_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
     var st0: aegis.aegis256x2_state = undefined;
 
     random.bytes(&key);
+    random.bytes(&nonce);
     random.bytes(&buf);
-    aegis.aegis256x2_mac_init(&st0, &key);
+    aegis.aegis256x2_mac_init(&st0, &key, &nonce);
 
     var timer = try Timer.start();
     const start = timer.lap();
@@ -332,12 +342,14 @@ fn bench_aegis256x2_mac() !void {
 
 fn bench_aegis256x4_mac() !void {
     var key: [aegis.aegis256x4_KEYBYTES]u8 = undefined;
+    var nonce: [aegis.aegis256x2_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
     var st0: aegis.aegis256x4_state = undefined;
 
     random.bytes(&key);
+    random.bytes(&nonce);
     random.bytes(&buf);
-    aegis.aegis256x4_mac_init(&st0, &key);
+    aegis.aegis256x4_mac_init(&st0, &key, &nonce);
 
     var timer = try Timer.start();
     const start = timer.lap();

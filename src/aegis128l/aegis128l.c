@@ -175,10 +175,8 @@ aegis128l_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen, con
 }
 
 void
-aegis128l_mac_init(aegis128l_state *st_, const uint8_t *k)
+aegis128l_mac_init(aegis128l_state *st_, const uint8_t *k, const uint8_t *npub)
 {
-    const uint8_t npub[aegis128l_NPUBBYTES] = { 0 };
-
     memset(st_, 0, sizeof *st_);
     implementation->state_init(st_, NULL, 0, npub, k);
 }
