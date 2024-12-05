@@ -194,24 +194,28 @@ aegis128x2_mac_nr(uint8_t *mac, size_t maclen, uint64_t adlen, aes_block_t *stat
 
     memset(t, 0, sizeof t);
     if (maclen == 16) {
+#if AES_BLOCK_LENGTH > 16
         tmp = AES_BLOCK_XOR(state[6], AES_BLOCK_XOR(state[5], state[4]));
         tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[3], state[2]));
         tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[1], state[0]));
         AES_BLOCK_STORE(t, tmp);
-
         memcpy(state, state0, sizeof(aegis_blocks));
         for (i = 0; i < AES_BLOCK_LENGTH / 32; i++) {
             aegis128x2_absorb(t + i * 32, state);
         }
+        tmp = AES_BLOCK_LOAD_64x2(0, AES_BLOCK_LENGTH << 3);
+        tmp = AES_BLOCK_XOR(tmp, state[2]);
         for (i = 0; i < 7; i++) {
             aegis128x2_update(state, tmp, tmp);
         }
+#endif
         tmp = AES_BLOCK_XOR(state[6], AES_BLOCK_XOR(state[5], state[4]));
         tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[3], state[2]));
         tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[1], state[0]));
         AES_BLOCK_STORE(t, tmp);
         memcpy(mac, t, 16);
     } else if (maclen == 32) {
+#if AES_BLOCK_LENGTH > 16
         tmp = AES_BLOCK_XOR(state[3], state[2]);
         tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[1], state[0]));
         AES_BLOCK_STORE(t, tmp);
@@ -224,9 +228,12 @@ aegis128x2_mac_nr(uint8_t *mac, size_t maclen, uint64_t adlen, aes_block_t *stat
         for (i = 0; i < 2 * AES_BLOCK_LENGTH / 32; i++) {
             aegis128x2_absorb(t + i * 32, state);
         }
+        tmp = AES_BLOCK_LOAD_64x2(0, (2 * AES_BLOCK_LENGTH) << 3);
+        tmp = AES_BLOCK_XOR(tmp, state[2]);
         for (i = 0; i < 7; i++) {
             aegis128x2_update(state, tmp, tmp);
         }
+#endif
         tmp = AES_BLOCK_XOR(state[3], state[2]);
         tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[1], state[0]));
         AES_BLOCK_STORE(t, tmp);
