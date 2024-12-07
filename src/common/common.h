@@ -25,8 +25,6 @@
 #    if defined(__clang__) || defined(__GNUC__)
 #        define HAVE_AVX_ASM
 #    endif
-#endif
-#if defined(__x86_64__) || defined(_M_AMD64)
 #    define HAVE_AVXINTRIN_H
 #    define HAVE_AVX2INTRIN_H
 #    define HAVE_AVX512FINTRIN_H
