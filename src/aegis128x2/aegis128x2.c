@@ -178,7 +178,7 @@ aegis128x2_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen, co
 void
 aegis128x2_mac_init(aegis128x2_mac_state *st_, const uint8_t *k, const uint8_t *npub)
 {
-    implementation->state_init(st_, NULL, 0, npub, k);
+    implementation->state_mac_init(st_, npub, k);
 }
 
 int

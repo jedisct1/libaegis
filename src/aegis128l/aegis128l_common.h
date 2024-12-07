@@ -585,7 +585,6 @@ state_mac_init(aegis128l_mac_state *st_, const uint8_t *npub, const uint8_t *k)
     _aegis128l_mac_state *const st =
         (_aegis128l_mac_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
                                   ~(uintptr_t) (ALIGNMENT - 1));
-    size_t i;
 
     COMPILER_ASSERT((sizeof *st) + ALIGNMENT <= sizeof *st_);
     st->pos = 0;
