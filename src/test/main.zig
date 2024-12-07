@@ -790,8 +790,8 @@ test "aegis128x2 - MAC test vector" {
     try testing.expectEqual(ret, 0);
     ret = aegis.aegis128x2_mac_final(&st, &mac256, mac256.len);
     try testing.expectEqual(ret, 0);
-    const expected128_hex = "30ff53a9e8fe94705b753598b4899ded";
-    const expected256_hex = "cfcd370c2f182244b512ec5c7e71f54e2b56ae9e8462e845ec02d4f65bc346c0";
+    const expected128_hex = "f472304012396667f51ab7450d87f460";
+    const expected256_hex = "f376288f13b51c73ecb814922919a31f2cbe1fd322a0062ef7860327a2bc3159";
     var expected128: [16]u8 = undefined;
     var expected256: [32]u8 = undefined;
     _ = try std.fmt.hexToBytes(&expected128, expected128_hex);

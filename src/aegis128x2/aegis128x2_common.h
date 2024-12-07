@@ -205,6 +205,7 @@ aegis128x2_mac_nr(uint8_t *mac, size_t maclen, uint64_t adlen, aes_block_t *stat
             aegis128x2_absorb(r, state);
         }
         tmp = AES_BLOCK_LOAD_64x2(d, maclen);
+        tmp = AES_BLOCK_XOR(tmp, state[2]);
         for (i = 0; i < 7; i++) {
             aegis128x2_update(state, tmp, tmp);
         }
@@ -228,6 +229,7 @@ aegis128x2_mac_nr(uint8_t *mac, size_t maclen, uint64_t adlen, aes_block_t *stat
             aegis128x2_absorb(r, state);
         }
         tmp = AES_BLOCK_LOAD_64x2(d, maclen);
+        tmp = AES_BLOCK_XOR(tmp, state[2]);
         for (i = 0; i < 7; i++) {
             aegis128x2_update(state, tmp, tmp);
         }
