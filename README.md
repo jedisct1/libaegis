@@ -79,6 +79,19 @@ Include `<aegis.h>` and call `aegis_init()` prior to doing anything else with th
 
 [Other AEGIS implementations](https://github.com/cfrg/draft-irtf-cfrg-aegis-aead?tab=readme-ov-file#known-implementations) are also available for most programming languages.
 
+## Key differences between AEGIS variants
+
+| **Feature**          | **AEGIS-128L**                                                        | **AEGIS-256**                                | **AEGIS-128X2**                    | **AEGIS-128X4**                    | **AEGIS-256X2**                   | **AEGIS-256X4**                   |
+| -------------------- | --------------------------------------------------------------------- | -------------------------------------------- | ---------------------------------- | ---------------------------------- | --------------------------------- | --------------------------------- |
+| **Key Length**       | 128 bits                                                              | 256 bits                                     | 128 bits                           | 128 bits                           | 256 bits                          | 256 bits                          |
+| **Nonce Length**     | 128 bits                                                              | 256 bits                                     | 128 bits                           | 128 bits                           | 256 bits                          | 256 bits                          |
+| **State Size**       | 1024 bits (8 x 128-bit blocks)                                        | 768 bits (6 x 128-bit blocks)                | 2048 bits (2 x 1024-bit states)    | 4096 bits (4 x 1024-bit states)    | 1536 bits (2 x 768-bit states)    | 3072 bits (4 x 768-bit states)    |
+| **Input Rate**       | 256 bits per update                                                   | 128 bits per update                          | 512 bits per update                | 1024 bits per update               | 256 bits per update               | 512 bits per update               |
+| **Parallelism**      | None                                                                  | None                                         | 2 parallel lanes                   | 4 parallel lanes                   | 2 parallel lanes                  | 4 parallel lanes                  |
+| **Performance**      | High on standard CPUs                                                 | High on standard CPUs                        | Higher on CPUs with AVX2           | Higher on CPUs with AVX-512        | Higher on CPUs with AVX2          | Higher on CPUs with AVX-512       |
+| **Security Level**   | 128-bit security                                                      | 256-bit security                             | 128-bit security                   | 128-bit security                   | 256-bit security                  | 256-bit security                  |
+| **Special Features** | Optimized for high performance on standard CPUs with AES instructions | Optimized for high security with larger keys | Parallelized version of AEGIS-128L | Parallelized version of AEGIS-128L | Parallelized version of AEGIS-256 | Parallelized version of AEGIS-256 |
+
 ## Benchmark results
 
 AEGIS is very fast on CPUs with parallel execution pipelines and AES support.
