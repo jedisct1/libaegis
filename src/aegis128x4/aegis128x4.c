@@ -177,19 +177,19 @@ aegis128x4_decrypt_unauthenticated(uint8_t *m, const uint8_t *c, size_t clen, co
 }
 
 void
-aegis128x4_mac_init(aegis128x4_state *st_, const uint8_t *k, const uint8_t *npub)
+aegis128x4_mac_init(aegis128x4_mac_state *st_, const uint8_t *k, const uint8_t *npub)
 {
-    implementation->state_init(st_, NULL, 0, npub, k);
+    implementation->state_mac_init(st_, npub, k);
 }
 
 int
-aegis128x4_mac_update(aegis128x4_state *st_, const uint8_t *m, size_t mlen)
+aegis128x4_mac_update(aegis128x4_mac_state *st_, const uint8_t *m, size_t mlen)
 {
     return implementation->state_mac_update(st_, m, mlen);
 }
 
 int
-aegis128x4_mac_final(aegis128x4_state *st_, uint8_t *mac, size_t maclen)
+aegis128x4_mac_final(aegis128x4_mac_state *st_, uint8_t *mac, size_t maclen)
 {
     if (maclen != 16 && maclen != 32) {
         errno = EINVAL;
@@ -199,7 +199,7 @@ aegis128x4_mac_final(aegis128x4_state *st_, uint8_t *mac, size_t maclen)
 }
 
 int
-aegis128x4_mac_verify(aegis128x4_state *st_, const uint8_t *mac, size_t maclen)
+aegis128x4_mac_verify(aegis128x4_mac_state *st_, const uint8_t *mac, size_t maclen)
 {
     uint8_t expected_mac[32];
 
@@ -217,9 +217,15 @@ aegis128x4_mac_verify(aegis128x4_state *st_, const uint8_t *mac, size_t maclen)
 }
 
 void
-aegis128x4_mac_state_clone(aegis128x4_state *dst, const aegis128x4_state *src)
+aegis128x4_mac_reset(aegis128x4_mac_state *st_)
 {
-    implementation->state_clone(dst, src);
+    implementation->state_mac_reset(st_);
+}
+
+void
+aegis128x4_mac_state_clone(aegis128x4_mac_state *dst, const aegis128x4_mac_state *src)
+{
+    implementation->state_mac_clone(dst, src);
 }
 
 int
