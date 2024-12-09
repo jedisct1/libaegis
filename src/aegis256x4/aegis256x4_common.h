@@ -197,6 +197,74 @@ aegis256x4_declast(uint8_t *const dst, const uint8_t *const src, size_t len,
     aegis256x4_update(state, msg);
 }
 
+static void
+aegis256x4_mac_nr(uint8_t *mac, size_t maclen, uint64_t adlen, aes_block_t *state)
+{
+    uint8_t     t[2 * AES_BLOCK_LENGTH];
+    uint8_t     r[RATE];
+    aes_block_t tmp;
+    int         i;
+    const int   d = AES_BLOCK_LENGTH / 16;
+
+    tmp = AES_BLOCK_LOAD_64x2(0, adlen << 3);
+    tmp = AES_BLOCK_XOR(tmp, state[3]);
+
+    for (i = 0; i < 7; i++) {
+        aegis256x4_update(state, tmp);
+    }
+
+    memset(r, 0, sizeof r);
+    if (maclen == 16) {
+#if AES_BLOCK_LENGTH > 16
+        tmp = AES_BLOCK_XOR(state[5], state[4]);
+        tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[3], state[2]));
+        tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[1], state[0]));
+        AES_BLOCK_STORE(t, tmp);
+
+        for (i = 1; i < d; i++) {
+            memcpy(r, t + i * 16, 16);
+            aegis256x4_absorb(r, state);
+        }
+        tmp = AES_BLOCK_LOAD_64x2(d, maclen);
+        tmp = AES_BLOCK_XOR(tmp, state[3]);
+        for (i = 0; i < 7; i++) {
+            aegis256x4_update(state, tmp);
+        }
+#endif
+        tmp = AES_BLOCK_XOR(state[5], state[4]);
+        tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[3], state[2]));
+        tmp = AES_BLOCK_XOR(tmp, AES_BLOCK_XOR(state[1], state[0]));
+        AES_BLOCK_STORE(t, tmp);
+        memcpy(mac, t, 16);
+    } else if (maclen == 32) {
+#if AES_BLOCK_LENGTH > 16
+        tmp = AES_BLOCK_XOR(state[2], AES_BLOCK_XOR(state[1], state[0]));
+        AES_BLOCK_STORE(t, tmp);
+        tmp = AES_BLOCK_XOR(state[5], AES_BLOCK_XOR(state[4], state[3]));
+        AES_BLOCK_STORE(t + AES_BLOCK_LENGTH, tmp);
+        for (i = 1; i < d; i++) {
+            memcpy(r, t + i * 16, 16);
+            aegis256x4_absorb(r, state);
+            memcpy(r, t + AES_BLOCK_LENGTH + i * 16, 16);
+            aegis256x4_absorb(r, state);
+        }
+        tmp = AES_BLOCK_LOAD_64x2(d, maclen);
+        tmp = AES_BLOCK_XOR(tmp, state[3]);
+        for (i = 0; i < 7; i++) {
+            aegis256x4_update(state, tmp);
+        }
+#endif
+        tmp = AES_BLOCK_XOR(state[2], AES_BLOCK_XOR(state[1], state[0]));
+        AES_BLOCK_STORE(t, tmp);
+        memcpy(mac, t, 16);
+        tmp = AES_BLOCK_XOR(state[5], AES_BLOCK_XOR(state[4], state[3]));
+        AES_BLOCK_STORE(t, tmp);
+        memcpy(mac + 16, t, 16);
+    } else {
+        memset(mac, 0, maclen);
+    }
+}
+
 static int
 encrypt_detached(uint8_t *c, uint8_t *mac, size_t maclen, const uint8_t *m, size_t mlen,
                  const uint8_t *ad, size_t adlen, const uint8_t *npub, const uint8_t *k)
@@ -355,6 +423,14 @@ typedef struct _aegis256x4_state {
     uint64_t     mlen;
     size_t       pos;
 } _aegis256x4_state;
+
+typedef struct _aegis256x4_mac_state {
+    aegis_blocks blocks;
+    aegis_blocks blocks0;
+    uint8_t      buf[RATE];
+    uint64_t     adlen;
+    size_t       pos;
+} _aegis256x4_mac_state;
 
 static void
 state_init(aegis256x4_state *st_, const uint8_t *ad, size_t adlen, const uint8_t *npub,
@@ -624,13 +700,33 @@ state_decrypt_detached_final(aegis256x4_state *st_, uint8_t *m, size_t mlen_max,
     return ret;
 }
 
-static int
-state_mac_update(aegis256x4_state *st_, const uint8_t *ad, size_t adlen)
+static void
+state_mac_init(aegis256x4_mac_state *st_, const uint8_t *npub, const uint8_t *k)
 {
-    aegis_blocks             blocks;
-    _aegis256x4_state *const st =
-        (_aegis256x4_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
-                               ~(uintptr_t) (ALIGNMENT - 1));
+    aegis_blocks                 blocks;
+    _aegis256x4_mac_state *const st =
+        (_aegis256x4_mac_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                                   ~(uintptr_t) (ALIGNMENT - 1));
+
+    COMPILER_ASSERT((sizeof *st) + ALIGNMENT <= sizeof *st_);
+    st->pos = 0;
+
+    memcpy(blocks, st->blocks, sizeof blocks);
+
+    aegis256x4_init(k, npub, blocks);
+
+    memcpy(st->blocks0, blocks, sizeof blocks);
+    memcpy(st->blocks, blocks, sizeof blocks);
+    st->adlen = 0;
+}
+
+static int
+state_mac_update(aegis256x4_mac_state *st_, const uint8_t *ad, size_t adlen)
+{
+    aegis_blocks                 blocks;
+    _aegis256x4_mac_state *const st =
+        (_aegis256x4_mac_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                                   ~(uintptr_t) (ALIGNMENT - 1));
     size_t i;
     size_t left;
 
@@ -672,12 +768,12 @@ state_mac_update(aegis256x4_state *st_, const uint8_t *ad, size_t adlen)
 }
 
 static int
-state_mac_final(aegis256x4_state *st_, uint8_t *mac, size_t maclen)
+state_mac_final(aegis256x4_mac_state *st_, uint8_t *mac, size_t maclen)
 {
-    aegis_blocks             blocks;
-    _aegis256x4_state *const st =
-        (_aegis256x4_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
-                               ~(uintptr_t) (ALIGNMENT - 1));
+    aegis_blocks                 blocks;
+    _aegis256x4_mac_state *const st =
+        (_aegis256x4_mac_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                                   ~(uintptr_t) (ALIGNMENT - 1));
     size_t left;
 
     memcpy(blocks, st->blocks, sizeof blocks);
@@ -687,7 +783,7 @@ state_mac_final(aegis256x4_state *st_, uint8_t *mac, size_t maclen)
         memset(st->buf + left, 0, RATE - left);
         aegis256x4_absorb(st->buf, blocks);
     }
-    aegis256x4_mac(mac, maclen, st->adlen, 0, blocks);
+    aegis256x4_mac_nr(mac, maclen, st->adlen, blocks);
 
     memcpy(st->blocks, blocks, sizeof blocks);
 
@@ -695,13 +791,24 @@ state_mac_final(aegis256x4_state *st_, uint8_t *mac, size_t maclen)
 }
 
 static void
-state_clone(aegis256x4_state *dst, const aegis256x4_state *src)
+state_mac_reset(aegis256x4_mac_state *st_)
 {
-    _aegis256x4_state *const dst_ =
-        (_aegis256x4_state *) ((((uintptr_t) &dst->opaque) + (ALIGNMENT - 1)) &
-                               ~(uintptr_t) (ALIGNMENT - 1));
-    const _aegis256x4_state *const src_ =
-        (const _aegis256x4_state *) ((((uintptr_t) &src->opaque) + (ALIGNMENT - 1)) &
-                                     ~(uintptr_t) (ALIGNMENT - 1));
+    _aegis256x4_mac_state *const st =
+        (_aegis256x4_mac_state *) ((((uintptr_t) &st_->opaque) + (ALIGNMENT - 1)) &
+                                   ~(uintptr_t) (ALIGNMENT - 1));
+    st->adlen = 0;
+    st->pos   = 0;
+    memcpy(st->blocks, st->blocks0, sizeof(aegis_blocks));
+}
+
+static void
+state_mac_clone(aegis256x4_mac_state *dst, const aegis256x4_mac_state *src)
+{
+    _aegis256x4_mac_state *const dst_ =
+        (_aegis256x4_mac_state *) ((((uintptr_t) &dst->opaque) + (ALIGNMENT - 1)) &
+                                   ~(uintptr_t) (ALIGNMENT - 1));
+    const _aegis256x4_mac_state *const src_ =
+        (const _aegis256x4_mac_state *) ((((uintptr_t) &src->opaque) + (ALIGNMENT - 1)) &
+                                         ~(uintptr_t) (ALIGNMENT - 1));
     *dst_ = *src_;
 }

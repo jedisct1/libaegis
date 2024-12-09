@@ -289,8 +289,8 @@ typedef struct _aegis256_state {
 } _aegis256_state;
 
 typedef struct _aegis256_mac_state {
-    aegis_blocks blocks0;
     aegis_blocks blocks;
+    aegis_blocks blocks0;
     uint8_t      buf[RATE];
     uint64_t     adlen;
     size_t       pos;

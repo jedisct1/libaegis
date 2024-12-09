@@ -33,7 +33,7 @@ typedef struct aegis128x2_state {
 
 /* An AEGIS state, only for MAC updates */
 typedef struct aegis128x2_mac_state {
-    CRYPTO_ALIGN(64) uint8_t opaque[896];
+    CRYPTO_ALIGN(64) uint8_t opaque[704];
 } aegis128x2_mac_state;
 
 /* The length of an AEGIS key, in bytes */

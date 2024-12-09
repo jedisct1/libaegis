@@ -407,8 +407,8 @@ typedef struct _aegis128x2_state {
 } _aegis128x2_state;
 
 typedef struct _aegis128x2_mac_state {
-    aegis_blocks blocks0;
     aegis_blocks blocks;
+    aegis_blocks blocks0;
     uint8_t      buf[RATE];
     uint64_t     adlen;
     size_t       pos;

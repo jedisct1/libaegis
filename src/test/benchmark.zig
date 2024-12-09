@@ -258,7 +258,7 @@ fn bench_aegis128x4_mac() !void {
     var key: [aegis.aegis128x4_KEYBYTES]u8 = undefined;
     var nonce: [aegis.aegis128x4_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
-    var st0: aegis.aegis128x4_state = undefined;
+    var st0: aegis.aegis128x4_mac_state = undefined;
 
     random.bytes(&key);
     random.bytes(&nonce);
@@ -268,7 +268,7 @@ fn bench_aegis128x4_mac() !void {
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        var st: aegis.aegis128x4_state = undefined;
+        var st: aegis.aegis128x4_mac_state = undefined;
         aegis.aegis128x4_mac_state_clone(&st, &st0);
         _ = aegis.aegis128x4_mac_update(&st, &buf, msg_len);
         _ = aegis.aegis128x4_mac_final(&st, &buf, aegis.aegis128x4_ABYTES_MAX);
@@ -313,7 +313,7 @@ fn bench_aegis256x2_mac() !void {
     var key: [aegis.aegis256x2_KEYBYTES]u8 = undefined;
     var nonce: [aegis.aegis256x2_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
-    var st0: aegis.aegis256x2_state = undefined;
+    var st0: aegis.aegis256x2_mac_state = undefined;
 
     random.bytes(&key);
     random.bytes(&nonce);
@@ -323,7 +323,7 @@ fn bench_aegis256x2_mac() !void {
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        var st: aegis.aegis256x2_state = undefined;
+        var st: aegis.aegis256x2_mac_state = undefined;
         aegis.aegis256x2_mac_state_clone(&st, &st0);
         _ = aegis.aegis256x2_mac_update(&st, &buf, msg_len);
         _ = aegis.aegis256x2_mac_final(&st, &buf, aegis.aegis256x2_ABYTES_MAX);
@@ -341,7 +341,7 @@ fn bench_aegis256x4_mac() !void {
     var key: [aegis.aegis256x4_KEYBYTES]u8 = undefined;
     var nonce: [aegis.aegis256x2_NPUBBYTES]u8 = undefined;
     var buf: [msg_len]u8 = undefined;
-    var st0: aegis.aegis256x4_state = undefined;
+    var st0: aegis.aegis256x4_mac_state = undefined;
 
     random.bytes(&key);
     random.bytes(&nonce);
@@ -351,7 +351,7 @@ fn bench_aegis256x4_mac() !void {
     var timer = try Timer.start();
     const start = timer.lap();
     for (0..iterations) |_| {
-        var st: aegis.aegis256x4_state = undefined;
+        var st: aegis.aegis256x4_mac_state = undefined;
         aegis.aegis256x4_mac_state_clone(&st, &st0);
         _ = aegis.aegis256x4_mac_update(&st, &buf, msg_len);
         _ = aegis.aegis256x4_mac_final(&st, &buf, aegis.aegis256x4_ABYTES_MAX);
