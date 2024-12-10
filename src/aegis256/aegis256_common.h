@@ -649,7 +649,7 @@ state_mac_final(aegis256_mac_state *st_, uint8_t *mac, size_t maclen)
         memset(st->buf + left, 0, RATE - left);
         aegis256_absorb(st->buf, blocks);
     }
-    aegis256_mac(mac, maclen, st->adlen, 0, blocks);
+    aegis256_mac(mac, maclen, st->adlen, maclen, blocks);
 
     memcpy(st->blocks, blocks, sizeof blocks);
 
