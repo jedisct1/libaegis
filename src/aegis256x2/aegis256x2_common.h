@@ -187,7 +187,7 @@ aegis256x2_mac_nr(uint8_t *mac, size_t maclen, uint64_t adlen, aes_block_t *stat
     int         i;
     const int   d = AES_BLOCK_LENGTH / 16;
 
-    tmp = AES_BLOCK_LOAD_64x2(0, adlen << 3);
+    tmp = AES_BLOCK_LOAD_64x2(maclen, adlen << 3);
     tmp = AES_BLOCK_XOR(tmp, state[3]);
 
     for (i = 0; i < 7; i++) {
