@@ -186,7 +186,7 @@ aegis128x2_mac_nr(uint8_t *mac, size_t maclen, uint64_t adlen, aes_block_t *stat
     int         i;
     const int   d = AES_BLOCK_LENGTH / 16;
 
-    tmp = AES_BLOCK_LOAD_64x2(maclen, adlen << 3);
+    tmp = AES_BLOCK_LOAD_64x2(maclen << 3, adlen << 3);
     tmp = AES_BLOCK_XOR(tmp, state[2]);
 
     for (i = 0; i < 7; i++) {
@@ -204,7 +204,7 @@ aegis128x2_mac_nr(uint8_t *mac, size_t maclen, uint64_t adlen, aes_block_t *stat
             memcpy(r, t + i * 32, 32);
             aegis128x2_absorb(r, state);
         }
-        tmp = AES_BLOCK_LOAD_64x2(maclen, d);
+        tmp = AES_BLOCK_LOAD_64x2(maclen << 3, d);
         tmp = AES_BLOCK_XOR(tmp, state[2]);
         for (i = 0; i < 7; i++) {
             aegis128x2_update(state, tmp, tmp);
@@ -228,7 +228,7 @@ aegis128x2_mac_nr(uint8_t *mac, size_t maclen, uint64_t adlen, aes_block_t *stat
             memcpy(r + 16, t + AES_BLOCK_LENGTH + i * 16, 16);
             aegis128x2_absorb(r, state);
         }
-        tmp = AES_BLOCK_LOAD_64x2(maclen, d);
+        tmp = AES_BLOCK_LOAD_64x2(maclen << 3, d);
         tmp = AES_BLOCK_XOR(tmp, state[2]);
         for (i = 0; i < 7; i++) {
             aegis128x2_update(state, tmp, tmp);
