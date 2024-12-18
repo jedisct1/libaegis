@@ -15,7 +15,7 @@
 #    ifdef __clang__
 #        pragma clang attribute push(__attribute__((target("altivec,crypto"))), apply_to = function)
 #    elif defined(__GNUC__)
-#        pragma GCC target("+altivec+crypto")
+#        pragma GCC target("altivec,crypto")
 #    endif
 
 #    define AES_BLOCK_LENGTH 64
@@ -51,8 +51,8 @@ AES_BLOCK_LOAD(const uint8_t *a)
 static inline aes_block_t
 AES_BLOCK_LOAD_64x2(uint64_t a, uint64_t b)
 {
-    const vector unsigned char t =
-        vec_revb(vec_insert(a, vec_promote((unsigned long long) (b), 1), 0));
+    const vector unsigned char t = ((vector unsigned char) vec_revb(
+        vec_insert(a, vec_promote((unsigned long long) (b), 1), 0)));
     return (aes_block_t) { t, t, t, t };
 }
 static inline void

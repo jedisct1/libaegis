@@ -15,7 +15,7 @@
 #    ifdef __clang__
 #        pragma clang attribute push(__attribute__((target("altivec,crypto"))), apply_to = function)
 #    elif defined(__GNUC__)
-#        pragma GCC target("+altivec+crypto")
+#        pragma GCC target("altivec,crypto")
 #    endif
 
 #    define AES_BLOCK_LENGTH 16
@@ -26,9 +26,9 @@ typedef vector unsigned char aes_block_t;
 #    define AES_BLOCK_AND(A, B) vec_and((A), (B))
 #    define AES_BLOCK_LOAD(A)   vec_xl_be(0, (const unsigned char *) (A))
 #    define AES_BLOCK_LOAD_64x2(A, B) \
-        vec_revb(vec_insert((A), vec_promote((unsigned long long) (B), 1), 0))
+        ((aes_block_t) vec_revb(vec_insert((A), vec_promote((unsigned long long) (B), 1), 0)))
 #    define AES_BLOCK_STORE(A, B) vec_xst_be((B), 0, (unsigned char *) (A))
-#    define AES_ENC(A, B)         vec_cipher_be((A), (B))
+#    define AES_ENC(A, B)         ((aes_block_t) vec_cipher_be((A), (B)))
 
 static inline void
 aegis256_update(aes_block_t *const state, const aes_block_t d)
