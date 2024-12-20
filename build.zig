@@ -20,7 +20,7 @@ pub fn build(b: *std.Build) void {
     const favor_performance: bool = b.option(bool, "favor-performance", "Favor performance over side channel mitigations") orelse false;
     lib_options.addOption(bool, "favor_performance", favor_performance);
     if (favor_performance) {
-        lib.defineCMacro("FAVOR_PERFORMANCE", "1");
+        lib.root_module.addCMacro("FAVOR_PERFORMANCE", "1");
     }
 
     const with_benchmark: bool = b.option(bool, "with-benchmark", "Compile benchmark") orelse false;
